@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNO ERP — ERP com IA. Sua empresa um passo à frente.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:#FDFCFA;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,95,0,.12);color:#0D0D0D}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#f8f8f6}
+::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#FF5F00}
+input::placeholder{color:#bbb}
+@keyframes heroPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.3);opacity:1}}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes blink{50%{opacity:0}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes floatDown{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes dataFlow{0%{stroke-dashoffset:60}100%{stroke-dashoffset:0}}
+@keyframes nodeGlow{0%,100%{opacity:.25;r:3}50%{opacity:.7;r:5}}
+@keyframes cardGlow{0%,100%{box-shadow:0 0 0 1px rgba(255,95,0,.4),0 0 20px rgba(255,95,0,.1)}50%{box-shadow:0 0 0 1px rgba(255,95,0,.65),0 0 36px rgba(255,95,0,.22)}}
+@keyframes orbitRing{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes floatBrain{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.04)}}
+@keyframes heroDashIn{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+@keyframes heroPopIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+
+.hero-badge{animation:heroFadeUp .8s ease both;animation-delay:.2s}
+.hero-line-1{animation:heroFadeUp .8s ease both;animation-delay:.4s}
+.hero-line-2{animation:heroFadeUp .8s ease both;animation-delay:.6s}
+.hero-typing{animation:heroFadeUp .8s ease both;animation-delay:.8s}
+.hero-desc{animation:heroFadeUp .8s ease both;animation-delay:.9s}
+.hero-cta{animation:heroFadeUp .7s ease both}
+.hero-cta:nth-child(1){animation-delay:1s}
+.hero-cta:nth-child(2){animation-delay:1.1s}
+.hero-trust{animation:heroFadeUp .6s ease both;animation-delay:1.2s}
+.hero-dashboard{animation:heroDashIn 1s ease both;animation-delay:.5s}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media (max-width: 900px) {
+  /* Nav */
+  .nav-links { display: none !important; }
+  .nav-mobile-btn { display: flex !important; }
+  
+  /* Hero */
+  .hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; padding: 100px 16px 56px !important; }
+  .hero-left-col h1 { font-size: 36px !important; }
+  .hero-typing span { font-size: 20px !important; }
+  .hero-left-col p { font-size: 15px !important; }
+  .hero-dashboard { max-width: 100% !important; }
+  .hero-float-card { display: none !important; }
+  .hero-cta { padding: 12px 24px !important; font-size: 14px !important; }
+  .hero-trust { gap: 16px !important; flex-wrap: wrap !important; }
+
+  /* Sections global (not hero) */
+  section:not(:first-of-type) { padding: 56px 16px !important; }
+  
+  /* Grids → 1 col */
+  .grid-3 { grid-template-columns: 1fr !important; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .grid-2-auto { grid-template-columns: 1fr !important; }
+  
+  /* Module pills */
+  .mod-pills { 
+    flex-wrap: nowrap !important; 
+    overflow-x: auto !important; 
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    padding: 0 0 10px !important;
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mod-pills::-webkit-scrollbar { display: none; }
+  .mod-pills button { 
+    padding: 8px 16px !important; 
+    font-size: 12px !important; 
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  .mod-panel-header { 
+    flex-direction: column !important; 
+    gap: 16px !important; 
+    padding: 20px 16px !important;
+    align-items: flex-start !important;
+  }
+  .mod-panel-header > svg { display: none !important; }
+  .mod-features { 
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .mod-features > div {
+    padding: 12px 14px !important;
+  }
+  .mod-footer { 
+    flex-direction: column !important; 
+    gap: 12px !important; 
+    align-items: flex-start !important; 
+    padding: 16px !important;
+    padding-top: 20px !important;
+  }
+  .mod-footer a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .mod-panel {
+    border-radius: 16px !important;
+    margin: 0 -8px !important;
+  }
+  .mod-features-wrap {
+    padding: 16px !important;
+  }
+  
+  /* Mobile app phones */
+  .phones-container { height: 360px !important; }
+  .phone-left, .phone-right { display: none !important; }
+  .phone-center { position: relative !important; left: auto !important; top: auto !important; transform: none !important; width: 240px !important; margin: 0 auto !important; }
+  .mobile-features { grid-template-columns: 1fr !important; }
+  
+  /* IAU */
+  .iau-grid { grid-template-columns: 1fr !important; }
+  .iau-visual { margin-top: 24px !important; }
+  
+  /* CTA */
+  .cta-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+  
+  /* Mega menu */
+  .mega-menu { left: -20px !important; right: -20px !important; min-width: auto !important; }
+  .mega-grid { grid-template-columns: 1fr !important; }
+  
+  /* Headings */
+  h2 { font-size: 28px !important; }
+  
+  /* Marquee */
+  .marquee-strip { padding: 10px 0 !important; }
+  .marquee-strip span { font-size: 11px !important; padding: 0 16px !important; }
+  
+  /* Partners */
+  .partners-row { gap: 24px !important; }
+  .partners-row span { font-size: 14px !important; }
+  
+  /* Services */
+  .service-card-img { height: 120px !important; }
+  
+  /* Blog */
+  .blog-thumb { height: 140px !important; }
+}
+
+@media (max-width: 480px) {
+  .hero-grid { padding: 96px 16px 48px !important; }
+  .hero-left-col h1 { font-size: 30px !important; }
+  .hero-btns { flex-direction: column !important; }
+  .hero-btns a { width: 100% !important; justify-content: center !important; }
+  .footer-grid { grid-template-columns: 1fr !important; }
+  .mod-pills { flex-wrap: nowrap !important; overflow-x: auto !important; justify-content: flex-start !important; padding-bottom: 8px !important; }
+  .mod-pills::-webkit-scrollbar { display: none; }
+}
+
+/* Journey section */
+.journey-flow { display: flex; gap: 20px; align-items: flex-start; }
+
+@media (max-width: 900px) {
+  .journey-section-pad { padding: 60px 20px 52px !important; }
+  .journey-flow { flex-direction: column !important; gap: 0 !important; }
+  .journey-step-col { flex-direction: row !important; align-items: flex-start !important; gap: 14px !important; width: 100% !important; }
+  .journey-step-circle { flex-shrink: 0 !important; }
+  .journey-step-connector-v { display: flex !important; }
+  .journey-step-card { flex: 1 !important; margin-top: 0 !important; }
+  .journey-h-line { display: none !important; }
+  .journey-ai-label { display: none !important; }
+  .journey-section-pad h2 { font-size: clamp(24px,7vw,34px) !important; letter-spacing: -1px !important; }
+  .journey-tagline { font-size: 14.5px !important; }
+  .journey-neural-svg { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .journey-section-pad { padding: 48px 16px 44px !important; }
+  .journey-card { padding: 14px 13px 16px !important; }
+  .journey-brain-lg { transform: scale(0.68) !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, createElement: ce } = React;
+
+/* === ICON SYSTEM === */
+const I = ({d, size=16, color="currentColor", sw=2}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{display:"inline-block",verticalAlign:"middle",flexShrink:0}}>
+    {typeof d === "string" ? <path d={d}/> : d}
+  </svg>
+);
+const icons = {
+  zap: <I d={<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></>}/>,
+  bell: <I d={<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>}/>,
+  brain: <I d={<><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></>}/>,
+  barChart: <I d={<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>}/>,
+  clipboard: <I d={<><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>}/>,
+  handshake: <I d={<><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>}/>,
+  smartphone: <I d={<><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></>}/>,
+  warehouse: <I d={<><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></>}/>,
+  shoppingCart: <I d={<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>}/>,
+  factory: <I d={<><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></>}/>,
+  truck: <I d={<><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></>}/>,
+  settings: <I d={<><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>}/>,
+  arrowRight: <I d={<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>}/>,
+  check: <I d="M20 6 9 17l-5-5"/>,
+  shield: <I d={<><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></>}/>,
+  clock: <I d={<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>}/>,
+  users: <I d={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>}/>,
+  plug: <I d={<><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z"/></>}/>,
+  monitor: <I d={<><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></>}/>,
+  globe: <I d={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>}/>,
+  headphones: <I d={<><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></>}/>,
+  package2: <I d={<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>}/>,
+  cpu: <I d={<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></>}/>,
+  chevronDown: <I d="m6 9 6 6 6-6"/>,
+  lightbulb: <I d={<><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>}/>,
+  arrowUpRight: <I d={<><path d="M7 7h10v10"/><path d="M7 17 17 7"/></>}/>,
+  trendingUp: <I d={<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>}/>,
+  creditCard: <I d={<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>}/>,
+  fileText: <I d={<><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></>}/>,
+  box: <I d={<><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>}/>,
+  code: <I d={<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>}/>,
+  workflow: <I d={<><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></>}/>,
+  rocket: <I d={<><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></>}/>,
+  target: <I d={<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>}/>,
+  play: <I d={<><polygon points="6 3 20 12 6 21 6 3"/></>}/>,
+  download: <I d={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>}/>,
+  mail: <I d={<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>}/>,
+  phone: <I d={<><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></>}/>,
+  mapPin: <I d={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>}/>,
+};
+const Ic = ({name, size=16, color="currentColor"}) => {
+  const icon = icons[name];
+  if(!icon) return null;
+  return React.cloneElement(icon, {}, React.cloneElement(icon.props.children, {size, color, sw: icon.props.children?.props?.sw || 2}));
+};
+// Simpler approach - just make icon components
+const mkIc = (paths) => ({size=16,color="currentColor"}={}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{display:"inline-block",verticalAlign:"middle",flexShrink:0}}>{paths}</svg>
+);
+const Zap=mkIc(<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>);
+const Bell=mkIc(<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>);
+const Brain2=mkIc(<><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></>);
+const BarChart3=mkIc(<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>);
+const ClipboardList=mkIc(<><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>);
+const Handshake=mkIc(<><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>);
+const Smartphone=mkIc(<><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></>);
+const Warehouse=mkIc(<><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></>);
+const ShoppingCart=mkIc(<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>);
+const Factory2=mkIc(<><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></>);
+const Truck=mkIc(<><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></>);
+const Settings2=mkIc(<><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></>);
+const ArrowRight=mkIc(<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>);
+const Check=mkIc(<path d="M20 6 9 17l-5-5"/>);
+const Shield=mkIc(<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>);
+const Clock=mkIc(<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>);
+const Users=mkIc(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>);
+const Plug=mkIc(<><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z"/></>);
+const Monitor=mkIc(<><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></>);
+const Globe=mkIc(<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>);
+const Headphones=mkIc(<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>);
+const Package=mkIc(<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>);
+const Cpu=mkIc(<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></>);
+const ChevronDown=mkIc(<path d="m6 9 6 6 6-6"/>);
+const Lightbulb=mkIc(<><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></>);
+const ArrowUpRight=mkIc(<><path d="M7 7h10v10"/><path d="M7 17 17 7"/></>);
+const TrendingUp=mkIc(<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>);
+const CreditCard=mkIc(<><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></>);
+const FileText=mkIc(<><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></>);
+const Code=mkIc(<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>);
+const Workflow=mkIc(<><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></>);
+const Rocket=mkIc(<><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></>);
+const Target=mkIc(<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>);
+const Play=mkIc(<polygon points="6 3 20 12 6 21 6 3"/>);
+const Download=mkIc(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>);
+const Mail=mkIc(<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>);
+const Phone2=mkIc(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>);
+const MapPin=mkIc(<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>);
+
+// Aliases for the JSX code
+const Brain = Brain2;
+const Factory = Factory2;
+const Settings = Settings2;
+const Phone = Phone2;
+const Box = mkIc(<><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>);
+
+/* ═══════════ DESIGN TOKENS ═══════════ */
+const C = {
+  orange: "#FF5F00", orangeHot: "#E85500", orangeWarm: "#FF8A00",
+  orangeSoft: "#FFF3EB", orangeBorder: "rgba(255,95,0,0.15)",
+  black: "#0D0D0D", dark: "#141414", gray800: "#2a2a2a",
+  gray600: "#555", gray500: "#717171", gray400: "#999", gray300: "#bbb",
+  gray200: "#ddd", gray100: "#efefef", gray50: "#f8f8f6",
+  cream: "#FDFCFA", white: "#fff",
+};
+const F = { h: "'Inter', sans-serif", b: "'Inter', sans-serif", mono: "'JetBrains Mono', monospace" };
+
+/* ═══════════ LOGO SVG ═══════════ */
+const Logo = ({ height = 32 }) => (
+  <svg viewBox="0 0 512.82 213.17" height={height} style={{ display: "block" }}>
+    <g>
+      <path d="M305.22,91.78c0,6.8-1.4,11.5-4.3,14.3s-6.6,4.2-11.1,4.2-4.3-.3-6.2-1c-1.9-.6-3.5-1.7-4.8-3.2s-2.4-3.4-3.1-5.8c-.8-2.4-1.1-5.2-1.1-8.6v-50.4h-18.8v51.9c0,4.9.7,9.4,2,13.4,1.3,4.1,3.4,7.6,6.1,10.5,2.8,2.9,6.3,5.2,10.5,6.9,4.3,1.7,9.3,2.5,15.2,2.5s11.1-.8,15.4-2.4,7.9-3.9,10.7-6.8c2.8-2.9,4.9-6.4,6.3-10.5s2-8.6,2-13.5v-51.9h-18.8v50.4h0Z" fill="#FFFFFF" />
+      <path d="M360.72,70.18c7.1,8.3,13.7,17.1,20,26.4s12.1,18.8,17.5,28.3h15.8V41.38h-18.7v49.3c-2.9-4.3-6-8.9-9.3-13.6s-6.6-9.2-9.9-13.6-6.6-8.5-9.8-12.4c-3.2-3.9-6.1-7.1-8.8-9.8h-15.3v83.5h18.6v-54.7h-.1v.1h0Z" fill="#FFFFFF" />
+      <path d="M441.82,115.58c3.8,3.7,8.2,6.4,13.3,8.2,5.1,1.8,10.4,2.8,16.1,2.8s11.4-.9,16.5-2.8,9.5-4.6,13.2-8.2c3.7-3.7,6.6-8.2,8.7-13.6s3.2-11.7,3.2-18.9-1.1-13.4-3.2-18.9-5.1-10-8.9-13.7-8.2-6.5-13.3-8.3-10.5-2.8-16.1-2.8-10.8.9-15.9,2.8c-5,1.8-9.4,4.6-13.3,8.3s-6.9,8.2-9.1,13.7c-2.2,5.4-3.4,11.7-3.4,18.9s1.1,13.4,3.2,18.9,5.1,10,8.9,13.6h.1,0ZM450.52,71.98c1-3.3,2.5-6.2,4.3-8.6,1.9-2.4,4.2-4.2,6.9-5.5,2.7-1.3,5.9-2,9.4-2s6.6.6,9.3,1.9,5.1,3.1,7,5.5,3.3,5.2,4.3,8.6c1,3.3,1.5,7.1,1.5,11.2s-.5,7.8-1.5,11.1-2.5,6.1-4.3,8.5c-1.9,2.4-4.2,4.2-7,5.5s-5.9,1.9-9.3,1.9-6.7-.6-9.4-1.9c-2.7-1.3-5-3.1-6.9-5.5s-3.3-5.2-4.3-8.5-1.5-7-1.5-11.1.5-7.7,1.5-11h0v-.1Z" fill="#FFFFFF" />
+      <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill="#FFFFFF" />
+      <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill="#FFFFFF" />
+      <path d="M284.25,192.08v-43.66h28.04v6.74h-20.1v10.77h17.89v6.61h-17.89v12.79h21.61v6.74h-29.55Z" fill="#EE5820" />
+      <path d="M377.3,147.98c6.3,0,11.12,1.16,14.46,3.46,3.34,2.31,5.01,5.84,5.01,10.58,0,5.92-2.92,9.93-8.76,12.03.8.97,1.7,2.14,2.71,3.53,1.01,1.39,2.04,2.89,3.09,4.5,1.05,1.62,2.06,3.28,3.02,4.98.97,1.7,1.83,3.37,2.58,5.01h-8.88c-.8-1.51-1.66-3.03-2.58-4.57s-1.86-3.02-2.8-4.47-1.88-2.81-2.8-4.1c-.92-1.28-1.79-2.42-2.58-3.43-.59.04-1.09.06-1.51.06h-5.04v16.51h-7.94v-43.03c1.93-.42,3.99-.7,6.17-.85,2.18-.15,4.14-.22,5.86-.22h0ZM377.87,154.85c-1.68,0-3.23.06-4.66.19v14.11h3.46c1.93,0,3.63-.1,5.1-.32,1.47-.21,2.7-.59,3.69-1.13.99-.55,1.73-1.28,2.24-2.21s.76-2.1.76-3.53c0-1.34-.25-2.48-.76-3.4s-1.23-1.66-2.17-2.21-2.07-.93-3.37-1.17c-1.3-.23-2.73-.35-4.28-.35v.02Z" fill="#EE5820" />
+      <path d="M462.04,147.98c6.34,0,11.2,1.16,14.58,3.46,3.38,2.31,5.07,5.92,5.07,10.84,0,2.56-.45,4.76-1.35,6.58-.9,1.83-2.22,3.32-3.94,4.47-1.72,1.16-3.82,2.01-6.3,2.55-2.48.55-5.31.82-8.5.82h-3.97v15.37h-7.94v-43.03c1.85-.42,3.89-.7,6.14-.85,2.25-.15,4.32-.22,6.21-.22h0ZM462.6,154.85c-2.02,0-3.68.06-4.98.19v14.87h3.84c3.82,0,6.76-.54,8.82-1.61s3.09-3.1,3.09-6.08c0-1.43-.27-2.62-.82-3.59-.55-.97-1.3-1.72-2.27-2.27s-2.11-.93-3.43-1.17c-1.32-.23-2.74-.35-4.25-.35h0Z" fill="#EE5820" />
+    </g>
+  </svg>
+);
+
+const LogoMark = ({ size = 80, color = "#e8e8e6" }) => (
+  <svg viewBox="0 0 200 200" width={size} height={size} style={{ display: "block" }}>
+    <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill={color} transform="translate(10,10) scale(0.9)" />
+    <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill={color} transform="translate(10,10) scale(0.9)" />
+  </svg>
+);
+if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const useMobile = (bp = 900) => {
+  const [m, setM] = useState(window.innerWidth <= bp);
+  useEffect(() => { const fn = () => setM(window.innerWidth <= bp); window.addEventListener("resize", fn); return () => window.removeEventListener("resize", fn); }, []);
+  return m;
+};
+
+const Reveal = ({ children, delay = 0, style = {}, direction = "up" }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (typeof gsap === "undefined" || !ref.current) return;
+    const dirs = { up: { y: 50 }, down: { y: -50 }, left: { x: -60 }, right: { x: 60 } };
+    const from = { opacity: 0, ...dirs[direction] };
+    gsap.fromTo(ref.current, from, {
+      opacity: 1, x: 0, y: 0, duration: 0.9, delay,
+      ease: "power3.out",
+      scrollTrigger: { trigger: ref.current, start: "top 88%", toggleActions: "play none none none" }
+    });
+  }, []);
+  return <div ref={ref} style={{ ...style }}>{children}</div>;
+};
+
+const Badge = ({ children }) => (
+  <span style={{ display: "inline-block", fontFamily: F.b, fontSize: 11.5, fontWeight: 700, color: C.orange, letterSpacing: 1.8, textTransform: "uppercase", marginBottom: 10 }}>{children}</span>
+);
+
+const SectionTitle = ({ children, sub, center }) => (
+  <div style={{ textAlign: center ? "center" : "left", marginBottom: 48 }}>
+    {children}
+    {sub && <p style={{ fontFamily: F.b, fontSize: 16, color: C.gray500, lineHeight: 1.65, maxWidth: 520, margin: center ? "8px auto 0" : "8px 0 0" }}>{sub}</p>}
+  </div>
+);
+
+const H2 = ({ children }) => (
+  <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 800, color: C.black, margin: "4px 0 0", letterSpacing: -1.2, lineHeight: 1.1 }}>{children}</h2>
+);
+
+/* ═══════════ NAV ═══════════ */
+const navLinks = {
+  "Soluções": [
+    { n: "Sistema de Gestão", d: "Plataforma completa para PME", ic: <ClipboardList size={16} />, href: "sistema-de-gestao.html" },
+    { n: "CRM", d: "Clientes e oportunidades", ic: <Handshake size={16} />, href: "crm.html" },
+    { n: "IAU — IA", d: "Inteligência artificial preditiva", ic: <Brain size={16} />, href: "iau.html" },
+    { n: "BI (Google)", d: "BigQuery & Looker", ic: <BarChart3 size={16} />, href: "bi-google.html" },
+    { n: "App UNO ERP", d: "Força de vendas mobile", ic: <Smartphone size={16} />, href: "app-uno-erp.html" },
+    { n: "M-Commerce", d: "App B2B para revendas", ic: <ShoppingCart size={16} />, href: "m-commerce.html" },
+    { n: "WMS para PME", d: "Gestão de armazém", ic: <Warehouse size={16} />, href: "wms-para-pme.html" },
+    { n: "Site B2B", d: "Portal com preços exclusivos", ic: <Globe size={16} />, href: "site-b2b.html" },
+    { n: "Integrações B2C", d: "Marketplaces e e-commerce", ic: <Plug size={16} />, href: "integracoes-b2c.html" },
+  ],
+  "Segmentos": [
+    { n: "Indústria", d: "Produção e manufatura", ic: <Factory size={16} /> },
+    { n: "Distribuição & Revenda", d: "Atacado e distribuição", ic: <Truck size={16} /> },
+    { n: "Serviços", d: "Automação e TI", ic: <Settings size={16} /> },
+  ],
+  "Personalização": [
+    { n: "Desenvolvimento", d: "Customizações sob medida", ic: <Code size={16} />, href: "desenvolvimento.html" },
+    { n: "Integrações & Plugins", d: "20+ integrações nativas", ic: <Plug size={16} />, href: "integracoes-e-plugins.html" },
+    { n: "Dashboards", d: "Painéis personalizados", ic: <Monitor size={16} /> },
+    { n: "Planos", d: "Encontre o ideal", ic: <Package size={16} /> },
+  ],
+};
+
+const Nav = () => {
+  const [sc, setSc] = useState(false);
+  const [open, setOpen] = useState(null);
+  useEffect(() => { const fn = () => setSc(window.scrollY > 30); window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn); }, []);
+
+  const isBig = open === "Soluções";
+
+  return (
+    <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: sc ? "rgba(20,20,20,0.95)" : "transparent", backdropFilter: sc ? "blur(16px)" : "none", borderBottom: sc ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent", transition: "all .3s" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 40px", height: 72, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Logo height={40} />
+        </a>
+        <button className="nav-mobile-btn" onClick={() => setOpen(open === "mobile" ? null : "mobile")} style={{ display: "none", background: "none", border: "none", color: C.white, cursor: "pointer", padding: 8 }}>{open === "mobile" ? <span style={{fontSize:24}}>✕</span> : <span style={{fontSize:24}}>☰</span>}</button>
+        <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {Object.keys(navLinks).map(k => (
+            <div key={k} style={{ position: "relative" }} onMouseEnter={() => setOpen(k)} onMouseLeave={() => setOpen(null)}>
+              <button style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 13px", fontFamily: F.b, fontSize: 13.5, fontWeight: 500, color: open === k ? C.orange : "rgba(255,255,255,.6)", borderRadius: 8, display: "flex", alignItems: "center", gap: 3, transition: ".2s" }}>
+                {k} <ChevronDown size={13} style={{ transition: ".2s", transform: open === k ? "rotate(180deg)" : "none" }} />
+              </button>
+              {open === k && (
+                <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", height: 12, background: "transparent" }} />
+              )}
+              {open === k && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 8px)",
+                  left: k === "Soluções" ? "-140px" : "0",
+                  background: "rgba(18,18,18,0.96)",
+                  backdropFilter: "blur(24px) saturate(1.5)",
+                  borderRadius: 18, padding: isBig ? "20px" : "10px",
+                  boxShadow: "0 32px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.04)",
+                  minWidth: isBig ? 580 : 300,
+                  animation: "ddIn .25s cubic-bezier(.22,1,.36,1)",
+                }}>
+                  {/* Arrow indicator */}
+                  <div style={{
+                    position: "absolute", top: -6, left: k === "Soluções" ? 170 : 30,
+                    width: 12, height: 12, background: "rgba(18,18,18,0.96)",
+                    transform: "rotate(45deg)", borderRadius: 2,
+                    borderTop: "1px solid rgba(255,255,255,.06)", borderLeft: "1px solid rgba(255,255,255,.06)",
+                  }} />
+
+                  {isBig ? (
+                    /* Soluções — 3 column mega menu */
+                    <div>
+                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 14px", borderBottom: "1px solid rgba(255,255,255,.06)", marginBottom: 14 }}>
+                        Todas as Soluções
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+                        {navLinks[k].map((item, i) => (
+                          <a key={i} href={item.href || "#"} style={{
+                            display: "flex", alignItems: "flex-start", gap: 10, padding: "12px 12px",
+                            borderRadius: 12, textDecoration: "none", transition: "all .2s",
+                            border: "1px solid transparent",
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,95,0,.06)"; e.currentTarget.style.borderColor = "rgba(255,95,0,.12)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "transparent"; }}>
+                            <div style={{
+                              width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+                              background: "rgba(255,95,0,.08)", border: "1px solid rgba(255,95,0,.12)",
+                              color: C.orange, display: "flex", alignItems: "center", justifyContent: "center",
+                              transition: "all .2s",
+                            }}>{item.ic}</div>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.white, marginBottom: 2 }}>{item.n}</div>
+                              <div style={{ fontFamily: F.b, fontSize: 11, color: "rgba(255,255,255,.3)", lineHeight: 1.35 }}>{item.d}</div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                      <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.25)" }}>Precisa de ajuda para escolher?</span>
+                        <a href="#contato" style={{ fontFamily: F.b, fontSize: 12, fontWeight: 600, color: C.orange, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                          Fale com um especialista <ArrowRight size={12} />
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Segmentos / Personalização — single column */
+                    <div>
+                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 12px" }}>
+                        {k}
+                      </div>
+                      {navLinks[k].map((item, i) => (
+                        <a key={i} href={item.href||"#"} style={{
+                          display: "flex", alignItems: "center", gap: 12, padding: "11px 12px",
+                          borderRadius: 12, textDecoration: "none", transition: "all .2s",
+                          border: "1px solid transparent",
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,95,0,.06)"; e.currentTarget.style.borderColor = "rgba(255,95,0,.12)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "transparent"; }}>
+                          <div style={{
+                            width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                            background: "rgba(255,95,0,.08)", border: "1px solid rgba(255,95,0,.12)",
+                            color: C.orange, display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>{item.ic}</div>
+                          <div>
+                            <div style={{ fontFamily: F.b, fontSize: 13.5, fontWeight: 600, color: C.white }}>{item.n}</div>
+                            <div style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.3)" }}>{item.d}</div>
+                          </div>
+                          <ArrowRight size={14} color="rgba(255,255,255,.15)" style={{ marginLeft: "auto" }} />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <a href="#contato" style={{ fontFamily: F.b, fontSize: 13.5, fontWeight: 500, color: "rgba(255,255,255,.6)", padding: "8px 13px", textDecoration: "none" }}>Contato</a>
+          <div style={{ width: 1, height: 24, background: "rgba(255,255,255,.15)", margin: "0 10px" }} />
+          <a href="#contato" style={{ fontFamily: F.b, fontSize: 13, fontWeight: 700, color: C.white, background: C.orange, padding: "9px 22px", borderRadius: 8, textDecoration: "none", transition: "all .2s", display: "flex", alignItems: "center", gap: 6 }}
+            onMouseEnter={e => e.currentTarget.style.background = C.orangeHot} onMouseLeave={e => e.currentTarget.style.background = C.orange}>
+            Fale Conosco <ArrowUpRight size={14} />
+          </a>
+        </div>
+      </div>
+      <style>{`@keyframes ddIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
+      {/* Mobile menu overlay */}
+      {open === "mobile" && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0,
+          background: "rgba(18,18,18,0.98)", backdropFilter: "blur(24px)",
+          padding: "20px 24px 28px", borderTop: "1px solid rgba(255,255,255,.06)",
+          maxHeight: "80vh", overflowY: "auto",
+        }}>
+          {Object.keys(navLinks).map(section => (
+            <div key={section} style={{ marginBottom: 20 }}>
+              <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{section}</div>
+              {navLinks[section].map((item, i) => (
+                <a key={i} href="#" onClick={() => setOpen(null)} style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "10px 0",
+                  textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,.04)",
+                }}>
+                  <span style={{ color: C.orange, display: "flex" }}>{item.ic}</span>
+                  <span style={{ fontFamily: F.b, fontSize: 14, color: C.white, fontWeight: 500 }}>{item.n}</span>
+                </a>
+              ))}
+            </div>
+          ))}
+          <a href="#contato" onClick={() => setOpen(null)} style={{
+            display: "flex", justifyContent: "center", alignItems: "center", gap: 8,
+            fontFamily: F.b, fontSize: 15, fontWeight: 700, color: C.white, background: C.orange,
+            padding: "14px 0", borderRadius: 10, textDecoration: "none", marginTop: 8,
+          }}>Fale Conosco <ArrowUpRight size={14} /></a>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+/* ═══════════ ANIMATED DASHBOARD MOCKUP ═══════════ */
+const dashStates = [
+  {
+    month: "Março 2025", metrics: [
+      { l: "Receita", v: "R$ 847K", ch: "+18%", up: true },
+      { l: "Pedidos", v: "1.243", ch: "+12%", up: true },
+      { l: "Ticket", v: "R$ 681", ch: "-3%", up: false },
+    ],
+    bars: [32,48,40,62,55,70,58,78,68,85,80,92],
+    line: "5,55 28,42 52,48 75,30 98,35 122,24 145,30 168,18 192,22 215,10 238,14 262,5",
+    dots: [[215,10],[238,14],[262,5]],
+    insight: "SKU-4421 queda de 23% prevista — ajustar preço +8%",
+  },
+  {
+    month: "Abril 2025", metrics: [
+      { l: "Receita", v: "R$ 921K", ch: "+22%", up: true },
+      { l: "Pedidos", v: "1.387", ch: "+11%", up: true },
+      { l: "Ticket", v: "R$ 664", ch: "-2%", up: false },
+    ],
+    bars: [38,52,45,58,62,65,72,75,80,88,84,95],
+    line: "5,50 28,38 52,42 75,34 98,30 122,28 145,22 168,20 192,16 215,8 238,10 262,2",
+    dots: [[215,8],[238,10],[262,2]],
+    insight: "Região Sul com +34% de demanda. Recomendação: reforçar estoque.",
+  },
+  {
+    month: "Maio 2025", metrics: [
+      { l: "Receita", v: "R$ 1.1M", ch: "+25%", up: true },
+      { l: "Pedidos", v: "1.520", ch: "+9%", up: true },
+      { l: "Ticket", v: "R$ 723", ch: "+8%", up: true },
+    ],
+    bars: [42,55,50,65,60,72,68,82,78,90,86,98],
+    line: "5,48 28,35 52,40 75,28 98,32 122,20 145,25 168,14 192,18 215,6 238,8 262,2",
+    dots: [[215,6],[238,8],[262,2]],
+    insight: "Meta trimestral atingida! Margem líquida subiu 3.2pp vs Q1.",
+  },
+  {
+    month: "Junho 2025", metrics: [
+      { l: "Receita", v: "R$ 978K", ch: "+15%", up: true },
+      { l: "Pedidos", v: "1.298", ch: "-5%", up: false },
+      { l: "Ticket", v: "R$ 753", ch: "+4%", up: true },
+    ],
+    bars: [35,50,42,60,52,68,62,74,70,82,78,88],
+    line: "5,52 28,40 52,45 75,32 98,38 122,26 145,32 168,20 192,24 215,12 238,16 262,8",
+    dots: [[215,12],[238,16],[262,8]],
+    insight: "3 clientes inativos há 45+ dias. Campanha de reativação sugerida.",
+  },
+];
+
+const DashMockup = () => {
+  const [idx, setIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+  const data = dashStates[idx];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIdx(prev => (prev + 1) % dashStates.length);
+        setFade(true);
+      }, 400);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const t = (extra = "") => ({
+    transition: "all 0.6s cubic-bezier(0.22, 1, 0.36, 1)" + (extra ? ", " + extra : ""),
+    opacity: fade ? 1 : 0,
+    transform: fade ? "translateY(0)" : "translateY(6px)",
+  });
+
+  return (
+    <div style={{ padding: 18 }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <span style={{ fontFamily: F.h, fontSize: 13, fontWeight: 700, color: C.black, ...t() }}>Dashboard — {data.month}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(40,200,64,.08)", padding: "3px 10px", borderRadius: 6 }}>
+          <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#28c840", animation: "pulse2 2s infinite" }} />
+          <span style={{ fontFamily: F.b, fontSize: 10, color: "#1a8a30", fontWeight: 600 }}>IAU Ativa</span>
+        </div>
+      </div>
+
+      {/* Metrics */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+        {data.metrics.map((m, i) => (
+          <div key={i} style={{ background: C.gray50, borderRadius: 9, padding: "10px 11px", border: `1px solid ${C.gray100}` }}>
+            <div style={{ fontFamily: F.b, fontSize: 10, color: C.gray400 }}>{m.l}</div>
+            <div style={{ fontFamily: F.h, fontSize: 16, fontWeight: 800, color: C.black, margin: "2px 0", ...t() }}>{m.v}</div>
+            <span style={{ fontFamily: F.b, fontSize: 10.5, fontWeight: 700, color: m.up ? "#1a8a30" : "#c0392b", ...t() }}>{m.ch}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <div style={{ background: C.gray50, borderRadius: 9, padding: "12px 12px 8px", border: `1px solid ${C.gray100}`, height: 110, position: "relative", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: "100%", position: "relative", zIndex: 1 }}>
+          {data.bars.map((h, i) => (
+            <div key={i} style={{
+              flex: 1, borderRadius: 3,
+              background: i >= 9 ? C.orange : C.gray200,
+              opacity: i >= 9 ? 1 : .4,
+              height: `${h}%`,
+              transition: "height 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+            }} />
+          ))}
+        </div>
+        <svg style={{ position: "absolute", inset: "12px", width: "calc(100% - 24px)", height: "calc(100% - 20px)", zIndex: 2 }} viewBox="0 0 300 80" preserveAspectRatio="none">
+          <polyline
+            points={data.line}
+            fill="none" stroke={C.orange} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            style={{ transition: "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)", filter: "drop-shadow(0 1px 3px rgba(255,95,0,.3))" }}
+          />
+          {data.dots.map(([cx, cy], i) => (
+            <circle key={i} cx={cx} cy={cy} r="3" fill={C.orange} stroke={C.white} strokeWidth="1.5"
+              style={{ transition: "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)" }}
+            />
+          ))}
+        </svg>
+      </div>
+
+      {/* IAU Insight */}
+      <div style={{ marginTop: 10, padding: "9px 11px", borderRadius: 9, background: C.orangeSoft, border: `1px solid ${C.orangeBorder}`, display: "flex", alignItems: "center", gap: 9, ...t() }}>
+        <div style={{ width: 26, height: 26, borderRadius: 6, flexShrink: 0, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center" }}><Zap size={13} color={C.white} /></div>
+        <div>
+          <span style={{ fontFamily: F.b, fontSize: 10.5, fontWeight: 700, color: C.orange }}>IAU: </span>
+          <span style={{ fontFamily: F.b, fontSize: 11, color: C.gray600 }}>{data.insight}</span>
+        </div>
+      </div>
+
+      {/* Progress dots */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 10 }}>
+        {dashStates.map((_, i) => (
+          <div key={i} style={{
+            width: idx === i ? 16 : 5, height: 5, borderRadius: 3,
+            background: idx === i ? C.orange : C.gray200,
+            transition: "all 0.4s ease",
+          }} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ═══════════ HERO — GSAP CINEMATIC AI-FIRST ═══════════ */
+const Hero = () => {
+  const heroRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // Typing effect
+  const [typed, setTyped] = useState("");
+  const words = ["Gestão completa.", "IA que antecipa.", "Estoque preciso.", "Vendas que escalam.", "Produção eficiente."];
+  const [wI, setWI] = useState(0), [cI, setCI] = useState(0), [del, setDel] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!ready) return;
+    const w = words[wI], spd = del ? 60 : 120;
+    const t = setTimeout(() => {
+      if (!del && cI < w.length) { setTyped(w.slice(0, cI + 1)); setCI(cI + 1); }
+      else if (!del && cI === w.length) setTimeout(() => setDel(true), 2500);
+      else if (del && cI > 0) { setTyped(w.slice(0, cI - 1)); setCI(cI - 1); }
+      else { setDel(false); setWI((wI + 1) % words.length); }
+    }, spd);
+    return () => clearTimeout(t);
+  }, [cI, del, wI, ready]);
+
+  // Canvas neural network
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+    let w, h;
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      w = canvas.offsetWidth; h = canvas.offsetHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+    };
+    resize(); window.addEventListener("resize", resize);
+    const particles = Array.from({ length: 45 }, () => ({
+      x: Math.random() * 2000, y: Math.random() * 1200,
+      r: Math.random() * 2 + 0.5, vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
+    }));
+    let time = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h); time += 0.004;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+      });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            ctx.strokeStyle = `rgba(255,95,0,${(1 - dist / 150) * 0.15})`;
+            ctx.lineWidth = 0.6; ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      particles.forEach(p => {
+        ctx.fillStyle = "rgba(255,95,0,0.06)"; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "rgba(255,120,30,0.4)"; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      });
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+  }, []);
+
+  // Start typing immediately
+  useEffect(() => { setReady(true); }, []);
+
+  // Hero parallax on scroll (only GSAP usage)
+  useEffect(() => {
+    if (typeof gsap === "undefined") return;
+    const ctx = gsap.context(() => {
+      gsap.to(".hero-left-col", {
+        y: -80, opacity: 0,
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "60% top", scrub: true }
+      });
+      gsap.to(".hero-dashboard", {
+        y: -30,
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "60% top", scrub: true }
+      });
+      gsap.to(".hero-orb", {
+        y: -50,
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: true }
+      });
+    }, heroRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={heroRef} style={{ position: "relative", overflow: "hidden", minHeight: "100vh" }}>
+      {/* === BACKGROUND LAYERS === */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+        <div className="hero-gradient" style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #1a0f05 0%, #0f0f0f 35%, #0d0d0d 60%, #110a04 100%)" }} />
+        <div className="hero-bg-grid" style={{ position: "absolute", inset: 0, opacity: 0.035, backgroundImage: "linear-gradient(rgba(255,95,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,95,0,1) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+        <canvas ref={canvasRef} className="hero-canvas" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+
+        {/* Orbs */}
+        <div className="hero-orb" style={{ position: "absolute", top: "5%", right: "10%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,85,0,.07) 0%, transparent 60%)", pointerEvents: "none" }} />
+        <div className="hero-orb" style={{ position: "absolute", bottom: "0%", left: "5%", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,100,0,.05) 0%, transparent 60%)", pointerEvents: "none" }} />
+        <div className="hero-orb" style={{ position: "absolute", top: "40%", left: "40%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,95,0,.03) 0%, transparent 60%)", pointerEvents: "none", animation: "heroPulse 6s ease-in-out infinite" }} />
+
+        {/* Animated data streams — horizontal lines */}
+        {[18, 35, 55, 72, 88].map((top, i) => (
+          <div key={i} className="hero-stream" style={{ position: "absolute", top: `${top}%`, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, rgba(255,95,0,${0.04 + i * 0.01}), transparent)`, transformOrigin: "left", pointerEvents: "none" }} />
+        ))}
+
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 40% 40%, transparent 45%, rgba(0,0,0,.35) 100%)", pointerEvents: "none" }} />
+      </div>
+
+      {/* === CONTENT === */}
+      <div className="hero-grid" style={{ maxWidth: 1240, margin: "0 auto", padding: "150px 40px 100px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", position: "relative", zIndex: 2 }}>
+        <div className="hero-left-col" style={{ perspective: "1000px" }}>
+          {/* Badge */}
+          <div className="hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1.5px solid rgba(255,95,0,.35)", borderRadius: 50, padding: "5px 6px 5px 14px", marginBottom: 24 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, boxShadow: "0 0 10px rgba(255,95,0,.5)", animation: "pulse2 2s infinite" }} />
+            <span style={{ fontFamily: F.b, fontSize: 12, fontWeight: 700, color: C.orange, letterSpacing: .8, textTransform: "uppercase" }}>AI-First ERP Platform</span>
+            <span style={{ background: C.orange, color: C.white, borderRadius: 50, padding: "3px 10px", fontFamily: F.b, fontSize: 11, fontWeight: 700 }}>NOVO</span>
+          </div>
+
+          {/* Headline */}
+          <h1 style={{ fontFamily: F.h, fontWeight: 900, fontSize: "clamp(38px,4.8vw,62px)", lineHeight: 1.1, color: C.white, margin: 0, letterSpacing: -2 }}>
+            <div className="hero-line-1" style={{ overflow: "hidden" }}>ERP com <span style={{ color: C.orange }}>IA.</span></div>
+            <div className="hero-line-2" style={{ overflow: "hidden" }}>
+              Sua empresa um{" "}
+              <span className="hero-inteligente" style={{ color: C.orange, display: "inline-block", overflow: "hidden", verticalAlign: "bottom" }}>passo à frente.</span>
+            </div>
+          </h1>
+
+          {/* Typing subtitle */}
+          <div className="hero-typing" style={{ marginTop: 12, minHeight: 44 }}>
+            <span style={{ fontFamily: F.h, fontWeight: 800, fontSize: "clamp(20px,2.2vw,28px)", color: C.orange, letterSpacing: -0.5 }}>
+              {typed}<span style={{ opacity: .5, animation: "blink 1s step-end infinite", color: C.orange }}>|</span>
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="hero-desc" style={{ fontFamily: F.b, fontSize: 16.5, color: "rgba(255,255,255,.5)", lineHeight: 1.75, margin: "20px 0 32px", maxWidth: 460 }}>
+            A plataforma de gestão definitiva, sob medida para a sua operação.
+            Com <strong style={{ color: "rgba(255,255,255,.85)" }}>Inteligência Artificial nativa</strong>, mais de 20 anos de mercado e 500+ empresas ativas.
+          </p>
+
+          {/* CTAs */}
+          <div className="hero-btns" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a href="#contato" className="hero-cta" style={{ fontFamily: F.b, fontSize: 15, fontWeight: 700, color: C.white, background: C.orange, padding: "14px 32px", borderRadius: 10, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, transition: "all .25s", boxShadow: "0 6px 24px rgba(255,95,0,.35)" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 36px rgba(255,95,0,.45)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(255,95,0,.35)"; }}>
+              Agendar Demonstração <ArrowRight size={16} />
+            </a>
+            <a href="#" className="hero-cta" style={{ fontFamily: F.b, fontSize: 15, fontWeight: 600, color: C.white, background: "rgba(255,255,255,.06)", padding: "14px 28px", borderRadius: 10, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8, border: "1.5px solid rgba(255,255,255,.12)", transition: "all .25s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,.12)"}>
+              <Play size={16} /> Assistir Vídeo
+            </a>
+          </div>
+
+          {/* Trust */}
+          <div className="hero-trust" style={{ display: "flex", gap: 24, marginTop: 44 }}>
+            {[{ ic: <Shield size={14} />, t: "99% Uptime" }, { ic: <Users size={14} />, t: "500+ Empresas" }, { ic: <Clock size={14} />, t: "Setup em 48h" }].map((x, i) => (
+              <div key={i} className="hero-trust" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ color: C.orange, display: "flex" }}>{x.ic}</span>
+                <span style={{ fontFamily: F.b, fontSize: 12.5, color: "rgba(255,255,255,.35)", fontWeight: 500 }}>{x.t}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* === DASHBOARD MOCKUP === */}
+        <div className="hero-dashboard" style={{ position: "relative", perspective: "1200px" }}>
+          <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", background: C.white, borderRadius: 16, overflow: "hidden", boxShadow: "0 0 80px 20px rgba(255,95,0,.12), 0 0 40px 5px rgba(255,95,0,.08), 0 40px 100px rgba(0,0,0,.25)", border: "1px solid rgba(255,95,0,.08)" }}>
+              <div style={{ padding: "9px 14px", background: C.gray50, borderBottom: `1px solid ${C.gray100}`, display: "flex", alignItems: "center", gap: 7 }}>
+                <div style={{ display: "flex", gap: 5 }}>{["#ff5f57","#febc2e","#28c840"].map((c, i) => <div key={i} style={{ width: 9, height: 9, borderRadius: "50%", background: c }} />)}</div>
+                <div style={{ flex: 1, background: C.white, borderRadius: 5, padding: "4px 10px", fontFamily: F.mono, fontSize: 10.5, color: C.gray400, border: `1px solid ${C.gray100}` }}>app.unoerp.com.br/dashboard</div>
+              </div>
+              <DashMockup />
+            </div>
+            {/* Floating AI cards */}
+            <div className="hero-float-card" style={{ position: "absolute", top: -14, right: -16, background: C.orange, borderRadius: 12, padding: "10px 16px", boxShadow: "0 12px 36px rgba(255,95,0,.3)", display: "flex", alignItems: "center", gap: 10, zIndex: 2, animation: "floatUp 4s ease-in-out infinite" }}>
+              <Brain size={18} color={C.white} />
+              <div>
+                <div style={{ fontFamily: F.h, fontSize: 14, fontWeight: 800, color: C.white }}>IAU Ativa</div>
+                <div style={{ fontFamily: F.b, fontSize: 10, color: "rgba(255,255,255,.7)" }}>IA analisando em tempo real</div>
+              </div>
+            </div>
+            <div className="hero-float-card" style={{ position: "absolute", bottom: -14, left: -16, background: "rgba(20,20,20,.95)", borderRadius: 12, padding: "10px 16px", boxShadow: "0 12px 36px rgba(0,0,0,.25)", border: "1px solid rgba(255,95,0,.2)", display: "flex", alignItems: "center", gap: 10, zIndex: 2, animation: "floatDown 5s ease-in-out infinite" }}>
+              <Zap size={16} color={C.orange} />
+              <div>
+                <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 700, color: C.white }}>3 alertas preditivos</div>
+                <div style={{ fontFamily: F.b, fontSize: 10, color: C.gray400 }}>Últimas 24h · Powered by IAU</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
+/* ═══════════ MARQUEE ═══════════ */
+const MarqueeStrip = () => (
+  <div className="marquee-strip" style={{ background: C.orange, padding: "14px 0", overflow: "hidden", display: "flex", alignItems: "center" }}>
+    <div style={{ display: "inline-flex", alignItems: "center", animation: "marquee 35s linear infinite", whiteSpace: "nowrap" }}>
+      {[...Array(2)].map((_, r) => (
+        <span key={r} style={{ display: "inline-flex", alignItems: "center" }}>
+          {["Sistema de Gestão","CRM","IAU — IA","BI Google","App Mobile","WMS","M-Commerce","Site B2B","50+ Integrações","Dashboards","Customizável"].map((t, i) => (
+            <span key={i} style={{ fontFamily: F.b, fontSize: 13, fontWeight: 700, color: C.white, letterSpacing: 1, textTransform: "uppercase", padding: "0 28px", display: "inline-flex", alignItems: "center", gap: 14, lineHeight: 1 }}>
+              <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(255,255,255,.5)", display: "inline-block", flexShrink: 0 }} />{t}
+            </span>
+          ))}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
+/* ═══════════ SEGMENTS (3 cards) ═══════════ */
+const SegmentsOverview = () => {
+  const segs = [
+    { ic: <Truck size={24} />, t: "Distribuição & Revenda", d: "Estoque, logística e vendas integradas. Gestão multifilial para distribuição e atacado com controle total." },
+    { ic: <Factory size={24} />, t: "Indústria", d: "Produção, estoque e insumos. Rastreabilidade, controle de qualidade e PCP para indústrias de todos os portes." },
+    { ic: <Settings size={24} />, t: "Serviços", d: "Ordens de serviço, contratos e SLA. Gestão completa para empresas de automação, TI e manutenção." },
+  ];
+  return (
+    <section style={{ padding: "80px 40px", background: C.cream }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <Reveal><SectionTitle center sub="Configurado para os desafios e particularidades do seu negócio. Desde a distribuição até o chão de fábrica."><Badge>Sistema ERP para empresas</Badge><H2>Tudo o que sua empresa precisa em um só sistema.</H2></SectionTitle></Reveal>
+        <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+          {segs.map((s, i) => (
+            <Reveal key={i} delay={i * .08}>
+              <div style={{ background: C.white, borderRadius: 16, padding: "32px 28px", border: `1px solid ${C.gray100}`, height: "100%", transition: "all .3s", cursor: "pointer" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,.06)"; e.currentTarget.style.borderColor = C.orange; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = C.gray100; }}>
+                <div style={{ width: 50, height: 50, borderRadius: 13, marginBottom: 20, background: C.orangeSoft, border: `1px solid ${C.orangeBorder}`, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}>{s.ic}</div>
+                <h3 style={{ fontFamily: F.h, fontSize: 19, fontWeight: 700, color: C.black, margin: "0 0 8px" }}>{s.t}</h3>
+                <p style={{ fontFamily: F.b, fontSize: 14, color: C.gray500, lineHeight: 1.65, margin: "0 0 16px" }}>{s.d}</p>
+                <span style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.orange, display: "flex", alignItems: "center", gap: 4 }}>Saiba mais <ArrowRight size={14} /></span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════ MODULES (TABS) ═══════════ */
+const modulesData = {
+  "Comercial": { ic: <ShoppingCart size={20} />, color: "#FF5F00", desc: "Controle total do ciclo de vendas: do orçamento à entrega, com metas, cashback e múltiplas tabelas de preço.", items: ["Emissão de vendas e orçamentos","Controle de metas por equipe","Cashback com regras de negócio","Controle de vendas por canal","Gestão de retenção de clientes","Tabela de preços e descontos por grupo","Relatórios de curva ABC e giro","Integração com e-commerce B2C e B2B","Suporte a múltiplas tabelas de preço"] },
+  "Financeiro": { ic: <CreditCard size={20} />, color: "#1a8a30", desc: "Fluxo de caixa em tempo real, conciliação automática, boletos, PIX e integração contábil completa.", items: ["Contas a pagar e receber","Fluxo de caixa em tempo real","Conciliação bancária automática","Boletos e PIX nativos","DRE e balanço gerencial","Gestão de centros de custo","Integração contábil SPED/EFD","Controle de comissões"] },
+  "Produção": { ic: <Factory size={20} />, color: "#7c3aed", desc: "Do PCP à rastreabilidade por lote. Controle completo de ordens, insumos, custos e roteiros produtivos.", items: ["Ordens de produção (OP)","Ficha técnica de produtos","Controle de insumos e perdas","Rastreabilidade por lote","PCP — Planejamento de produção","Custo de produção detalhado","MRP — Necessidade de materiais","Roteiros e processos produtivos"] },
+  "Estoque": { ic: <Box size={20} />, color: "#0284c7", desc: "Múltiplos depósitos, WMS, picking, packing, lote e validade — tudo integrado ao financeiro e vendas.", items: ["Controle de múltiplos depósitos","Inventário cíclico e geral","Curva ABC de estoque","Movimentações e transferências","Controle de lote e validade","Estoque mínimo e máximo","Endereçamento (WMS)","Separação e conferência (Picking)"] },
+  "Fiscal": { ic: <FileText size={20} />, color: "#b45309", desc: "NF-e, SPED, apuração automática de impostos e regime tributário configurável para qualquer operação.", items: ["NF-e, NFS-e, NFC-e, CT-e","SPED Fiscal e Contribuições","Livros de entrada e saída","Apuração de ICMS, IPI, PIS, COFINS","Guias de recolhimento automáticas","Regime tributário configurável","CST, CFOP e NCM inteligentes","Integração contábil completa"] },
+  "IAU — IA": { ic: <Brain size={20} />, color: "#FF5F00", desc: "KPIs preditivos, alertas inteligentes e análise automática. O diferencial AI-First do UNO ERP.", items: ["KPIs preditivos de vendas e estoque","Alertas automáticos de riscos","Análise de tendências por IA","Relatórios em linguagem natural","Detecção de anomalias financeiras","Previsão de fluxo de caixa","Recomendações acionáveis","Dashboards adaptativos (BigQuery + Looker)"] },
+  "Integrações": { ic: <Plug size={20} />, color: "#dc2626", desc: "Marketplaces, e-commerces, logística, contábil, marketing e muito mais. APIs abertas para customização.", items: ["Marketplaces (Mercado Livre, Shopee, Amazon)","E-commerce (Tray, VTEX, Nuvemshop)","Logística (Correios, Jadlog, Sequoia)","Marketing (RD Station, Google Ads)","Contábil (Domínio, Fortes, Questor)","PDV e frente de caixa","Bancos e financeiras","APIs abertas para customização"] },
+  "App Mobile": { ic: <Smartphone size={20} />, color: "#0d9488", desc: "Força de vendas, OS, inventário e picking no celular. Funciona offline com sincronização em tempo real.", items: ["Força de vendas em campo","Ordens de serviço mobile","Contagem de inventário","Picking e packing","Funciona offline","Sincronização em tempo real","Catálogo digital para revendas","Assinatura digital no app"] },
+};
+
+const ModulesSection = () => {
+  const [active, setActive] = useState("Comercial");
+  const keys = Object.keys(modulesData);
+  const data = modulesData[active];
+
+  return (
+    <section style={{ padding: "96px 40px", background: C.white }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <Badge>ERP para empresas</Badge>
+            <H2>Módulos que cobrem toda a operação</H2>
+            <p style={{ fontFamily: F.b, fontSize: 16, color: C.gray500, maxWidth: 500, margin: "8px auto 0", lineHeight: 1.65 }}>Cada módulo foi construído para resolver problemas reais. Ative apenas o que você precisa.</p>
+          </div>
+        </Reveal>
+
+        {/* Horizontal pill tabs */}
+        <Reveal delay={.1}>
+          <div className="mod-pills" style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", marginBottom: 40 }}>
+            {keys.map(k => {
+              const isActive = active === k;
+              const mod = modulesData[k];
+              return (
+                <button key={k} onClick={() => setActive(k)} style={{
+                  display: "flex", alignItems: "center", gap: 8, padding: "10px 20px",
+                  borderRadius: 50, border: isActive ? "none" : `1.5px solid ${C.gray200}`,
+                  background: isActive ? C.black : C.white,
+                  cursor: "pointer", transition: "all .25s",
+                }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = C.orange; e.currentTarget.style.background = C.orangeSoft; }}}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = C.gray200; e.currentTarget.style.background = C.white; }}}
+                >
+                  <span style={{ color: isActive ? C.orange : mod.color, display: "flex" }}>{mod.ic}</span>
+                  <span style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: isActive ? C.white : C.gray600 }}>{k}</span>
+                </button>
+              );
+            })}
+          </div>
+        </Reveal>
+
+        {/* Content panel */}
+        <Reveal delay={.15}>
+          <div className="mod-panel" style={{
+            background: C.gray50, borderRadius: 24, border: `1px solid ${C.gray100}`,
+            overflow: "hidden",
+          }}>
+            {/* Top bar with module info */}
+            <div className="mod-panel-header" style={{
+              padding: "32px 40px", borderBottom: `1px solid ${C.gray100}`,
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              background: C.white,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  background: `${data.color}12`, border: `1.5px solid ${data.color}25`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: data.color,
+                }}>{data.ic}</div>
+                <div>
+                  <h3 style={{ fontFamily: F.h, fontSize: 24, fontWeight: 800, color: C.black, margin: 0, letterSpacing: -0.5 }}>{active}</h3>
+                  <p style={{ fontFamily: F.b, fontSize: 14, color: C.gray500, margin: "2px 0 0", maxWidth: 420 }}>{data.desc}</p>
+                </div>
+              </div>
+              <LogoMark size={64} color={`${data.color}10`} />
+            </div>
+
+            {/* Features grid */}
+            <div className="mod-features-wrap" style={{ padding: "32px 40px" }}>
+              <div className="mod-features" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {data.items.map((item, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "14px 18px", borderRadius: 12,
+                    background: C.white, border: `1px solid ${C.gray100}`,
+                    transition: "all .2s", cursor: "default",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = `${data.color}30`; e.currentTarget.style.boxShadow = `0 4px 16px ${data.color}08`; e.currentTarget.style.transform = "translateX(4px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = C.gray100; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}
+                  >
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                      background: `${data.color}10`, display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Check size={14} color={data.color} />
+                    </div>
+                    <span style={{ fontFamily: F.b, fontSize: 13.5, color: C.gray800, fontWeight: 500 }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom action bar */}
+              <div className="mod-footer" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28, paddingTop: 24, borderTop: `1px solid ${C.gray100}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Brain size={16} color={C.orange} />
+                  <span style={{ fontFamily: F.b, fontSize: 13, color: C.gray400 }}>Todos os módulos incluem análise da IAU integrada</span>
+                </div>
+                <a href="#contato" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  fontFamily: F.b, fontSize: 13, fontWeight: 700, color: C.white,
+                  background: C.orange, padding: "11px 24px", borderRadius: 10,
+                  textDecoration: "none", transition: "all .2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = C.orangeHot; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = C.orange; e.currentTarget.style.transform = "none"; }}
+                >Solicitar demonstração <ArrowRight size={14} /></a>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════ DIFFERENTIALS — SYSTEM SHOWCASE ═══════════ */
+const Differentials = () => (
+  <section style={{ padding: "80px 40px", background: C.dark, overflow: "hidden" }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      <Reveal>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <Badge>Diferenciais</Badge>
+          <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 800, color: C.white, margin: "4px 0 8px", letterSpacing: -1.2, lineHeight: 1.1 }}>Crescimento Empresarial com<br />Soluções Únicas</h2>
+          <p style={{ fontFamily: F.b, fontSize: 16, color: "rgba(255,255,255,.4)", maxWidth: 500, margin: "0 auto", lineHeight: 1.65 }}>Sistema 100% customizável que se adapta à realidade de cada cliente.</p>
+        </div>
+      </Reveal>
+
+      <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { ic: <Rocket size={22} />, t: "Performance Total", d: "Processamento otimizado para milhares de transações simultâneas. Zero travamentos." },
+          { ic: <Shield size={22} />, t: "Segurança Avançada", d: "Criptografia, backups automáticos, logs de auditoria e controle de acesso granular." },
+          { ic: <Code size={22} />, t: "100% Customizável", d: "APIs abertas, plugins nativos e desenvolvimento sob medida para seu negócio." },
+          { ic: <Target size={22} />, t: "Multi-Empresa", d: "Gerencie filiais, CNPJs e operações distintas em um único painel centralizado." },
+          { ic: <Workflow size={22} />, t: "Automação de Processos", d: "Regras de negócio, aprovações automáticas, notificações e workflows configuráveis." },
+          { ic: <Globe size={22} />, t: "Acesso em Qualquer Lugar", d: "100% cloud, responsivo e com app nativo para iOS e Android." },
+        ].map((d, i) => (
+          <Reveal key={i} delay={i * .06}>
+            <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 16, padding: "28px 24px", height: "100%", transition: "all .3s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,95,0,.3)"; e.currentTarget.style.background = "rgba(255,95,0,.04)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; e.currentTarget.style.background = "rgba(255,255,255,.04)"; }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, marginBottom: 16, background: "rgba(255,95,0,.1)", border: "1px solid rgba(255,95,0,.2)", display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}>{d.ic}</div>
+              <h3 style={{ fontFamily: F.h, fontSize: 16, fontWeight: 700, color: C.white, margin: "0 0 6px" }}>{d.t}</h3>
+              <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.65, margin: 0 }}>{d.d}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ MOBILE APP ═══════════ */
+const MobileApp = () => (
+  <section style={{ padding: "80px 40px", background: C.dark, overflow: "hidden", position: "relative" }}>
+    {/* Ambient glow */}
+    <div style={{ position: "absolute", top: "50%", left: "30%", transform: "translate(-50%,-50%)", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,95,0,.06) 0%, transparent 65%)", pointerEvents: "none" }} />
+
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      {/* Header centered */}
+      <Reveal>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <Badge>Controle na palma da mão</Badge>
+          <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 800, color: C.white, margin: "4px 0 8px", letterSpacing: -1.2, lineHeight: 1.1 }}>
+            Seu ERP completo,<br />em qualquer lugar
+          </h2>
+          <p style={{ fontFamily: F.b, fontSize: 16, color: "rgba(255,255,255,.4)", maxWidth: 480, margin: "0 auto", lineHeight: 1.65 }}>
+            App nativo para iOS e Android. Funciona offline, sincroniza em tempo real e traz toda a potência do UNO ERP para o seu bolso.
+          </p>
+        </div>
+      </Reveal>
+
+      <div className="grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 48, alignItems: "center" }}>
+        {/* Left — 3 phone mockups stacked/overlapping */}
+        <Reveal>
+          <div className="phones-container" style={{ position: "relative", height: 480, display: "flex", justifyContent: "center" }}>
+            {/* Phone 1 — Dashboard (back left) */}
+            <div className="phone-left" style={{ position: "absolute", left: 10, top: 20, width: 200, background: C.black, borderRadius: 26, padding: 8, boxShadow: "0 24px 60px rgba(0,0,0,.4)", transform: "rotate(-6deg)", zIndex: 1, opacity: .85 }}>
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden" }}>
+                <div style={{ background: C.orange, padding: "22px 14px 14px" }}>
+                  <div style={{ fontFamily: F.b, fontSize: 9, color: "rgba(255,255,255,.6)" }}>Dashboard</div>
+                  <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 800, color: C.white }}>Março 2025</div>
+                </div>
+                <div style={{ padding: 10 }}>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+                    {[{l:"Receita",v:"R$ 847K"},{l:"Pedidos",v:"1.243"}].map((m,i) => (
+                      <div key={i} style={{ flex: 1, background: C.gray50, borderRadius: 8, padding: "8px 8px" }}>
+                        <div style={{ fontFamily: F.b, fontSize: 8, color: C.gray400 }}>{m.l}</div>
+                        <div style={{ fontFamily: F.h, fontSize: 12, fontWeight: 800, color: C.black }}>{m.v}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 50 }}>
+                    {[30,45,38,55,48,62,58,70,65,78].map((h,i) => (
+                      <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 2, background: i >= 7 ? C.orange : C.gray200, opacity: i >= 7 ? 1 : .35 }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone 2 — Main / Vendas (center, prominent) */}
+            <div className="phone-center" style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", width: 230, background: C.black, borderRadius: 30, padding: 9, boxShadow: "0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05)", zIndex: 3 }}>
+              <div style={{ background: C.white, borderRadius: 22, overflow: "hidden" }}>
+                <div style={{ background: `linear-gradient(135deg, ${C.orange}, ${C.orangeWarm})`, padding: "26px 16px 16px" }}>
+                  <div style={{ fontFamily: F.b, fontSize: 9, color: "rgba(255,255,255,.6)", marginBottom: 3 }}>UNO ERP</div>
+                  <div style={{ fontFamily: F.h, fontSize: 15, fontWeight: 800, color: C.white }}>Força de Vendas</div>
+                  <div style={{ fontFamily: F.b, fontSize: 10, color: "rgba(255,255,255,.7)", marginTop: 2 }}>5 pedidos pendentes</div>
+                </div>
+                <div style={{ padding: 12 }}>
+                  {[
+                    { l: "Vendas Hoje", v: "R$ 12.340", ic: <TrendingUp size={12} />, up: true },
+                    { l: "Meta Mensal", v: "78%", ic: <Target size={12} />, up: true },
+                    { l: "Clientes Visitados", v: "12/18", ic: <Users size={12} />, up: false },
+                    { l: "Pedidos Emitidos", v: "28", ic: <Package size={12} />, up: true },
+                  ].map((m, i) => (
+                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: i < 3 ? `1px solid ${C.gray100}` : "none" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                        <span style={{ color: C.orange, display: "flex" }}>{m.ic}</span>
+                        <span style={{ fontFamily: F.b, fontSize: 11, color: C.gray500 }}>{m.l}</span>
+                      </div>
+                      <span style={{ fontFamily: F.h, fontSize: 13, fontWeight: 800, color: C.black }}>{m.v}</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 10, background: C.orangeSoft, borderRadius: 8, padding: "9px 10px", display: "flex", alignItems: "center", gap: 7 }}>
+                    <Zap size={12} color={C.orange} />
+                    <span style={{ fontFamily: F.b, fontSize: 10, color: C.gray600 }}>IAU: Cliente XYZ sem pedido há 30 dias</span>
+                  </div>
+                  <button style={{ width: "100%", marginTop: 10, padding: "10px 0", borderRadius: 10, border: "none", background: C.orange, color: C.white, fontFamily: F.b, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>+ Novo Pedido</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone 3 — OS / Inventário (back right) */}
+            <div className="phone-right" style={{ position: "absolute", right: 10, top: 30, width: 200, background: C.black, borderRadius: 26, padding: 8, boxShadow: "0 24px 60px rgba(0,0,0,.4)", transform: "rotate(5deg)", zIndex: 2, opacity: .85 }}>
+              <div style={{ background: C.white, borderRadius: 20, overflow: "hidden" }}>
+                <div style={{ background: C.black, padding: "22px 14px 14px" }}>
+                  <div style={{ fontFamily: F.b, fontSize: 9, color: "rgba(255,255,255,.5)" }}>Inventário</div>
+                  <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 800, color: C.white }}>Contagem Cíclica</div>
+                </div>
+                <div style={{ padding: 10 }}>
+                  {["SKU-1120 — Conferido ✓","SKU-1121 — Conferido ✓","SKU-1122 — Pendente","SKU-1123 — Divergência"].map((item,i) => (
+                    <div key={i} style={{ padding: "7px 0", borderBottom: i < 3 ? `1px solid ${C.gray100}` : "none", fontFamily: F.b, fontSize: 10, color: i === 3 ? "#c0392b" : (i === 2 ? C.gray400 : "#1a8a30") }}>{item}</div>
+                  ))}
+                  <div style={{ marginTop: 8, background: C.gray50, borderRadius: 8, padding: 8, textAlign: "center" }}>
+                    <div style={{ fontFamily: F.h, fontSize: 18, fontWeight: 800, color: C.orange }}>75%</div>
+                    <div style={{ fontFamily: F.b, fontSize: 9, color: C.gray400 }}>Progresso</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Right — Features grid */}
+        <div>
+          <div className="mobile-features" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
+            {[
+              { ic: <ShoppingCart size={20} />, t: "Força de Vendas", d: "Catálogo, pedidos, orçamentos e metas em campo" },
+              { ic: <ClipboardList size={20} />, t: "Ordens de Serviço", d: "Abertura, execução e assinatura digital no app" },
+              { ic: <Package size={20} />, t: "Inventário", d: "Contagem cíclica e geral com leitura de código de barras" },
+              { ic: <Warehouse size={20} />, t: "Picking & Packing", d: "Separação e conferência de pedidos em tempo real" },
+              { ic: <Globe size={20} />, t: "Catálogo Digital", d: "Compartilhe produtos com fotos e preços via WhatsApp" },
+              { ic: <Zap size={20} />, t: "Insights IAU", d: "Alertas preditivos e recomendações direto no celular" },
+            ].map((f, i) => (
+              <Reveal key={i} delay={i * .06}>
+                <div style={{ background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.06)", borderRadius: 14, padding: "20px 18px", transition: "all .3s", cursor: "default" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,95,0,.25)"; e.currentTarget.style.background = "rgba(255,95,0,.04)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; e.currentTarget.style.background = "rgba(255,255,255,.04)"; }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, marginBottom: 12, background: "rgba(255,95,0,.1)", border: "1px solid rgba(255,95,0,.18)", display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}>{f.ic}</div>
+                  <div style={{ fontFamily: F.h, fontSize: 14, fontWeight: 700, color: C.white, marginBottom: 4 }}>{f.t}</div>
+                  <div style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.4)", lineHeight: 1.5 }}>{f.d}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Download + Trust */}
+          <Reveal delay={.3}>
+            <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+              <a href="#" style={{ background: C.orange, color: C.white, fontFamily: F.b, fontSize: 13, fontWeight: 700, padding: "13px 28px", borderRadius: 10, textDecoration: "none", display: "flex", alignItems: "center", gap: 8, transition: "all .2s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(255,95,0,.3)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+                <Play size={14} /> Google Play
+              </a>
+              <a href="#" style={{ background: "rgba(255,255,255,.08)", color: C.white, fontFamily: F.b, fontSize: 13, fontWeight: 700, padding: "13px 28px", borderRadius: 10, textDecoration: "none", display: "flex", alignItems: "center", gap: 8, border: "1px solid rgba(255,255,255,.1)", transition: "all .2s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.25)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.1)"; }}>
+                <Download size={14} /> App Store
+              </a>
+            </div>
+            <div style={{ display: "flex", gap: 24 }}>
+              {[{ ic: <Check size={13} />, t: "Sincronização em tempo real" }, { ic: <Check size={13} />, t: "Funciona 100% offline" }, { ic: <Check size={13} />, t: "iOS e Android nativos" }].map((x, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: "#28c840", display: "flex" }}>{x.ic}</span>
+                  <span style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.35)" }}>{x.t}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ SERVICES (Implantação / Dev / Suporte) ═══════════ */
+const Services = () => (
+  <section style={{ padding: "80px 40px", background: C.white }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      <Reveal><SectionTitle center sub="Não somos apenas um sistema para emitir NFs. Nosso atendimento é humanizado, com analistas que conhecem seu negócio."><Badge>Atendimento personalizado e humano</Badge><H2>Conectando Soluções às Suas Demandas</H2></SectionTitle></Reveal>
+      <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { ic: <Rocket size={24} />, t: "Implantação", d: "Análise completa do seu cenário, migração de dados, configuração personalizada e treinamento da equipe. Tudo sem interromper sua operação.", color: "#E8F5E9" },
+          { ic: <Code size={24} />, t: "Desenvolvimento", d: "O UNO ERP é totalmente customizável. Desenvolvemos módulos, relatórios e integrações sob medida para o seu negócio.", color: "#FFF3E0" },
+          { ic: <Headphones size={24} />, t: "Suporte", d: "Equipe de suporte dedicada que entende seu negócio. Atendimento humanizado com analistas que conhecem sua empresa a fundo.", color: "#E3F2FD" },
+        ].map((s, i) => (
+          <Reveal key={i} delay={i * .08}>
+            <div style={{ borderRadius: 16, border: `1px solid ${C.gray100}`, overflow: "hidden", height: "100%", transition: "all .3s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+              <div style={{ background: s.color, height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 64, height: 64, borderRadius: 16, background: C.white, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange, boxShadow: "0 4px 16px rgba(0,0,0,.06)" }}>{s.ic}</div>
+              </div>
+              <div style={{ padding: "24px 24px 28px" }}>
+                <h3 style={{ fontFamily: F.h, fontSize: 19, fontWeight: 700, color: C.black, margin: "0 0 8px" }}>{s.t}</h3>
+                <p style={{ fontFamily: F.b, fontSize: 14, color: C.gray500, lineHeight: 1.65, margin: "0 0 14px" }}>{s.d}</p>
+                <span style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.orange, display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>Saiba mais <ArrowRight size={14} /></span>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ PARTNERS / INTEGRATIONS ═══════════ */
+const Partners = () => (
+  <section style={{ padding: "48px 40px", background: C.gray50, borderTop: `1px solid ${C.gray100}`, borderBottom: `1px solid ${C.gray100}` }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto", textAlign: "center" }}>
+      <span style={{ fontFamily: F.b, fontSize: 12, fontWeight: 600, color: C.gray400, letterSpacing: 1, textTransform: "uppercase" }}>Integrações e parceiros</span>
+      <div className="partners-row" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 48, marginTop: 24, flexWrap: "wrap", opacity: .45 }}>
+        {["RD Station", "Concil", "Bling", "Tiny", "TOTVS", "Tray", "Nuvemshop", "Mercado Livre"].map((p, i) => (
+          <span key={i} style={{ fontFamily: F.h, fontSize: 17, fontWeight: 800, color: C.black, letterSpacing: -.3 }}>{p}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ IAU (AI) SECTION ═══════════ */
+const IAUSection = () => (
+  <section style={{ padding: "80px 40px", background: C.cream }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      <Reveal>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 48 }}>
+          <div style={{ width: 52, height: 52, borderRadius: 14, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Brain size={26} color={C.white} /></div>
+          <div>
+            <Badge>Inteligência Artificial Nativa</Badge>
+            <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 800, color: C.black, margin: "4px 0 0", letterSpacing: -1.2, lineHeight: 1.1 }}>
+              Conheça a <span style={{ color: C.orange }}>IAU</span> — o cérebro do sistema
+            </h2>
+          </div>
+        </div>
+      </Reveal>
+
+      <div className="iau-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+        <div>
+          {[
+            { ic: <Zap size={18} />, t: "KPIs Preditivos", d: "Previsões de vendas, estoque e caixa baseadas em dados históricos e machine learning." },
+            { ic: <Bell size={18} />, t: "Alertas Proativos", d: "Notificações automáticas sobre riscos, oportunidades e anomalias nos seus dados." },
+            { ic: <Brain size={18} />, t: "Análise Automática", d: "Relatórios que se escrevem sozinhos em linguagem natural, claros e acionáveis." },
+            { ic: <BarChart3 size={18} />, t: "Dashboards Adaptativos", d: "Painéis inteligentes que se adaptam ao contexto. BigQuery & Looker integrados." },
+          ].map((f, i) => (
+            <Reveal key={i} delay={i * .07}>
+              <div style={{ display: "flex", gap: 14, padding: "18px 0", borderBottom: i < 3 ? `1px solid ${C.gray100}` : "none" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, background: C.orangeSoft, border: `1px solid ${C.orangeBorder}`, display: "flex", alignItems: "center", justifyContent: "center", color: C.orange }}>{f.ic}</div>
+                <div>
+                  <h4 style={{ fontFamily: F.h, fontSize: 15, fontWeight: 700, color: C.black, margin: "0 0 3px" }}>{f.t}</h4>
+                  <p style={{ fontFamily: F.b, fontSize: 13.5, color: C.gray500, lineHeight: 1.6, margin: 0 }}>{f.d}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {/* AI Insights Visual Dashboard */}
+        <Reveal delay={.12}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* Prediction card */}
+            <div style={{ background: C.white, borderRadius: 16, padding: "24px", border: `1px solid ${C.gray100}`, boxShadow: "0 4px 24px rgba(0,0,0,.04)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: C.orangeSoft, border: `1px solid ${C.orangeBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}><TrendingUp size={16} color={C.orange} /></div>
+                  <div>
+                    <div style={{ fontFamily: F.h, fontSize: 14, fontWeight: 700, color: C.black }}>Previsão de Receita</div>
+                    <div style={{ fontFamily: F.b, fontSize: 11, color: C.gray400 }}>Próximos 3 meses · IAU</div>
+                  </div>
+                </div>
+                <div style={{ background: "rgba(40,200,64,.08)", padding: "4px 10px", borderRadius: 6 }}>
+                  <span style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "#1a8a30" }}>+18% previsto</span>
+                </div>
+              </div>
+              {/* Mini chart */}
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80, padding: "0 4px" }}>
+                {[40,45,38,52,48,55,60,58,65,70,68,75,null,null,null].map((h, i) => (
+                  <div key={i} style={{ flex: 1, height: h ? `${h}%` : "0", borderRadius: 3, background: i >= 12 ? "transparent" : (i >= 9 ? C.orange : C.gray200), position: "relative", opacity: i >= 9 ? 1 : .4 }}>
+                    {i === 12 && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "78%", borderRadius: 3, background: `repeating-linear-gradient(0deg, ${C.orange}22, ${C.orange}22 2px, transparent 2px, transparent 6px)`, border: `1px dashed ${C.orange}44` }} />}
+                    {i === 13 && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "85%", borderRadius: 3, background: `repeating-linear-gradient(0deg, ${C.orange}22, ${C.orange}22 2px, transparent 2px, transparent 6px)`, border: `1px dashed ${C.orange}44` }} />}
+                    {i === 14 && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "92%", borderRadius: 3, background: `repeating-linear-gradient(0deg, ${C.orange}22, ${C.orange}22 2px, transparent 2px, transparent 6px)`, border: `1px dashed ${C.orange}44` }} />}
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                <span style={{ fontFamily: F.b, fontSize: 10, color: C.gray400 }}>Jan</span>
+                <span style={{ fontFamily: F.b, fontSize: 10, color: C.gray400 }}>Atual</span>
+                <span style={{ fontFamily: F.b, fontSize: 10, color: C.orange, fontWeight: 600 }}>Previsão →</span>
+              </div>
+            </div>
+
+            {/* Alert cards row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {/* Alert 1 */}
+              <div style={{ background: C.white, borderRadius: 14, padding: "18px 20px", border: `1px solid ${C.orangeBorder}`, borderLeft: `3px solid ${C.orange}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Zap size={14} color={C.orange} />
+                  <span style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: C.orange }}>ALERTA PREDITIVO</span>
+                </div>
+                <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 700, color: C.black, marginBottom: 4 }}>Produto SKU-4421</div>
+                <div style={{ fontFamily: F.b, fontSize: 12, color: C.gray500, lineHeight: 1.5 }}>Queda de 23% prevista para o próximo mês. Sugestão: ajustar preço em +8%.</div>
+              </div>
+              {/* Alert 2 */}
+              <div style={{ background: C.white, borderRadius: 14, padding: "18px 20px", border: `1px solid rgba(40,200,64,.15)`, borderLeft: "3px solid #28c840" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                  <Bell size={14} color={"#28c840"} />
+                  <span style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "#1a8a30" }}>OPORTUNIDADE</span>
+                </div>
+                <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 700, color: C.black, marginBottom: 4 }}>Região Sudeste</div>
+                <div style={{ fontFamily: F.b, fontSize: 12, color: C.gray500, lineHeight: 1.5 }}>Demanda crescente detectada. Potencial de +R$ 120K em vendas nos próximos 60 dias.</div>
+              </div>
+            </div>
+
+            {/* Bottom summary */}
+            <div style={{ background: C.black, borderRadius: 14, padding: "18px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,95,0,.15)", display: "flex", alignItems: "center", justifyContent: "center" }}><Brain size={18} color={C.orange} /></div>
+                <div>
+                  <div style={{ fontFamily: F.h, fontSize: 13, fontWeight: 700, color: C.white }}>IAU processou 12.847 transações</div>
+                  <div style={{ fontFamily: F.b, fontSize: 11, color: C.gray400 }}>Última análise: há 3 minutos</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                {[{n:"3",l:"Alertas"},{n:"7",l:"Insights"},{n:"2",l:"Ações"}].map((s,i) => (
+                  <div key={i} style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: F.h, fontSize: 20, fontWeight: 800, color: C.orange }}>{s.n}</div>
+                    <div style={{ fontFamily: F.b, fontSize: 10, color: C.gray400 }}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ JORNADA IA — DESCOMPLICA SECTION ═══════════ */
+/* ── Journey step — uniform card + circle badge ── */
+const JourneyStep = ({ n, icon, title, items, last = false }) => (
+  <div className="journey-step-col" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+    {/* ── numbered circle ── */}
+    <div className="journey-step-circle" style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#FF5F00 0%,#C84400 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 22px rgba(255,95,0,.55), 0 4px 12px rgba(0,0,0,.5)", zIndex: 1, position: "relative", flexShrink: 0 }}>
+      <span style={{ fontFamily: F.h, fontSize: 13, fontWeight: 900, color: "#fff" }}>{n}</span>
+    </div>
+    {/* ── vertical connector (mobile only, hidden on desktop) ── */}
+    <div className="journey-step-connector-v" style={{ display: "none", width: 1, height: 20, background: "rgba(255,95,0,.3)" }} />
+    {/* ── card ── */}
+    <div className="journey-step-card" style={{ width: "100%", marginTop: 16, background: "rgba(12,6,2,.88)", border: "1px solid rgba(255,95,0,.3)", borderRadius: 16, padding: "18px 16px 20px", display: "flex", flexDirection: "column", gap: 13, backdropFilter: "blur(10px)", boxShadow: "0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)", position: "relative", overflow: "hidden" }}>
+      {/* top glow line */}
+      <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 1, background: "linear-gradient(90deg,transparent,rgba(255,95,0,.35),transparent)" }} />
+      {/* icon */}
+      <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg,rgba(255,95,0,.18),rgba(255,95,0,.05))", border: "1px solid rgba(255,95,0,.42)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 16px rgba(255,95,0,.18)" }}>
+        {icon}
+      </div>
+      {/* title */}
+      <h3 style={{ fontFamily: F.h, fontSize: 13.5, fontWeight: 800, color: C.white, margin: 0, lineHeight: 1.3 }}>{title}</h3>
+      {/* items */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {items.map((text, j) => (
+          <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+            <div style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(255,95,0,.18)", border: "1px solid rgba(255,95,0,.48)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+              <Check size={8} color={C.orange} />
+            </div>
+            <span style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.65)", lineHeight: 1.55 }}>{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const CognitiveArchSection = () => (
+  <section className="journey-section-pad" style={{ padding: "96px 32px 88px", background: "#040201", position: "relative", overflow: "hidden" }}>
+
+    {/* ── Neural network SVG background ── */}
+    <svg className="journey-neural-svg" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} viewBox="0 0 1240 620" preserveAspectRatio="xMidYMid slice">
+      {/* Edges */}
+      {[[80,80,220,200],[220,200,380,120],[380,120,540,280],[540,280,700,150],[700,150,880,300],[880,300,1060,160],[1060,160,1180,280],[220,200,540,280],[380,120,700,150],[540,280,880,300],[700,150,1060,160],[100,400,300,500],[300,500,520,420],[520,420,740,480],[740,480,960,400],[960,400,1140,460],[300,500,700,150],[520,420,880,300]].map(([x1,y1,x2,y2],i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FF5F00" strokeWidth="0.6" opacity="0.12" />
+      ))}
+      {/* Nodes */}
+      {[[80,80],[220,200],[380,120],[540,280],[700,150],[880,300],[1060,160],[1180,280],[100,400],[300,500],[520,420],[740,480],[960,400],[1140,460]].map(([cx,cy],i) => (
+        <circle key={i} cx={cx} cy={cy} r={i%3===0?3.5:2} fill="#FF5F00" opacity={i%3===0?0.35:0.2} />
+      ))}
+    </svg>
+
+    {/* ── Bokeh glows ── */}
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", top: "-10%", left: "5%",   width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,95,0,.22) 0%, transparent 60%)",  filter: "blur(55px)" }} />
+      <div style={{ position: "absolute", top: "40%",  left: "28%",  width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,140,0,.14) 0%, transparent 60%)", filter: "blur(35px)" }} />
+      <div style={{ position: "absolute", top: "15%",  left: "52%",  width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,95,0,.16) 0%, transparent 60%)",  filter: "blur(40px)" }} />
+      <div style={{ position: "absolute", top: "50%",  right: "5%",  width: 380, height: 380, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,80,0,.28) 0%, transparent 55%)",  filter: "blur(65px)" }} />
+      <div style={{ position: "absolute", bottom: "0", left: "42%",  width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,95,0,.12) 0%, transparent 65%)",  filter: "blur(28px)" }} />
+      {/* Bright particle dots */}
+      {[[6,18,5],[18,72,3.5],[34,42,4],[52,12,3],[63,85,4.5],[72,30,3],[84,55,5],[44,68,3.5],[92,20,4]].map(([l,t,r],i) => (
+        <div key={i} style={{ position: "absolute", left: `${l}%`, top: `${t}%`, width: r*2, height: r*2, borderRadius: "50%", background: C.orange, opacity: 0.2 + (i%3)*0.12, boxShadow: `0 0 ${r*4}px rgba(255,95,0,.6)`, animation: `floatUp ${2.5+i*0.4}s ease-in-out infinite`, animationDelay: `${i*0.3}s` }} />
+      ))}
+    </div>
+
+    <div style={{ maxWidth: 1240, margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+      {/* ── Header ── */}
+      <Reveal>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          {/* AI label */}
+          <div className="journey-ai-label" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, boxShadow: "0 0 8px rgba(255,95,0,.8)", animation: "pulse2 2s infinite" }} />
+            <span style={{ fontFamily: F.mono, fontSize: 11, fontWeight: 500, color: "rgba(255,95,0,.8)", letterSpacing: 2, textTransform: "uppercase" }}>Powered by Artificial Intelligence</span>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, boxShadow: "0 0 8px rgba(255,95,0,.8)", animation: "pulse2 2s infinite", animationDelay: ".5s" }} />
+          </div>
+          <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.8vw,52px)", fontWeight: 900, color: C.white, margin: "0 0 16px", letterSpacing: -2, lineHeight: 1.05 }}>
+            Jornada IA UNO{" "}
+            <span style={{ background: "linear-gradient(90deg, #FF5F00, #FF9A00)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>#Descomplica</span>
+          </h2>
+          <p style={{ fontFamily: F.b, fontSize: 16.5, color: "rgba(255,255,255,.45)", lineHeight: 1.8, maxWidth: 520, margin: "0 auto" }}>
+            Como a <strong style={{ color: "rgba(255,255,255,.9)", fontWeight: 700 }}>Inteligência Artificial</strong> transforma atendimento,<br/>processos e gestão dentro do ERP.
+          </p>
+        </div>
+      </Reveal>
+
+      {/* ── Timeline steps ── */}
+      <div style={{ position: "relative", marginBottom: 52 }}>
+        {/* ── horizontal connecting line ── */}
+        <div className="journey-h-line" style={{ position: "absolute", top: 23, left: "10%", right: "10%", height: 1, background: "linear-gradient(90deg,transparent,rgba(255,95,0,.55) 12%,rgba(255,95,0,.4) 88%,transparent)", zIndex: 0 }} />
+
+        <div className="journey-flow">
+          {[
+            { n:"01", icon:<Headphones size={20} color="#FF7A20"/>, title:"Todos os canais em um só lugar",   items:["WhatsApp, Instagram, Mercado Livre e mais","Uma plataforma centralizada e integrada"] },
+            { n:"02", icon:<Brain size={20} color="#FF7A20"/>,      title:"IA atendendo seus clientes",       items:["Atendimento automático 24/7","Triagem e qualificação de leads por IA"] },
+            { n:"03", icon:<Cpu size={20} color="#FF7A20"/>,        title:"Inteligência conectada ao ERP",    items:["Dados em tempo real no ERP","Qualificação e rotas automáticas"] },
+            { n:"04", icon:<Workflow size={20} color="#FF7A20"/>,   title:"Processos automatizados",          items:["Mais produtividade para as equipes","Respostas mais rápidas e precisas"] },
+            { n:"05", icon:<Brain size={20} color="#FF8A30"/>,      title:"ERP com inteligência de negócio",  items:["Mais eficiência operacional","Decisões orientadas por dados e IA"] },
+          ].map((s, i) => (
+            <Reveal key={i} delay={i * 0.08} style={{ flex: 1, minWidth: 0 }}>
+              <JourneyStep n={s.n} icon={s.icon} title={s.title} items={s.items} last={i===4}/>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Bottom tagline ── */}
+      <Reveal delay={0.4}>
+        <div style={{ textAlign: "center", padding: "4px 0" }}>
+          <p className="journey-tagline" style={{ fontFamily: F.b, fontSize: 17, color: "rgba(255,255,255,.6)", margin: 0, lineHeight: 1.7 }}>
+            A evolução do ERP:{" "}
+            <strong style={{ color: C.white, fontWeight: 700 }}>mais automação, mais inteligência</strong>
+            {" "}e mais resultado para sua empresa.
+          </p>
+        </div>
+      </Reveal>
+
+    </div>
+  </section>
+);
+
+/* ═══════════ BLOG / INSIGHTS ═══════════ */
+const Blog = () => (
+  <section style={{ padding: "80px 40px", background: C.white }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      <Reveal>
+        <SectionTitle center sub="Conteúdos e tendências para ajudar na gestão da sua empresa.">
+          <Badge>Blog</Badge><H2>Insights e Tendências: O Futuro das Soluções ERP</H2>
+        </SectionTitle>
+      </Reveal>
+      <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { tag: "IA", t: "Como a Inteligência Artificial está transformando a gestão de PMEs", d: "Descubra como empresas brasileiras estão usando IA preditiva para antecipar demanda e reduzir custos operacionais." },
+          { tag: "Gestão", t: "5 sinais de que sua empresa precisa de um ERP especializado", d: "Planilhas, retrabalho e falta de visibilidade são sintomas. Veja como um ERP resolve cada um deles." },
+          { tag: "Indústria", t: "PCP na prática: como planejar a produção com eficiência", d: "Do MRP ao controle de ordens de produção — como a indústria pode reduzir perdas e aumentar a produtividade." },
+        ].map((p, i) => (
+          <Reveal key={i} delay={i * .08}>
+            <div style={{ borderRadius: 16, border: `1px solid ${C.gray100}`, overflow: "hidden", cursor: "pointer", transition: "all .3s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,0,0,.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+              <div style={{ height: 180, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontFamily: F.h, fontSize: 48, fontWeight: 800, color: "rgba(255,255,255,.06)" }}>UNO</span>
+              </div>
+              <div style={{ padding: "20px 22px 24px" }}>
+                <span style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: C.orange, textTransform: "uppercase", letterSpacing: 1 }}>{p.tag}</span>
+                <h3 style={{ fontFamily: F.h, fontSize: 16, fontWeight: 700, color: C.black, margin: "6px 0 8px", lineHeight: 1.35 }}>{p.t}</h3>
+                <p style={{ fontFamily: F.b, fontSize: 13, color: C.gray500, lineHeight: 1.6, margin: 0 }}>{p.d}</p>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════ CTA / FORM ═══════════ */
+const CTA = () => (
+  <section id="contato" style={{ padding: "80px 40px", background: C.gray50 }}>
+    <div className="cta-grid" style={{ maxWidth: 1240, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: 56, alignItems: "center" }}>
+      <Reveal><div>
+        <Badge>Comece agora</Badge>
+        <h2 style={{ fontFamily: F.h, fontSize: "clamp(28px,3.5vw,42px)", fontWeight: 800, color: C.black, margin: "4px 0 14px", letterSpacing: -1.2, lineHeight: 1.1 }}>Pronto para transformar a gestão da sua empresa?</h2>
+        <p style={{ fontFamily: F.b, fontSize: 16, color: C.gray500, lineHeight: 1.7, margin: "0 0 28px", maxWidth: 420 }}>Agende uma demonstração gratuita e descubra como a IAU pode transformar seus dados em decisões.</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {["Demonstração 100% gratuita e sem compromisso","Setup completo em até 48 horas","Suporte humanizado com analistas dedicados","Sem cartão de crédito para começar"].map((t, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 22, height: 22, borderRadius: 6, flexShrink: 0, background: "rgba(40,200,64,.08)", display: "flex", alignItems: "center", justifyContent: "center" }}><Check size={13} color="#28c840" /></div>
+              <span style={{ fontFamily: F.b, fontSize: 14, color: C.gray600 }}>{t}</span>
+            </div>
+          ))}
+        </div>
+      </div></Reveal>
+      <Reveal delay={.1}>
+        <div style={{ background: C.white, borderRadius: 18, padding: "32px 28px", border: `1px solid ${C.gray100}`, boxShadow: "0 16px 60px rgba(0,0,0,.04)" }}>
+          <h3 style={{ fontFamily: F.h, fontSize: 19, fontWeight: 800, color: C.black, margin: "0 0 22px" }}>Agende sua demonstração</h3>
+          {[{ l: "Nome completo", ph: "Seu nome", t: "text" },{ l: "E-mail corporativo", ph: "email@empresa.com.br", t: "email" },{ l: "WhatsApp", ph: "(00) 00000-0000", t: "tel" }].map((f, i) => (
+            <div key={i} style={{ marginBottom: 14 }}>
+              <label style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>{f.l}</label>
+              <input type={f.t} placeholder={f.ph} style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", transition: "border .2s", background: C.white, color: C.black, boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = C.orange} onBlur={e => e.target.style.borderColor = C.gray200} />
+            </div>
+          ))}
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>Faturamento mensal</label>
+            <select style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", background: C.white, color: C.gray600, cursor: "pointer", boxSizing: "border-box" }}>
+              <option>Selecione uma faixa</option><option>Abaixo de R$ 200.000</option><option>R$ 200.000 a R$ 500.000</option><option>R$ 500.000 a R$ 1.000.000</option><option>Acima de R$ 1.000.000</option>
+            </select>
+          </div>
+          <button style={{ width: "100%", padding: "14px 0", borderRadius: 10, border: "none", background: C.orange, color: C.white, fontFamily: F.b, fontSize: 15, fontWeight: 700, cursor: "pointer", transition: "all .2s", boxShadow: "0 4px 16px rgba(255,95,0,.25)" }}
+            onMouseEnter={e => { e.target.style.background = C.orangeHot; }} onMouseLeave={e => { e.target.style.background = C.orange; }}>
+            Agendar Demonstração Gratuita
+          </button>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
+
+/* ═══════════ FOOTER ═══════════ */
+const Footer = () => (
+  <footer style={{ background: C.black, padding: "56px 40px 28px" }}>
+    <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+      <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr 1.2fr", gap: 32, marginBottom: 48 }}>
+        <div>
+          <div style={{ marginBottom: 14 }}>
+            <Logo height={36} />
+          </div>
+          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.3)", lineHeight: 1.7, maxWidth: 220 }}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
+          <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
+            {[<Mail size={16} />, <Phone size={16} />, <MapPin size={16} />].map((ic, i) => (
+              <div key={i} style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.35)", cursor: "pointer", transition: "all .2s" }}
+                onMouseEnter={e => { e.currentTarget.style.color = C.orange; e.currentTarget.style.borderColor = "rgba(255,95,0,.3)"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,.35)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; }}>
+                {ic}
+              </div>
+            ))}
+          </div>
+        </div>
+        {[
+          { t: "Soluções", ls: ["Sistema de Gestão","CRM","IAU — IA","BI (Google)","App Mobile","WMS","M-Commerce"] },
+          { t: "Segmentos", ls: ["Indústria","Distribuição","Serviços","Cosméticos","Alimentos","Química","Metalúrgica"] },
+          { t: "Empresa", ls: ["Sobre","Blog","Planos","Integrações","Desenvolvimento","Suporte","Contato"] },
+        ].map((col, i) => (
+          <div key={i}>
+            <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.2)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>{col.t}</div>
+            {col.ls.map((l, j) => (
+              <a key={j} href="#" style={{ display: "block", fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 9, transition: "color .15s" }}
+                onMouseEnter={e => e.target.style.color = C.orange} onMouseLeave={e => e.target.style.color = "rgba(255,255,255,.4)"}>{l}</a>
+            ))}
+          </div>
+        ))}
+        {/* Newsletter */}
+        <div>
+          <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.2)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Newsletter</div>
+          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.3)", lineHeight: 1.6, marginBottom: 12 }}>Receba dicas de gestão e novidades do UNO ERP.</p>
+          <input type="email" placeholder="Seu e-mail" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", fontFamily: F.b, fontSize: 13, color: C.white, outline: "none", marginBottom: 8, boxSizing: "border-box" }} />
+          <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, border: "none", background: C.orange, color: C.white, fontFamily: F.b, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Inscrever-se</button>
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 20, display: "flex", justifyContent: "space-between" }}>
+        <span style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.18)" }}>© 2025 UNO ERP · Todos os direitos reservados.</span>
+        <div style={{ display: "flex", gap: 20 }}>
+          {["Política de Privacidade","Termos e Condições"].map((t, i) => (
+            <a key={i} href="#" style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.18)", textDecoration: "none" }}>{t}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+
+/* ═══════════ APP ═══════════ */
+function UnoERPSite() {
+  return (
+    <>
+      <Nav />
+      <Hero />
+      <MarqueeStrip />
+      <SegmentsOverview />
+      <ModulesSection />
+      <Differentials />
+      <MobileApp />
+      <IAUSection />
+      <CognitiveArchSection />
+      <Services />
+      <Partners />
+      <Blog />
+      <CTA />
+      <Footer />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(UnoERPSite));
+</script>
+</body>
+</html>

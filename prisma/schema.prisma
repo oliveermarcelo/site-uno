@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  tag         String
+  coverImage  String?
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Integration {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String
+  category    String
+  icon        String?
+  website     String?
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Plugin {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String
+  module      String
+  icon        String?
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

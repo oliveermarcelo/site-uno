@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNO ERP — Painel Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:#f0eeec;color:#1a1a1a;-webkit-font-smoothing:antialiased;overflow:hidden}
+input,textarea,select,button{font-family:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d1ccc7;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#b0a89f}
+input::placeholder,textarea::placeholder{color:#bbb}
+select{appearance:none}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+<div id="root" style="height:100%"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+const API = window.location.origin + "/api";
+
+/* ─── Design Tokens ─── */
+const C = {
+  orange:"#FF5F00", orangeHot:"#E85500", orangeLight:"rgba(255,95,0,.08)",
+  orangeBorder:"rgba(255,95,0,.2)",
+  black:"#0D0D0D", dark:"#141414", sidebar:"#111010",
+  white:"#fff", cream:"#f0eeec", card:"#fafaf8",
+  gray50:"#f8f7f5", gray100:"#edecea", gray200:"#dddbd8",
+  gray300:"#c4c0bb", gray400:"#9e9890", gray500:"#716b63",
+  gray600:"#4a453f", gray700:"#2e2b27", gray800:"#1e1c19",
+  green:"#16a34a", greenBg:"#dcfce7", greenText:"#15803d",
+  red:"#dc2626", redBg:"#fee2e2", redText:"#dc2626",
+  yellow:"#d97706", yellowBg:"#fef9c3", yellowText:"#a16207",
+  blue:"#2563eb", blueBg:"#dbeafe", blueText:"#1d4ed8",
+};
+
+/* ─── SVG Icons ─── */
+const Ic = (d, opts={}) => ({size=16,color="currentColor",style:s={}}={}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={opts.fill?"currentColor":"none"} stroke={opts.fill?"none":"currentColor"} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" style={{display:"block",flexShrink:0,...s}}>{d}</svg>
+);
+const IcDashboard  = Ic(<><rect width="7" height="9" x="3" y="3" rx="1.5"/><rect width="7" height="5" x="14" y="3" rx="1.5"/><rect width="7" height="9" x="14" y="12" rx="1.5"/><rect width="7" height="5" x="3" y="16" rx="1.5"/></>);
+const IcBlog       = Ic(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></>);
+const IcInteg      = Ic(<><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></>);
+const IcPlugin     = Ic(<><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" x2="2" y1="8" y2="22"/><line x1="17.5" x2="9" y1="15" y2="15"/></>);
+const IcLeads      = Ic(<><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>);
+const IcEdit       = Ic(<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>);
+const IcTrash      = Ic(<><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></>);
+const IcPlus       = Ic(<><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></>);
+const IcClose      = Ic(<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>);
+const IcCheck      = Ic(<path d="M20 6 9 17l-5-5"/>);
+const IcUpload     = Ic(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>);
+const IcImage      = Ic(<><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>);
+const IcSearch     = Ic(<><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></>);
+const IcLogout     = Ic(<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></>);
+const IcStar       = Ic(<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>);
+const IcGlobe      = Ic(<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>);
+const IcChevronDown= Ic(<path d="m6 9 6 6 6-6"/>);
+const IcEye        = Ic(<><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></>);
+const IcMail       = Ic(<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>);
+const IcPhone      = Ic(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>);
+const IcBuilding   = Ic(<><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></>);
+const IcDownload   = Ic(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>);
+const IcRefresh    = Ic(<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></>);
+
+/* ─── API Helper ─── */
+const api = async (path, opts = {}) => {
+  const token = localStorage.getItem("uno_token");
+  const isFormData = opts.body instanceof FormData;
+  const headers = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+  };
+  const res = await fetch(API + path, { ...opts, headers });
+  if (res.status === 401) { localStorage.removeItem("uno_token"); window.location.reload(); }
+  return res.json().catch(() => ({}));
+};
+
+const uploadImage = async (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result); // base64 data URL
+    reader.readAsDataURL(file);
+  });
+};
+
+/* ─── Toast ─── */
+const ToastCtx = React.createContext(null);
+const ToastProvider = ({ children }) => {
+  const [toasts, setToasts] = useState([]);
+  const add = useCallback((msg, type="success") => {
+    const id = Date.now();
+    setToasts(t => [...t, {id, msg, type}]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
+  }, []);
+  const colors = { success:{bg:"#ecfdf5",border:"#86efac",icon:C.green}, error:{bg:"#fef2f2",border:"#fca5a5",icon:C.red}, info:{bg:"#eff6ff",border:"#93c5fd",icon:C.blue} };
+  return (
+    <ToastCtx.Provider value={add}>
+      {children}
+      <div style={{position:"fixed",bottom:24,right:24,zIndex:9999,display:"flex",flexDirection:"column",gap:8}}>
+        {toasts.map(t => {
+          const cl = colors[t.type] || colors.success;
+          return (
+            <div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",borderRadius:12,background:cl.bg,border:`1px solid ${cl.border}`,boxShadow:"0 8px 24px rgba(0,0,0,.1)",minWidth:260,maxWidth:360,animation:"toastIn .3s ease both"}}>
+              <div style={{width:20,height:20,borderRadius:"50%",background:cl.icon,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <IcCheck size={11} color="#fff"/>
+              </div>
+              <span style={{fontSize:13.5,fontWeight:500,color:C.gray700,flex:1}}>{t.msg}</span>
+              <button onClick={()=>setToasts(ts=>ts.filter(x=>x.id!==t.id))} style={{background:"none",border:"none",cursor:"pointer",color:C.gray400,padding:2}}><IcClose size={13} color={C.gray400}/></button>
+            </div>
+          );
+        })}
+      </div>
+    </ToastCtx.Provider>
+  );
+};
+const useToast = () => React.useContext(ToastCtx);
+
+/* ─── Toggle ─── */
+const Toggle = ({ checked, onChange, label }) => (
+  <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",userSelect:"none"}}>
+    <div onClick={()=>onChange(!checked)} style={{width:40,height:22,borderRadius:11,background:checked?C.orange:C.gray200,position:"relative",transition:"background .2s",flexShrink:0}}>
+      <div style={{position:"absolute",top:3,left:checked?19:3,width:16,height:16,borderRadius:"50%",background:"#fff",transition:"left .2s",boxShadow:"0 1px 3px rgba(0,0,0,.2)"}}/>
+    </div>
+    {label && <span style={{fontSize:13.5,fontWeight:500,color:C.gray600}}>{label}</span>}
+  </label>
+);
+
+/* ─── Image Upload ─── */
+const ImageUpload = ({ value, onChange, label="Imagem", hint="PNG, JPG, WebP · máx. 2MB", aspect="landscape" }) => {
+  const [drag, setDrag] = useState(false);
+  const ref = useRef();
+
+  const handle = async (file) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const url = await uploadImage(file);
+    onChange(url);
+  };
+
+  const dims = aspect === "square" ? { width:96, height:96, borderRadius:12 } : { width:"100%", height:160, borderRadius:12 };
+
+  return (
+    <div>
+      <label style={{display:"block",fontSize:12.5,fontWeight:600,color:C.gray500,textTransform:"uppercase",letterSpacing:.8,marginBottom:8}}>{label}</label>
+      {value ? (
+        <div style={{position:"relative",display:"inline-block"}}>
+          <img src={value} alt="" style={{...dims,objectFit:"cover",display:"block",border:`1px solid ${C.gray200}`}}/>
+          <button onClick={()=>onChange("")} style={{position:"absolute",top:6,right:6,width:24,height:24,borderRadius:"50%",background:"rgba(0,0,0,.6)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <IcClose size={11} color="#fff"/>
+          </button>
+          <button onClick={()=>ref.current.click()} style={{position:"absolute",bottom:6,right:6,background:"rgba(0,0,0,.6)",border:"none",borderRadius:6,padding:"4px 8px",cursor:"pointer",display:"flex",alignItems:"center",gap:4,color:"#fff",fontSize:11,fontWeight:600}}>
+            <IcUpload size={11} color="#fff"/>Trocar
+          </button>
+        </div>
+      ) : (
+        <div
+          onDragOver={e=>{e.preventDefault();setDrag(true)}}
+          onDragLeave={()=>setDrag(false)}
+          onDrop={e=>{e.preventDefault();setDrag(false);handle(e.dataTransfer.files[0])}}
+          onClick={()=>ref.current.click()}
+          style={{
+            border:`2px dashed ${drag?C.orange:C.gray200}`,borderRadius:12,
+            background:drag?C.orangeLight:C.gray50,
+            padding:"28px 16px",textAlign:"center",cursor:"pointer",
+            transition:"all .2s",...(aspect==="square"?{width:96,height:96,padding:8}:{})
+          }}
+        >
+          <IcImage size={aspect==="square"?22:28} color={drag?C.orange:C.gray300} style={{margin:"0 auto 6px"}}/>
+          {aspect!=="square"&&<>
+            <div style={{fontSize:13,fontWeight:600,color:C.gray500,marginBottom:3}}>Arraste ou <span style={{color:C.orange}}>clique para selecionar</span></div>
+            <div style={{fontSize:11.5,color:C.gray400}}>{hint}</div>
+          </>}
+        </div>
+      )}
+      <input ref={ref} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handle(e.target.files[0])}/>
+    </div>
+  );
+};
+
+/* ─── Field ─── */
+const Field = ({ label, children, half }) => (
+  <div style={{...(half?{}:{})}}>
+    <label style={{display:"block",fontSize:12.5,fontWeight:600,color:C.gray500,textTransform:"uppercase",letterSpacing:.8,marginBottom:6}}>{label}</label>
+    {children}
+  </div>
+);
+
+const inp = {
+  width:"100%",padding:"9px 12px",borderRadius:8,
+  border:`1.5px solid ${C.gray200}`,fontSize:13.5,
+  background:C.white,color:C.black,outline:"none",
+  boxSizing:"border-box",transition:"border-color .15s",
+};
+
+const Inp = (props) => {
+  const [focus, setFocus] = useState(false);
+  return <input {...props} onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}
+    style={{...inp,...props.style,borderColor:focus?C.orange:C.gray200}}/>;
+};
+
+const Textarea = (props) => {
+  const [focus, setFocus] = useState(false);
+  return <textarea {...props} onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}
+    style={{...inp,...props.style,borderColor:focus?C.orange:C.gray200,resize:"vertical"}}/>;
+};
+
+const Select = ({ value, onChange, children, style:s }) => {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div style={{position:"relative"}}>
+      <select value={value} onChange={onChange} onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}
+        style={{...inp,cursor:"pointer",paddingRight:34,...s,borderColor:focus?C.orange:C.gray200}}>
+        {children}
+      </select>
+      <IcChevronDown size={14} color={C.gray400} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}/>
+    </div>
+  );
+};
+
+/* ─── Pill Badge ─── */
+const Pill = ({ children, color="green" }) => {
+  const map = { green:{bg:C.greenBg,text:C.greenText}, red:{bg:C.redBg,text:C.redText}, yellow:{bg:C.yellowBg,text:C.yellowText}, blue:{bg:C.blueBg,text:C.blueText}, gray:{bg:C.gray100,text:C.gray500} };
+  const cl = map[color] || map.gray;
+  return <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:50,fontSize:11,fontWeight:700,background:cl.bg,color:cl.text,whiteSpace:"nowrap"}}>{children}</span>;
+};
+
+/* ─── Stat Card ─── */
+const StatCard = ({ label, value, sub, icon, color=C.orange }) => (
+  <div style={{background:C.white,borderRadius:16,padding:"20px 22px",border:`1px solid ${C.gray100}`,display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,animation:"fadeIn .4s ease both"}}>
+    <div>
+      <div style={{fontSize:12.5,fontWeight:600,color:C.gray400,textTransform:"uppercase",letterSpacing:.8,marginBottom:8}}>{label}</div>
+      <div style={{fontSize:28,fontWeight:800,color:C.black,lineHeight:1,marginBottom:4}}>{value}</div>
+      {sub&&<div style={{fontSize:12,color:C.gray400}}>{sub}</div>}
+    </div>
+    <div style={{width:44,height:44,borderRadius:12,background:`${color}14`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color}}>
+      {icon}
+    </div>
+  </div>
+);
+
+/* ─── Section Header ─── */
+const SectionHeader = ({ title, sub, action }) => (
+  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+    <div>
+      <h2 style={{fontSize:20,fontWeight:800,color:C.black,letterSpacing:-.5}}>{title}</h2>
+      {sub&&<div style={{fontSize:13,color:C.gray400,marginTop:2}}>{sub}</div>}
+    </div>
+    {action}
+  </div>
+);
+
+const Btn = ({ onClick, children, variant="primary", size="md", icon, disabled, style:s }) => {
+  const [hover, setHover] = useState(false);
+  const base = { display:"inline-flex",alignItems:"center",gap:6,fontWeight:700,border:"none",cursor:disabled?"not-allowed":"pointer",transition:"all .15s",borderRadius:9,fontFamily:"inherit" };
+  const variants = {
+    primary: { background: hover?C.orangeHot:C.orange, color:"#fff", boxShadow: hover?"0 4px 14px rgba(255,95,0,.35)":"none" },
+    secondary: { background: hover?C.gray100:C.gray50, color:C.gray700, border:`1px solid ${C.gray200}` },
+    ghost: { background: "transparent", color:C.gray500, border:`1px solid ${C.gray200}` },
+    danger: { background: hover?"#b91c1c":C.red, color:"#fff" },
+  };
+  const sizes = { sm:{fontSize:12,padding:"6px 12px"}, md:{fontSize:13,padding:"8px 16px"}, lg:{fontSize:14,padding:"11px 22px"} };
+  return (
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
+      style={{...base,...variants[variant],...sizes[size],...(disabled?{opacity:.5}:{}),...s}}>
+      {icon&&icon}{children}
+    </button>
+  );
+};
+
+/* ─── Empty State ─── */
+const Empty = ({ icon, title, sub }) => (
+  <div style={{padding:"60px 20px",textAlign:"center"}}>
+    <div style={{width:56,height:56,borderRadius:16,background:C.gray100,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",color:C.gray300}}>{icon}</div>
+    <div style={{fontSize:15,fontWeight:700,color:C.gray600,marginBottom:4}}>{title}</div>
+    <div style={{fontSize:13,color:C.gray400}}>{sub}</div>
+  </div>
+);
+
+/* ─── Divider ─── */
+const Div = ({ label }) => (
+  <div style={{display:"flex",alignItems:"center",gap:10,margin:"4px 0 16px"}}>
+    <div style={{flex:1,height:1,background:C.gray100}}/>
+    {label&&<span style={{fontSize:11,fontWeight:700,color:C.gray400,textTransform:"uppercase",letterSpacing:1,whiteSpace:"nowrap"}}>{label}</span>}
+    <div style={{flex:1,height:1,background:C.gray100}}/>
+  </div>
+);
+
+/* ════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════ */
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState("admin@unoerp.com.br");
+  const [pass, setPass] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    setErr(""); setLoading(true);
+    try {
+      const data = await api("/auth/login", { method:"POST", body:JSON.stringify({email,password:pass}) });
+      if (data.token) { localStorage.setItem("uno_token", data.token); onLogin(data.user); }
+      else setErr(data.error || "Credenciais inválidas");
+    } catch { setErr("Erro de conexão com o servidor"); }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"linear-gradient(135deg,#0d0b09 0%,#1a1210 100%)",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:"30%",left:"50%",transform:"translate(-50%,-50%)",width:600,height:400,background:"radial-gradient(ellipse,rgba(255,95,0,.12) 0%,transparent 65%)",pointerEvents:"none"}}/>
+      <div style={{width:400,background:C.white,borderRadius:20,padding:"40px 36px",boxShadow:"0 40px 100px rgba(0,0,0,.4)",animation:"fadeIn .5s ease both",position:"relative",zIndex:1}}>
+        {/* Logo */}
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <div style={{width:52,height:52,borderRadius:14,background:C.orange,margin:"0 auto 14px",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 8px 24px rgba(255,95,0,.35)"}}>
+            <svg viewBox="0 0 120 120" width={28} height={28}>
+              <path d="M20,10 L20,70 C20,85 30,95 45,95 C60,95 70,85 70,70 L70,10 Z" fill="#fff"/>
+              <path d="M75,10 L75,68 C75,68 90,50 105,35 L105,10 Z" fill="#fff"/>
+              <path d="M80,68 L80,95 L105,95 L105,35 Z" fill="rgba(255,255,255,.5)"/>
+            </svg>
+          </div>
+          <h1 style={{fontSize:22,fontWeight:800,color:C.black,letterSpacing:-.5}}>UNO ERP</h1>
+          <p style={{fontSize:13.5,color:C.gray400,marginTop:4}}>Painel de Administração</p>
+        </div>
+
+        {err && (
+          <div style={{background:C.redBg,border:`1px solid #fca5a5`,color:C.red,padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:20,display:"flex",alignItems:"center",gap:8}}>
+            <IcClose size={14} color={C.red}/>{err}
+          </div>
+        )}
+
+        <Field label="E-mail">
+          <Inp value={email} onChange={e=>setEmail(e.target.value)} placeholder="admin@unoerp.com.br"/>
+        </Field>
+        <div style={{marginTop:14}}>
+          <Field label="Senha">
+            <Inp type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="••••••••"/>
+          </Field>
+        </div>
+        <button onClick={submit} disabled={loading} style={{width:"100%",marginTop:24,padding:"12px",borderRadius:10,border:"none",background:C.orange,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"all .2s",opacity:loading?.7:1}}>
+          {loading?<span style={{width:18,height:18,border:"2px solid rgba(255,255,255,.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block"}}/>:<>Entrar</>}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════ */
+const Dashboard = ({ counts }) => {
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [recentLeads, setRecentLeads] = useState([]);
+  useEffect(()=>{
+    api("/blog/admin/all").then(d=>setRecentPosts((d||[]).slice(0,4)));
+    api("/leads/admin/all").then(d=>setRecentLeads((d||[]).slice(0,5)));
+  },[]);
+
+  return (
+    <div style={{animation:"fadeIn .35s ease both"}}>
+      <SectionHeader title="Dashboard" sub="Visão geral do conteúdo"/>
+      {/* Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:28}}>
+        <StatCard label="Posts no Blog" value={counts.blog??0} sub={`${counts.published??0} publicados`} icon={<IcBlog size={20}/>}/>
+        <StatCard label="Integrações" value={counts.integrations??0} sub="cadastradas" icon={<IcInteg size={20}/>} color={C.blue}/>
+        <StatCard label="Plugins" value={counts.plugins??0} sub="cadastrados" icon={<IcPlugin size={20}/>} color={C.green}/>
+        <StatCard label="Leads" value={counts.leads??0} sub="contatos recebidos" icon={<IcLeads size={20}/>} color="#7c3aed"/>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1.4fr 1fr",gap:20}}>
+        {/* Recent posts */}
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          <div style={{padding:"18px 20px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{fontSize:14,fontWeight:700,color:C.black}}>Posts Recentes</div>
+            <IcBlog size={15} color={C.gray300}/>
+          </div>
+          {recentPosts.length===0
+            ? <Empty icon={<IcBlog size={24}/>} title="Nenhum post" sub="Crie seu primeiro artigo"/>
+            : recentPosts.map((p,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",borderBottom:i<recentPosts.length-1?`1px solid ${C.gray50}`:"none"}}>
+                {p.imageUrl
+                  ? <img src={p.imageUrl} style={{width:40,height:40,borderRadius:8,objectFit:"cover",flexShrink:0}} alt=""/>
+                  : <div style={{width:40,height:40,borderRadius:8,background:C.gray100,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><IcImage size={16} color={C.gray300}/></div>
+                }
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13.5,fontWeight:600,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.title}</div>
+                  <div style={{fontSize:11.5,color:C.gray400,marginTop:2}}>{p.tag||"—"} · {p.createdAt?new Date(p.createdAt).toLocaleDateString("pt-BR"):""}</div>
+                </div>
+                <Pill color={p.published?"green":"yellow"}>{p.published?"Publicado":"Rascunho"}</Pill>
+              </div>
+            ))
+          }
+        </div>
+        {/* Recent leads */}
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          <div style={{padding:"18px 20px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{fontSize:14,fontWeight:700,color:C.black}}>Últimos Leads</div>
+            <IcLeads size={15} color={C.gray300}/>
+          </div>
+          {recentLeads.length===0
+            ? <Empty icon={<IcLeads size={24}/>} title="Nenhum lead" sub="Os contatos aparecerão aqui"/>
+            : recentLeads.map((l,i)=>(
+              <div key={i} style={{padding:"11px 20px",borderBottom:i<recentLeads.length-1?`1px solid ${C.gray50}`:"none"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{fontSize:13,fontWeight:600,color:C.black}}>{l.name||l.nome||"—"}</div>
+                  <div style={{fontSize:11,color:C.gray400}}>{l.createdAt?new Date(l.createdAt).toLocaleDateString("pt-BR"):""}</div>
+                </div>
+                <div style={{fontSize:11.5,color:C.gray400,marginTop:1}}>{l.email||"—"} {l.company||l.empresa?`· ${l.company||l.empresa}`:""}</div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   BLOG
+════════════════════════════════════════ */
+const BlogSection = () => {
+  const toast = useToast();
+  const [posts, setPosts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [panel, setPanel] = useState(null); // null | "new" | row
+  const [saving, setSaving] = useState(false);
+  const blank = { title:"", slug:"", excerpt:"", content:"", tag:"", imageUrl:"", published:false };
+  const [form, setForm] = useState(blank);
+
+  const load = async () => { const d = await api("/blog/admin/all"); setPosts(d||[]); };
+  useEffect(()=>{ load(); },[]);
+
+  const openNew = () => { setForm(blank); setPanel("new"); };
+  const openEdit = (row) => { setForm({title:row.title,slug:row.slug||"",excerpt:row.excerpt||"",content:row.content||"",tag:row.tag||"",imageUrl:row.imageUrl||"",published:!!row.published}); setPanel(row); };
+  const close = () => setPanel(null);
+
+  const autoSlug = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s-]/g,"").trim().replace(/\s+/g,"-");
+
+  const save = async () => {
+    if (!form.title.trim()) { toast("Título é obrigatório","error"); return; }
+    setSaving(true);
+    const payload = { ...form, slug: form.slug || autoSlug(form.title) };
+    const isEdit = panel && panel !== "new";
+    if (isEdit) await api(`/blog/admin/${panel.id}`, { method:"PUT", body:JSON.stringify(payload) });
+    else await api("/blog/admin", { method:"POST", body:JSON.stringify(payload) });
+    toast(isEdit ? "Post atualizado!" : "Post criado!"); setSaving(false); close(); load();
+  };
+
+  const del = async (id) => {
+    if (!confirm("Excluir este post permanentemente?")) return;
+    await api(`/blog/admin/${id}`, { method:"DELETE" });
+    toast("Post excluído","error"); load();
+  };
+
+  const filtered = posts.filter(p => !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.tag?.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div style={{display:"flex",gap:24,height:"100%",animation:"fadeIn .35s ease both"}}>
+      {/* List */}
+      <div style={{flex:1,minWidth:0}}>
+        <SectionHeader title="Blog" sub={`${posts.length} posts no total`}
+          action={<Btn onClick={openNew} icon={<IcPlus size={14}/>}>Novo Post</Btn>}/>
+        {/* Search */}
+        <div style={{position:"relative",marginBottom:20}}>
+          <IcSearch size={14} color={C.gray400} style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)"}}/>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar posts…"
+            style={{...inp,paddingLeft:36,background:C.white}}/>
+        </div>
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          {filtered.length===0
+            ? <Empty icon={<IcBlog size={24}/>} title="Nenhum post encontrado" sub="Crie seu primeiro artigo clicando em + Novo Post"/>
+            : filtered.map((p,i)=>(
+              <div key={p.id} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 20px",borderBottom:i<filtered.length-1?`1px solid ${C.gray50}`:"none",transition:"background .15s",cursor:"pointer"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.gray50} onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                onClick={()=>openEdit(p)}>
+                {/* Thumb */}
+                {p.imageUrl
+                  ? <img src={p.imageUrl} alt="" style={{width:56,height:40,objectFit:"cover",borderRadius:8,flexShrink:0}}/>
+                  : <div style={{width:56,height:40,borderRadius:8,background:C.gray100,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><IcImage size={16} color={C.gray300}/></div>
+                }
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:14,fontWeight:600,color:C.black,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.title}</div>
+                  <div style={{fontSize:12,color:C.gray400,marginTop:2,display:"flex",alignItems:"center",gap:6}}>
+                    {p.tag&&<span style={{background:C.gray100,borderRadius:4,padding:"1px 6px",fontSize:11,fontWeight:600,color:C.gray500}}>{p.tag}</span>}
+                    <span>{p.createdAt?new Date(p.createdAt).toLocaleDateString("pt-BR"):""}</span>
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                  <Pill color={p.published?"green":"yellow"}>{p.published?"Publicado":"Rascunho"}</Pill>
+                  <button onClick={e=>{e.stopPropagation();openEdit(p)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,borderRadius:6,display:"flex",transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.orange} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}>
+                    <IcEdit size={14}/>
+                  </button>
+                  <button onClick={e=>{e.stopPropagation();del(p.id)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,borderRadius:6,display:"flex",transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.red} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}>
+                    <IcTrash size={14}/>
+                  </button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {/* Side Panel */}
+      {panel!==null&&(
+        <div style={{width:440,flexShrink:0,background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,display:"flex",flexDirection:"column",maxHeight:"calc(100vh - 80px)",overflowY:"auto",animation:"slideIn .25s ease both"}}>
+          {/* Header */}
+          <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:C.white,zIndex:1}}>
+            <div style={{fontSize:15,fontWeight:800,color:C.black}}>{panel==="new"?"Novo Post":"Editar Post"}</div>
+            <button onClick={close} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,display:"flex",padding:4}}><IcClose size={16}/></button>
+          </div>
+          <div style={{padding:"22px",flex:1,display:"flex",flexDirection:"column",gap:16}}>
+            {/* Cover image */}
+            <ImageUpload value={form.imageUrl} onChange={v=>setForm({...form,imageUrl:v})} label="Imagem de Capa" hint="Recomendado 1200×630px · PNG, JPG, WebP"/>
+            <Div label="Conteúdo"/>
+            <Field label="Título *">
+              <Inp value={form.title} onChange={e=>setForm({...form,title:e.target.value,slug:autoSlug(e.target.value)})} placeholder="Digite o título do post"/>
+            </Field>
+            <Field label="Slug (URL)">
+              <Inp value={form.slug} onChange={e=>setForm({...form,slug:e.target.value})} placeholder="gerado-automaticamente"/>
+            </Field>
+            <div style={{display:"grid",gridTemplateColumns:"2fr 1fr",gap:12}}>
+              <Field label="Tag / Categoria">
+                <Inp value={form.tag} onChange={e=>setForm({...form,tag:e.target.value})} placeholder="ex: IA, Gestão, ERP"/>
+              </Field>
+            </div>
+            <Field label="Resumo">
+              <Textarea value={form.excerpt} onChange={e=>setForm({...form,excerpt:e.target.value})} rows={2} placeholder="Breve descrição para SEO e listagem…"/>
+            </Field>
+            <Field label="Conteúdo (HTML)">
+              <Textarea value={form.content} onChange={e=>setForm({...form,content:e.target.value})} rows={10} placeholder="<p>Conteúdo do artigo…</p>" style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12.5}}/>
+            </Field>
+            <Div label="Publicação"/>
+            <Toggle checked={form.published} onChange={v=>setForm({...form,published:v})} label={form.published?"Publicado — visível no site":"Rascunho — não visível"}/>
+          </div>
+          {/* Footer */}
+          <div style={{padding:"16px 22px",borderTop:`1px solid ${C.gray100}`,display:"flex",gap:8,position:"sticky",bottom:0,background:C.white}}>
+            <Btn onClick={save} disabled={saving} size="lg" style={{flex:1,justifyContent:"center"}}>
+              {saving?<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.4)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block"}}/>:"Salvar Post"}
+            </Btn>
+            <Btn onClick={close} variant="secondary" size="lg">Cancelar</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   INTEGRAÇÕES
+════════════════════════════════════════ */
+const IntegrationsSection = () => {
+  const toast = useToast();
+  const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [panel, setPanel] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const blank = { name:"", description:"", category:"", website:"", logoUrl:"", active:true, featured:false, sortOrder:0 };
+  const [form, setForm] = useState(blank);
+  const cats = ["Marketplace","E-commerce","Logística","Financeiro","Fiscal","CRM","ERP","Outros"];
+
+  const load = async () => { const d = await api("/integrations/admin/all"); setItems(d||[]); };
+  useEffect(()=>{ load(); },[]);
+
+  const openNew  = () => { setForm(blank); setPanel("new"); };
+  const openEdit = (row) => { setForm({name:row.name,description:row.description||"",category:row.category||"",website:row.website||"",logoUrl:row.logoUrl||"",active:!!row.active,featured:!!row.featured,sortOrder:row.sortOrder||0}); setPanel(row); };
+  const close = () => setPanel(null);
+
+  const save = async () => {
+    if (!form.name.trim()) { toast("Nome é obrigatório","error"); return; }
+    setSaving(true);
+    const isEdit = panel && panel !== "new";
+    if (isEdit) await api(`/integrations/admin/${panel.id}`, { method:"PUT", body:JSON.stringify(form) });
+    else await api("/integrations/admin", { method:"POST", body:JSON.stringify(form) });
+    toast(isEdit?"Integração atualizada!":"Integração criada!"); setSaving(false); close(); load();
+  };
+
+  const del = async (id) => {
+    if (!confirm("Excluir esta integração?")) return;
+    await api(`/integrations/admin/${id}`, { method:"DELETE" });
+    toast("Integração excluída","error"); load();
+  };
+
+  const filtered = items.filter(p => !search || p.name?.toLowerCase().includes(search.toLowerCase()) || p.category?.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div style={{display:"flex",gap:24,height:"100%",animation:"fadeIn .35s ease both"}}>
+      <div style={{flex:1,minWidth:0}}>
+        <SectionHeader title="Integrações" sub={`${items.length} integrações cadastradas`}
+          action={<Btn onClick={openNew} icon={<IcPlus size={14}/>}>Nova Integração</Btn>}/>
+        <div style={{position:"relative",marginBottom:20}}>
+          <IcSearch size={14} color={C.gray400} style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)"}}/>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar integrações…" style={{...inp,paddingLeft:36,background:C.white}}/>
+        </div>
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          {filtered.length===0
+            ? <Empty icon={<IcInteg size={24}/>} title="Nenhuma integração" sub="Cadastre a primeira integração"/>
+            : filtered.map((it,i)=>(
+              <div key={it.id} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 20px",borderBottom:i<filtered.length-1?`1px solid ${C.gray50}`:"none",cursor:"pointer",transition:"background .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.gray50} onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                onClick={()=>openEdit(it)}>
+                {it.logoUrl
+                  ? <img src={it.logoUrl} alt="" style={{width:40,height:40,objectFit:"cover",borderRadius:10,border:`1px solid ${C.gray100}`,flexShrink:0}}/>
+                  : <div style={{width:40,height:40,borderRadius:10,background:C.gray100,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><IcInteg size={16} color={C.gray300}/></div>
+                }
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{fontSize:14,fontWeight:600,color:C.black}}>{it.name}</span>
+                    {it.featured&&<IcStar size={12} color="#f59e0b" style={{fill:"#f59e0b",stroke:"none"}}/>}
+                  </div>
+                  <div style={{fontSize:12,color:C.gray400,marginTop:1,display:"flex",gap:6,alignItems:"center"}}>
+                    {it.category&&<span style={{background:C.gray100,borderRadius:4,padding:"1px 6px",fontSize:11,fontWeight:600,color:C.gray500}}>{it.category}</span>}
+                    {it.website&&<span style={{color:C.blue,fontSize:11}}>{it.website.replace(/https?:\/\//,"")}</span>}
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                  <Pill color={it.active?"green":"red"}>{it.active?"Ativa":"Inativa"}</Pill>
+                  <button onClick={e=>{e.stopPropagation();openEdit(it)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,display:"flex",borderRadius:6,transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.orange} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}><IcEdit size={14}/></button>
+                  <button onClick={e=>{e.stopPropagation();del(it.id)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,display:"flex",borderRadius:6,transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.red} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}><IcTrash size={14}/></button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {panel!==null&&(
+        <div style={{width:420,flexShrink:0,background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,display:"flex",flexDirection:"column",maxHeight:"calc(100vh - 80px)",overflowY:"auto",animation:"slideIn .25s ease both"}}>
+          <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:C.white,zIndex:1}}>
+            <div style={{fontSize:15,fontWeight:800,color:C.black}}>{panel==="new"?"Nova Integração":"Editar Integração"}</div>
+            <button onClick={close} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,display:"flex",padding:4}}><IcClose size={16}/></button>
+          </div>
+          <div style={{padding:"22px",flex:1,display:"flex",flexDirection:"column",gap:16}}>
+            {/* Logo */}
+            <div style={{display:"flex",gap:16,alignItems:"flex-end"}}>
+              <ImageUpload value={form.logoUrl} onChange={v=>setForm({...form,logoUrl:v})} label="Logo / Ícone" hint="" aspect="square"/>
+              <div style={{flex:1}}>
+                <Field label="Nome *">
+                  <Inp value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Ex: Mercado Livre"/>
+                </Field>
+              </div>
+            </div>
+            <Div label="Detalhes"/>
+            <Field label="Categoria">
+              <Select value={form.category} onChange={e=>setForm({...form,category:e.target.value})}>
+                <option value="">Selecione uma categoria</option>
+                {cats.map(c=><option key={c}>{c}</option>)}
+              </Select>
+            </Field>
+            <Field label="Website">
+              <Inp value={form.website} onChange={e=>setForm({...form,website:e.target.value})} placeholder="https://www.exemplo.com"/>
+            </Field>
+            <Field label="Descrição">
+              <Textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} rows={3} placeholder="Descreva o que a integração faz…"/>
+            </Field>
+            <Field label="Ordem de Exibição">
+              <Inp type="number" value={form.sortOrder} onChange={e=>setForm({...form,sortOrder:parseInt(e.target.value)||0})} style={{width:100}}/>
+            </Field>
+            <Div label="Visibilidade"/>
+            <Toggle checked={form.active} onChange={v=>setForm({...form,active:v})} label={form.active?"Ativa — visível no site":"Inativa — oculta"}/>
+            <Toggle checked={form.featured} onChange={v=>setForm({...form,featured:v})} label="Destaque — aparece em primeiro"/>
+          </div>
+          <div style={{padding:"16px 22px",borderTop:`1px solid ${C.gray100}`,display:"flex",gap:8,position:"sticky",bottom:0,background:C.white}}>
+            <Btn onClick={save} disabled={saving} size="lg" style={{flex:1,justifyContent:"center"}}>
+              {saving?<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.4)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block"}}/>:"Salvar"}
+            </Btn>
+            <Btn onClick={close} variant="secondary" size="lg">Cancelar</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   PLUGINS
+════════════════════════════════════════ */
+const PluginsSection = () => {
+  const toast = useToast();
+  const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [panel, setPanel] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const blank = { name:"", description:"", module:"", iconUrl:"", active:true, featured:false, sortOrder:0 };
+  const [form, setForm] = useState(blank);
+  const modules = ["Comercial","Financeiro","Estoque","Produção","Fiscal","Logística","CRM","Relatórios","Outros"];
+
+  const load = async () => { const d = await api("/plugins/admin/all"); setItems(d||[]); };
+  useEffect(()=>{ load(); },[]);
+
+  const openNew  = () => { setForm(blank); setPanel("new"); };
+  const openEdit = (row) => { setForm({name:row.name,description:row.description||"",module:row.module||"",iconUrl:row.iconUrl||"",active:!!row.active,featured:!!row.featured,sortOrder:row.sortOrder||0}); setPanel(row); };
+  const close = () => setPanel(null);
+
+  const save = async () => {
+    if (!form.name.trim()) { toast("Nome é obrigatório","error"); return; }
+    setSaving(true);
+    const isEdit = panel && panel !== "new";
+    if (isEdit) await api(`/plugins/admin/${panel.id}`, { method:"PUT", body:JSON.stringify(form) });
+    else await api("/plugins/admin", { method:"POST", body:JSON.stringify(form) });
+    toast(isEdit?"Plugin atualizado!":"Plugin criado!"); setSaving(false); close(); load();
+  };
+
+  const del = async (id) => {
+    if (!confirm("Excluir este plugin?")) return;
+    await api(`/plugins/admin/${id}`, { method:"DELETE" });
+    toast("Plugin excluído","error"); load();
+  };
+
+  const filtered = items.filter(p => !search || p.name?.toLowerCase().includes(search.toLowerCase()) || p.module?.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div style={{display:"flex",gap:24,height:"100%",animation:"fadeIn .35s ease both"}}>
+      <div style={{flex:1,minWidth:0}}>
+        <SectionHeader title="Plugins" sub={`${items.length} plugins cadastrados`}
+          action={<Btn onClick={openNew} icon={<IcPlus size={14}/>}>Novo Plugin</Btn>}/>
+        <div style={{position:"relative",marginBottom:20}}>
+          <IcSearch size={14} color={C.gray400} style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)"}}/>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar plugins…" style={{...inp,paddingLeft:36,background:C.white}}/>
+        </div>
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          {filtered.length===0
+            ? <Empty icon={<IcPlugin size={24}/>} title="Nenhum plugin" sub="Cadastre o primeiro plugin"/>
+            : filtered.map((it,i)=>(
+              <div key={it.id} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 20px",borderBottom:i<filtered.length-1?`1px solid ${C.gray50}`:"none",cursor:"pointer",transition:"background .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.gray50} onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                onClick={()=>openEdit(it)}>
+                {it.iconUrl
+                  ? <img src={it.iconUrl} alt="" style={{width:40,height:40,objectFit:"cover",borderRadius:10,border:`1px solid ${C.gray100}`,flexShrink:0}}/>
+                  : <div style={{width:40,height:40,borderRadius:10,background:`${C.orange}12`,border:`1px solid ${C.orangeBorder}`,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}><IcPlugin size={16} color={C.orange}/></div>
+                }
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{fontSize:14,fontWeight:600,color:C.black}}>{it.name}</span>
+                    {it.featured&&<IcStar size={12} color="#f59e0b" style={{fill:"#f59e0b",stroke:"none"}}/>}
+                  </div>
+                  <div style={{fontSize:12,color:C.gray400,marginTop:1,display:"flex",gap:6}}>
+                    {it.module&&<span style={{background:C.gray100,borderRadius:4,padding:"1px 6px",fontSize:11,fontWeight:600,color:C.gray500}}>{it.module}</span>}
+                    <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{it.description}</span>
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                  <Pill color={it.active?"green":"red"}>{it.active?"Ativo":"Inativo"}</Pill>
+                  <button onClick={e=>{e.stopPropagation();openEdit(it)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,display:"flex",borderRadius:6,transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.orange} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}><IcEdit size={14}/></button>
+                  <button onClick={e=>{e.stopPropagation();del(it.id)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,display:"flex",borderRadius:6,transition:"all .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.color=C.red} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}><IcTrash size={14}/></button>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {panel!==null&&(
+        <div style={{width:420,flexShrink:0,background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,display:"flex",flexDirection:"column",maxHeight:"calc(100vh - 80px)",overflowY:"auto",animation:"slideIn .25s ease both"}}>
+          <div style={{padding:"18px 22px",borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:C.white,zIndex:1}}>
+            <div style={{fontSize:15,fontWeight:800,color:C.black}}>{panel==="new"?"Novo Plugin":"Editar Plugin"}</div>
+            <button onClick={close} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,display:"flex",padding:4}}><IcClose size={16}/></button>
+          </div>
+          <div style={{padding:"22px",flex:1,display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{display:"flex",gap:16,alignItems:"flex-end"}}>
+              <ImageUpload value={form.iconUrl} onChange={v=>setForm({...form,iconUrl:v})} label="Ícone / Logo" hint="" aspect="square"/>
+              <div style={{flex:1}}>
+                <Field label="Nome *">
+                  <Inp value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Ex: Comissão de Vendas"/>
+                </Field>
+              </div>
+            </div>
+            <Div label="Detalhes"/>
+            <Field label="Módulo">
+              <Select value={form.module} onChange={e=>setForm({...form,module:e.target.value})}>
+                <option value="">Selecione o módulo</option>
+                {modules.map(m=><option key={m}>{m}</option>)}
+              </Select>
+            </Field>
+            <Field label="Descrição">
+              <Textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} rows={3} placeholder="Descreva o que o plugin faz…"/>
+            </Field>
+            <Field label="Ordem de Exibição">
+              <Inp type="number" value={form.sortOrder} onChange={e=>setForm({...form,sortOrder:parseInt(e.target.value)||0})} style={{width:100}}/>
+            </Field>
+            <Div label="Visibilidade"/>
+            <Toggle checked={form.active} onChange={v=>setForm({...form,active:v})} label={form.active?"Ativo — visível no site":"Inativo — oculto"}/>
+            <Toggle checked={form.featured} onChange={v=>setForm({...form,featured:v})} label="Destaque — aparece em primeiro"/>
+          </div>
+          <div style={{padding:"16px 22px",borderTop:`1px solid ${C.gray100}`,display:"flex",gap:8,position:"sticky",bottom:0,background:C.white}}>
+            <Btn onClick={save} disabled={saving} size="lg" style={{flex:1,justifyContent:"center"}}>
+              {saving?<span style={{width:16,height:16,border:"2px solid rgba(255,255,255,.4)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block"}}/>:"Salvar"}
+            </Btn>
+            <Btn onClick={close} variant="secondary" size="lg">Cancelar</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   LEADS
+════════════════════════════════════════ */
+const LeadsSection = () => {
+  const toast = useToast();
+  const [leads, setLeads] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => { setLoading(true); const d = await api("/leads/admin/all"); setLeads(d||[]); setLoading(false); };
+  useEffect(()=>{ load(); },[]);
+
+  const del = async (id) => {
+    if (!confirm("Excluir este lead?")) return;
+    await api(`/leads/admin/${id}`, { method:"DELETE" });
+    toast("Lead excluído","error"); setSelected(null); load();
+  };
+
+  const exportCSV = () => {
+    const header = ["Nome","E-mail","Telefone","Empresa","Segmento","Página","Data"];
+    const rows = leads.map(l=>[l.name||l.nome||"",l.email||"",l.phone||l.telefone||"",l.company||l.empresa||"",l.segment||l.segmento||"",l.page||"",l.createdAt?new Date(l.createdAt).toLocaleDateString("pt-BR"):""]);
+    const csv = [header,...rows].map(r=>r.map(v=>`"${v}"`).join(",")).join("\n");
+    const blob = new Blob([csv], {type:"text/csv"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="leads-uno-erp.csv"; a.click();
+    toast("CSV exportado!");
+  };
+
+  const filtered = leads.filter(l => !search || [l.name||l.nome,l.email,l.company||l.empresa].some(v=>v?.toLowerCase().includes(search.toLowerCase())));
+
+  return (
+    <div style={{display:"flex",gap:24,height:"100%",animation:"fadeIn .35s ease both"}}>
+      <div style={{flex:1,minWidth:0}}>
+        <SectionHeader title="Leads & Contatos" sub={`${leads.length} contatos recebidos`}
+          action={
+            <div style={{display:"flex",gap:8}}>
+              <Btn onClick={load} variant="ghost" size="sm" icon={<IcRefresh size={13}/>}>Atualizar</Btn>
+              <Btn onClick={exportCSV} variant="secondary" size="sm" icon={<IcDownload size={13}/>}>Exportar CSV</Btn>
+            </div>
+          }/>
+        <div style={{position:"relative",marginBottom:20}}>
+          <IcSearch size={14} color={C.gray400} style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)"}}/>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por nome, e-mail ou empresa…" style={{...inp,paddingLeft:36,background:C.white}}/>
+        </div>
+        <div style={{background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+          {loading ? (
+            <div style={{padding:40,textAlign:"center",color:C.gray400}}>
+              <span style={{width:24,height:24,border:`2px solid ${C.gray200}`,borderTopColor:C.orange,borderRadius:"50%",animation:"spin .7s linear infinite",display:"inline-block"}}/>
+            </div>
+          ) : filtered.length===0 ? (
+            <Empty icon={<IcLeads size={24}/>} title="Nenhum lead encontrado" sub="Os contatos dos formulários do site aparecerão aqui"/>
+          ) : filtered.map((l,i)=>(
+            <div key={l.id||i} onClick={()=>setSelected(selected?.id===l.id?null:l)}
+              style={{display:"flex",alignItems:"center",gap:14,padding:"13px 20px",borderBottom:i<filtered.length-1?`1px solid ${C.gray50}`:"none",cursor:"pointer",transition:"background .15s",background:selected?.id===l.id?C.gray50:"transparent"}}
+              onMouseEnter={e=>{if(selected?.id!==l.id)e.currentTarget.style.background=C.gray50}} onMouseLeave={e=>{if(selected?.id!==l.id)e.currentTarget.style.background="transparent"}}>
+              <div style={{width:36,height:36,borderRadius:"50%",background:C.orangeLight,border:`1px solid ${C.orangeBorder}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontFamily:"Inter",fontSize:13,fontWeight:700,color:C.orange}}>
+                {(l.name||l.nome||"?")[0].toUpperCase()}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13.5,fontWeight:600,color:C.black}}>{l.name||l.nome||"—"}</div>
+                <div style={{fontSize:12,color:C.gray400,display:"flex",gap:8,marginTop:1,flexWrap:"wrap"}}>
+                  <span>{l.email||"—"}</span>
+                  {(l.company||l.empresa)&&<span>· {l.company||l.empresa}</span>}
+                  {(l.segment||l.segmento)&&<span>· {l.segment||l.segmento}</span>}
+                </div>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                {l.page&&<span style={{fontSize:11,background:C.gray100,borderRadius:4,padding:"2px 7px",color:C.gray500,maxWidth:120,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{l.page}</span>}
+                <span style={{fontSize:11.5,color:C.gray400,whiteSpace:"nowrap"}}>{l.createdAt?new Date(l.createdAt).toLocaleDateString("pt-BR"):""}</span>
+                <button onClick={e=>{e.stopPropagation();del(l.id)}} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,padding:4,display:"flex",borderRadius:6,transition:"all .15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.color=C.red} onMouseLeave={e=>e.currentTarget.style.color=C.gray300}><IcTrash size={13}/></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lead detail */}
+      {selected&&(
+        <div style={{width:320,flexShrink:0,background:C.white,borderRadius:16,border:`1px solid ${C.gray100}`,padding:"22px",maxHeight:"calc(100vh - 80px)",overflowY:"auto",animation:"slideIn .25s ease both"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+            <div style={{fontSize:14,fontWeight:800,color:C.black}}>Detalhes do Lead</div>
+            <button onClick={()=>setSelected(null)} style={{background:"none",border:"none",cursor:"pointer",color:C.gray300,display:"flex"}}><IcClose size={15}/></button>
+          </div>
+          <div style={{width:56,height:56,borderRadius:"50%",background:C.orangeLight,border:`2px solid ${C.orangeBorder}`,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:20,fontWeight:800,color:C.orange}}>
+            {(selected.name||selected.nome||"?")[0].toUpperCase()}
+          </div>
+          <div style={{textAlign:"center",marginBottom:20}}>
+            <div style={{fontSize:16,fontWeight:800,color:C.black}}>{selected.name||selected.nome||"—"}</div>
+            {(selected.company||selected.empresa)&&<div style={{fontSize:13,color:C.gray400,marginTop:3}}>{selected.company||selected.empresa}</div>}
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {[
+              {ic:<IcMail size={14}/>,label:"E-mail",val:selected.email},
+              {ic:<IcPhone size={14}/>,label:"Telefone",val:selected.phone||selected.telefone},
+              {ic:<IcBuilding size={14}/>,label:"Empresa",val:selected.company||selected.empresa},
+              {ic:<IcPlugin size={14}/>,label:"Segmento",val:selected.segment||selected.segmento},
+              {ic:<IcGlobe size={14}/>,label:"Página",val:selected.page},
+              {ic:<IcBlog size={14}/>,label:"Mensagem",val:selected.message||selected.mensagem},
+            ].filter(f=>f.val).map((f,i)=>(
+              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"10px 12px",background:C.gray50,borderRadius:10}}>
+                <div style={{color:C.orange,flexShrink:0,marginTop:1}}>{f.ic}</div>
+                <div>
+                  <div style={{fontSize:11,fontWeight:600,color:C.gray400,textTransform:"uppercase",letterSpacing:.6,marginBottom:2}}>{f.label}</div>
+                  <div style={{fontSize:13,color:C.gray700,wordBreak:"break-all"}}>{f.val}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:20,display:"flex",flexDirection:"column",gap:8}}>
+            <Btn onClick={()=>{window.open(`mailto:${selected.email}`)}} variant="secondary" size="sm" icon={<IcMail size={13}/>} style={{width:"100%",justifyContent:"center"}}>Enviar E-mail</Btn>
+            <Btn onClick={()=>del(selected.id)} variant="ghost" size="sm" icon={<IcTrash size={13}/>} style={{width:"100%",justifyContent:"center",color:C.red,borderColor:"#fca5a5"}}>Excluir Lead</Btn>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ════════════════════════════════════════
+   MAIN APP
+════════════════════════════════════════ */
+function AdminApp() {
+  const [user, setUser] = useState(null);
+  const [tab, setTab] = useState("dashboard");
+  const [loading, setLoading] = useState(true);
+  const [counts, setCounts] = useState({});
+
+  useEffect(() => {
+    const token = localStorage.getItem("uno_token");
+    if (token) {
+      api("/auth/me").then(u => { if (u?.id) setUser(u); setLoading(false); }).catch(()=>setLoading(false));
+    } else setLoading(false);
+  }, []);
+
+  useEffect(()=>{
+    if(!user) return;
+    Promise.all([
+      api("/blog/admin/all").then(d=>(d||[]).length),
+      api("/integrations/admin/all").then(d=>(d||[]).length),
+      api("/plugins/admin/all").then(d=>(d||[]).length),
+      api("/leads/admin/all").then(d=>(d||[]).length),
+      api("/blog/admin/all").then(d=>(d||[]).filter(p=>p.published).length),
+    ]).then(([blog,integrations,plugins,leads,published])=>setCounts({blog,integrations,plugins,leads,published}));
+  },[user, tab]);
+
+  if (loading) return (
+    <div style={{height:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.black}}>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+        <div style={{width:32,height:32,border:`2px solid rgba(255,95,0,.2)`,borderTopColor:C.orange,borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+        <span style={{fontSize:13,color:"rgba(255,255,255,.3)"}}>Carregando…</span>
+      </div>
+    </div>
+  );
+
+  if (!user) return <ToastProvider><Login onLogin={setUser}/></ToastProvider>;
+
+  const navItems = [
+    { key:"dashboard", label:"Dashboard",    icon:<IcDashboard size={16}/> },
+    { key:"blog",      label:"Blog",          icon:<IcBlog size={16}/> },
+    { key:"integrations",label:"Integrações", icon:<IcInteg size={16}/> },
+    { key:"plugins",   label:"Plugins",       icon:<IcPlugin size={16}/> },
+    { key:"leads",     label:"Leads",         icon:<IcLeads size={16}/>, badge: counts.leads>0?counts.leads:null },
+  ];
+
+  return (
+    <ToastProvider>
+      <div style={{display:"flex",height:"100vh",overflow:"hidden"}}>
+
+        {/* ── Sidebar ── */}
+        <div style={{width:220,background:C.sidebar,display:"flex",flexDirection:"column",flexShrink:0,borderRight:"1px solid rgba(255,255,255,.05)"}}>
+          {/* Logo */}
+          <div style={{padding:"20px 18px 16px",borderBottom:"1px solid rgba(255,255,255,.05)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:34,height:34,borderRadius:9,background:C.orange,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 4px 12px ${C.orange}44`,flexShrink:0}}>
+                <svg viewBox="0 0 36 36" width={18} height={18}>
+                  <path d="M6,3 L6,21 C6,25.5 9,28.5 13.5,28.5 C18,28.5 21,25.5 21,21 L21,3 Z" fill="#fff"/>
+                  <path d="M22.5,3 L22.5,20.4 C22.5,20.4 27,15 31.5,10.5 L31.5,3 Z" fill="#fff"/>
+                  <path d="M24,20.4 L24,28.5 L31.5,28.5 L31.5,10.5 Z" fill="rgba(255,255,255,.4)"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{fontSize:14,fontWeight:800,color:"#fff",letterSpacing:-.3}}>UNO ERP</div>
+                <div style={{fontSize:10.5,color:"rgba(255,255,255,.3)",fontWeight:500}}>Admin Panel</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav style={{flex:1,padding:"10px 10px",overflowY:"auto"}}>
+            <div style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:1.5,padding:"8px 8px 6px"}}>Menu</div>
+            {navItems.map(it=>{
+              const active = tab===it.key;
+              return (
+                <button key={it.key} onClick={()=>setTab(it.key)} style={{
+                  display:"flex",alignItems:"center",gap:10,width:"100%",
+                  padding:"9px 10px",borderRadius:9,border:"none",cursor:"pointer",
+                  marginBottom:2,background:active?"rgba(255,95,0,.12)":"transparent",
+                  color:active?"#FF8A40":"rgba(255,255,255,.45)",
+                  fontSize:13.5,fontWeight:active?600:500,textAlign:"left",
+                  transition:"all .15s",position:"relative",
+                }}>
+                  <span style={{opacity:active?1:.7}}>{it.icon}</span>
+                  <span style={{flex:1}}>{it.label}</span>
+                  {it.badge&&<span style={{background:C.orange,color:"#fff",borderRadius:50,fontSize:10,fontWeight:700,padding:"1px 6px",minWidth:18,textAlign:"center"}}>{it.badge}</span>}
+                  {active&&<div style={{position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",width:3,height:20,background:C.orange,borderRadius:"0 2px 2px 0"}}/>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* User */}
+          <div style={{padding:"12px 14px",borderTop:"1px solid rgba(255,255,255,.05)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:8}}>
+              <div style={{width:30,height:30,borderRadius:"50%",background:"rgba(255,95,0,.15)",border:"1px solid rgba(255,95,0,.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,color:C.orange,flexShrink:0}}>
+                {(user.name||user.email||"A")[0].toUpperCase()}
+              </div>
+              <div style={{minWidth:0}}>
+                <div style={{fontSize:12.5,fontWeight:600,color:"rgba(255,255,255,.8)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name||"Admin"}</div>
+                <div style={{fontSize:11,color:"rgba(255,255,255,.3)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.email}</div>
+              </div>
+            </div>
+            <button onClick={()=>{localStorage.removeItem("uno_token");window.location.reload()}}
+              style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",color:"rgba(255,255,255,.3)",fontSize:12,fontWeight:500,padding:"4px 2px",width:"100%",transition:"color .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.color="#f87171"} onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,.3)"}>
+              <IcLogout size={13}/>Sair da conta
+            </button>
+          </div>
+        </div>
+
+        {/* ── Main ── */}
+        <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",background:C.cream}}>
+          {/* Topbar */}
+          <div style={{height:56,background:C.white,borderBottom:`1px solid ${C.gray100}`,display:"flex",alignItems:"center",padding:"0 28px",justifyContent:"space-between",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <span style={{fontSize:12.5,color:C.gray300}}>Admin</span>
+              <span style={{fontSize:12.5,color:C.gray300}}>/</span>
+              <span style={{fontSize:13,fontWeight:600,color:C.gray600}}>
+                {navItems.find(n=>n.key===tab)?.label}
+              </span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <a href="../public/index.html" target="_blank" style={{display:"flex",alignItems:"center",gap:6,fontSize:12.5,color:C.gray400,textDecoration:"none",padding:"5px 10px",borderRadius:8,border:`1px solid ${C.gray200}`,transition:"all .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.borderColor=C.orange} onMouseLeave={e=>e.currentTarget.style.borderColor=C.gray200}>
+                <IcEye size={13}/>Ver Site
+              </a>
+              <div style={{width:1,height:20,background:C.gray200}}/>
+              <div style={{fontSize:12,color:C.gray400,background:C.gray100,padding:"4px 10px",borderRadius:8}}>
+                v1.0 · {new Date().toLocaleDateString("pt-BR")}
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div style={{flex:1,overflowY:"auto",padding:"28px"}}>
+            {tab==="dashboard"&&<Dashboard counts={counts}/>}
+            {tab==="blog"&&<BlogSection/>}
+            {tab==="integrations"&&<IntegrationsSection/>}
+            {tab==="plugins"&&<PluginsSection/>}
+            {tab==="leads"&&<LeadsSection/>}
+          </div>
+        </div>
+
+      </div>
+    </ToastProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(AdminApp));
+</script>
+</body>
+</html>

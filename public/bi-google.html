@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BI Google — BigQuery & Looker Studio | UNO ERP</title>
+<meta name="description" content="Dashboards profissionais com BigQuery e Looker Studio do Google, integrados ao UNO ERP. Tome decisões com dados reais, em tempo real, de qualquer dispositivo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:#FDFCFA;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,95,0,.12);color:#0D0D0D}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#f8f8f6}
+::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#FF5F00}
+input::placeholder{color:#bbb}
+select{appearance:none}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes barGrow{from{height:0}to{height:var(--h)}}
+@keyframes lineTrace{from{stroke-dashoffset:300}to{stroke-dashoffset:0}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media(max-width:900px){
+  .nav-links{display:none!important}
+  .nav-mobile-btn{display:flex!important}
+  .hero-ring{display:none!important}
+  .hero-section{padding:100px 16px 56px!important}
+  .hero-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .hero-grid h1{font-size:32px!important}
+  .feat-grid{grid-template-columns:1fr 1fr!important}
+  .two-col{grid-template-columns:1fr!important;gap:40px!important}
+  .cta-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .footer-grid{grid-template-columns:1fr 1fr!important;gap:24px!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important;gap:12px!important}
+  .steps-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:32px!important}
+  .step-arrow{display:none!important}
+  section:not(.hero-section){padding:56px 16px!important}
+}
+@media(max-width:560px){
+  .hero-section{padding:96px 16px 48px!important}
+  .feat-grid{grid-template-columns:1fr!important}
+  .footer-grid{grid-template-columns:1fr!important}
+  .steps-row{grid-template-columns:1fr!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ══ ICONS ══ */
+const mkIc = (paths) => ({size=16,color="currentColor",style:s={}}={}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{display:"inline-block",verticalAlign:"middle",flexShrink:0,...s}}>{paths}</svg>
+);
+const ArrowRight   = mkIc(<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>);
+const ArrowUpRight = mkIc(<><path d="M7 7h10v10"/><path d="M7 17 17 7"/></>);
+const ChevronDown  = mkIc(<path d="m6 9 6 6 6-6"/>);
+const ChevronRight = mkIc(<path d="m9 18 6-6-6-6"/>);
+const Check        = mkIc(<path d="M20 6 9 17l-5-5"/>);
+const Brain        = mkIc(<><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></>);
+const BarChart3    = mkIc(<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>);
+const ClipboardList= mkIc(<><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>);
+const Handshake    = mkIc(<><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>);
+const Smartphone   = mkIc(<><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></>);
+const Warehouse    = mkIc(<><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></>);
+const ShoppingCart = mkIc(<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>);
+const Factory      = mkIc(<><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></>);
+const Truck        = mkIc(<><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></>);
+const Settings     = mkIc(<><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></>);
+const Plug         = mkIc(<><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z"/></>);
+const Globe        = mkIc(<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>);
+const Monitor      = mkIc(<><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></>);
+const Package      = mkIc(<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>);
+const Code         = mkIc(<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>);
+const Mail         = mkIc(<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>);
+const Phone        = mkIc(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>);
+const MapPin       = mkIc(<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>);
+const TrendingUp   = mkIc(<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>);
+const Users        = mkIc(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>);
+const Zap          = mkIc(<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>);
+const Layers       = mkIc(<><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>);
+const PieChart     = mkIc(<><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></>);
+const LineChart    = mkIc(<><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></>);
+const Database     = mkIc(<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></>);
+const RefreshCw    = mkIc(<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></>);
+const Shield       = mkIc(<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></>);
+const Share2       = mkIc(<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></>);
+const Filter       = mkIc(<><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></>);
+const Clock        = mkIc(<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>);
+const Star         = mkIc(<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>);
+const Target       = mkIc(<><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>);
+
+/* ══ TOKENS ══ */
+const C = {
+  orange:"#FF5F00",orangeHot:"#E85500",orangeWarm:"#FF8A00",
+  orangeSoft:"#FFF3EB",orangeBorder:"rgba(255,95,0,0.15)",
+  gblue:"#1A73E8",gblueSoft:"rgba(26,115,232,.08)",gblueBorder:"rgba(26,115,232,.15)",
+  black:"#0D0D0D",dark:"#141414",gray800:"#2a2a2a",
+  gray600:"#555",gray500:"#717171",gray400:"#999",gray300:"#bbb",
+  gray200:"#ddd",gray100:"#efefef",gray50:"#f8f8f6",
+  cream:"#FDFCFA",white:"#fff",
+};
+const F = { h:"'Inter', sans-serif", b:"'Inter', sans-serif", mono:"'JetBrains Mono', monospace" };
+
+/* ══ LOGO ══ */
+const Logo = ({height=32}) => (
+  <svg viewBox="0 0 512.82 213.17" height={height} style={{display:"block"}}>
+    <g>
+      <path d="M305.22,91.78c0,6.8-1.4,11.5-4.3,14.3s-6.6,4.2-11.1,4.2-4.3-.3-6.2-1c-1.9-.6-3.5-1.7-4.8-3.2s-2.4-3.4-3.1-5.8c-.8-2.4-1.1-5.2-1.1-8.6v-50.4h-18.8v51.9c0,4.9.7,9.4,2,13.4,1.3,4.1,3.4,7.6,6.1,10.5,2.8,2.9,6.3,5.2,10.5,6.9,4.3,1.7,9.3,2.5,15.2,2.5s11.1-.8,15.4-2.4,7.9-3.9,10.7-6.8c2.8-2.9,4.9-6.4,6.3-10.5s2-8.6,2-13.5v-51.9h-18.8v50.4h0Z" fill="#FFFFFF"/>
+      <path d="M360.72,70.18c7.1,8.3,13.7,17.1,20,26.4s12.1,18.8,17.5,28.3h15.8V41.38h-18.7v49.3c-2.9-4.3-6-8.9-9.3-13.6s-6.6-9.2-9.9-13.6-6.6-8.5-9.8-12.4c-3.2-3.9-6.1-7.1-8.8-9.8h-15.3v83.5h18.6v-54.7h-.1v.1h0Z" fill="#FFFFFF"/>
+      <path d="M441.82,115.58c3.8,3.7,8.2,6.4,13.3,8.2,5.1,1.8,10.4,2.8,16.1,2.8s11.4-.9,16.5-2.8,9.5-4.6,13.2-8.2c3.7-3.7,6.6-8.2,8.7-13.6s3.2-11.7,3.2-18.9-1.1-13.4-3.2-18.9-5.1-10-8.9-13.7-8.2-6.5-13.3-8.3-10.5-2.8-16.1-2.8-10.8.9-15.9,2.8c-5,1.8-9.4,4.6-13.3,8.3s-6.9,8.2-9.1,13.7c-2.2,5.4-3.4,11.7-3.4,18.9s1.1,13.4,3.2,18.9,5.1,10,8.9,13.6h.1,0ZM450.52,71.98c1-3.3,2.5-6.2,4.3-8.6,1.9-2.4,4.2-4.2,6.9-5.5,2.7-1.3,5.9-2,9.4-2s6.6.6,9.3,1.9,5.1,3.1,7,5.5,3.3,5.2,4.3,8.6c1,3.3,1.5,7.1,1.5,11.2s-.5,7.8-1.5,11.1-2.5,6.1-4.3,8.5c-1.9,2.4-4.2,4.2-7,5.5s-5.9,1.9-9.3,1.9-6.7-.6-9.4-1.9c-2.7-1.3-5-3.1-6.9-5.5s-3.3-5.2-4.3-8.5-1.5-7-1.5-11.1.5-7.7,1.5-11h0v-.1Z" fill="#FFFFFF"/>
+      <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill="#FFFFFF"/>
+      <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill="#FFFFFF"/>
+      <path d="M284.25,192.08v-43.66h28.04v6.74h-20.1v10.77h17.89v6.61h-17.89v12.79h21.61v6.74h-29.55Z" fill="#EE5820"/>
+      <path d="M377.3,147.98c6.3,0,11.12,1.16,14.46,3.46,3.34,2.31,5.01,5.84,5.01,10.58,0,5.92-2.92,9.93-8.76,12.03.8.97,1.7,2.14,2.71,3.53,1.01,1.39,2.04,2.89,3.09,4.5,1.05,1.62,2.06,3.28,3.02,4.98.97,1.7,1.83,3.37,2.58,5.01h-8.88c-.8-1.51-1.66-3.03-2.58-4.57s-1.86-3.02-2.8-4.47-1.88-2.81-2.8-4.1c-.92-1.28-1.79-2.42-2.58-3.43-.59.04-1.09.06-1.51.06h-5.04v16.51h-7.94v-43.03c1.93-.42,3.99-.7,6.17-.85,2.18-.15,4.14-.22,5.86-.22h0ZM377.87,154.85c-1.68,0-3.23.06-4.66.19v14.11h3.46c1.93,0,3.63-.1,5.1-.32,1.47-.21,2.7-.59,3.69-1.13.99-.55,1.73-1.28,2.24-2.21s.76-2.1.76-3.53c0-1.34-.25-2.48-.76-3.4s-1.23-1.66-2.17-2.21-2.07-.93-3.37-1.17c-1.3-.23-2.73-.35-4.28-.35v.02Z" fill="#EE5820"/>
+      <path d="M462.04,147.98c6.34,0,11.2,1.16,14.58,3.46,3.38,2.31,5.07,5.92,5.07,10.84,0,2.56-.45,4.76-1.35,6.58-.9,1.83-2.22,3.32-3.94,4.47-1.72,1.16-3.82,2.01-6.3,2.55-2.48.55-5.31.82-8.5.82h-3.97v15.37h-7.94v-43.03c1.85-.42,3.89-.7,6.14-.85,2.25-.15,4.32-.22,6.21-.22h0ZM462.6,154.85c-2.02,0-3.68.06-4.98.19v14.87h3.84c3.82,0,6.76-.54,8.82-1.61s3.09-3.1,3.09-6.08c0-1.43-.27-2.62-.82-3.59-.55-.97-1.3-1.72-2.27-2.27s-2.11-.93-3.43-1.17c-1.32-.23-2.74-.35-4.25-.35h0Z" fill="#EE5820"/>
+    </g>
+  </svg>
+);
+
+const LogoMark = ({size=80,color="#e8e8e6"}) => (
+  <svg viewBox="0 0 200 200" width={size} height={size} style={{display:"block"}}>
+    <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+    <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+  </svg>
+);
+
+/* ══ Google Logo SVG ══ */
+const GoogleG = ({size=18}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" style={{display:"inline-block",verticalAlign:"middle",flexShrink:0}}>
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+  </svg>
+);
+
+if(typeof gsap!=="undefined"&&typeof ScrollTrigger!=="undefined"){gsap.registerPlugin(ScrollTrigger);}
+
+const Reveal = ({children,delay=0,style={},direction="up"}) => {
+  const ref = useRef(null);
+  useEffect(()=>{
+    if(typeof gsap==="undefined"||!ref.current)return;
+    const dirs={up:{y:40},down:{y:-40},left:{x:-50},right:{x:50}};
+    const from={opacity:0,...dirs[direction]};
+    gsap.fromTo(ref.current,from,{opacity:1,x:0,y:0,duration:0.85,delay,ease:"power3.out",scrollTrigger:{trigger:ref.current,start:"top 88%",toggleActions:"play none none none"}});
+  },[]);
+  return <div ref={ref} style={{...style}}>{children}</div>;
+};
+
+const Badge = ({children}) => (
+  <span style={{display:"inline-block",fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.8,textTransform:"uppercase",marginBottom:10}}>{children}</span>
+);
+
+/* ══ NAV ══ */
+const navLinks = {
+  "Soluções":[
+    {n:"Sistema de Gestão",d:"Plataforma completa para PME",ic:<ClipboardList size={16}/>,href:"sistema-de-gestao.html"},
+    {n:"CRM",d:"Gestão intuitiva de clientes e oportunidades",ic:<Handshake size={16}/>,href:"crm.html"},
+    {n:"IAU — IA",d:"Inteligência artificial preditiva",ic:<Brain size={16}/>,href:"iau.html"},
+    {n:"BI (Google)",d:"BigQuery & Looker Studio",ic:<BarChart3 size={16}/>,href:"bi-google.html"},
+    {n:"App UNO ERP",d:"Força de vendas mobile",ic:<Smartphone size={16}/>,href:"app-uno-erp.html"},
+    {n:"M-Commerce",d:"App B2B para revendas",ic:<ShoppingCart size={16}/>,href:"m-commerce.html"},
+    {n:"WMS para PME",d:"Gestão de armazém",ic:<Warehouse size={16}/>,href:"wms-para-pme.html"},
+    {n:"Site B2B",d:"Portal com preços exclusivos",ic:<Globe size={16}/>,href:"site-b2b.html"},
+    {n:"Integrações B2C",d:"Marketplaces e e-commerce",ic:<Plug size={16}/>,href:"integracoes-b2c.html"},
+  ],
+  "Segmentos":[
+    {n:"Indústria",d:"Produção e manufatura",ic:<Factory size={16}/>,href:"#"},
+    {n:"Distribuição & Revenda",d:"Atacado e distribuição",ic:<Truck size={16}/>,href:"#"},
+    {n:"Serviços",d:"Automação e TI",ic:<Settings size={16}/>,href:"#"},
+  ],
+  "Personalização":[
+    {n:"Desenvolvimento",d:"Customizações sob medida",ic:<Code size={16}/>,href:"desenvolvimento.html"},
+    {n:"Integrações & Plugins",d:"20+ integrações nativas",ic:<Plug size={16}/>,href:"integracoes-e-plugins.html"},
+    {n:"Dashboards",d:"Painéis personalizados",ic:<Monitor size={16}/>,href:"#"},
+    {n:"Planos",d:"Encontre o ideal",ic:<Package size={16}/>,href:"#"},
+  ],
+};
+
+const Nav = () => {
+  const [sc,setSc] = useState(false);
+  const [open,setOpen] = useState(null);
+  useEffect(()=>{const fn=()=>setSc(window.scrollY>30);window.addEventListener("scroll",fn);return()=>window.removeEventListener("scroll",fn);},[]);
+  const isBig = open==="Soluções";
+  return (
+    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:sc?"rgba(20,20,20,0.95)":"transparent",backdropFilter:sc?"blur(16px)":"none",borderBottom:sc?"1px solid rgba(255,255,255,0.06)":"1px solid transparent",transition:"all .3s"}}>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:"0 40px",height:72,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <a href="index.html" style={{display:"flex",alignItems:"center",textDecoration:"none"}}><Logo height={40}/></a>
+        <button className="nav-mobile-btn" onClick={()=>setOpen(open==="mobile"?null:"mobile")} style={{display:"none",background:"none",border:"none",color:C.white,cursor:"pointer",padding:8}}>
+          {open==="mobile"?<span style={{fontSize:24}}>✕</span>:<span style={{fontSize:24}}>☰</span>}
+        </button>
+        <div className="nav-links" style={{display:"flex",alignItems:"center",gap:2}}>
+          {Object.keys(navLinks).map(k=>(
+            <div key={k} style={{position:"relative"}} onMouseEnter={()=>setOpen(k)} onMouseLeave={()=>setOpen(null)}>
+              <button style={{background:"none",border:"none",cursor:"pointer",padding:"8px 13px",fontFamily:F.b,fontSize:13.5,fontWeight:500,color:open===k?C.orange:"rgba(255,255,255,.6)",borderRadius:8,display:"flex",alignItems:"center",gap:3,transition:".2s"}}>
+                {k} <ChevronDown size={13} style={{transition:".2s",transform:open===k?"rotate(180deg)":"none"}}/>
+              </button>
+              {open===k&&<div style={{position:"absolute",top:"100%",left:0,width:"100%",height:12,background:"transparent"}}/>}
+              {open===k&&(
+                <div style={{position:"absolute",top:"calc(100% + 8px)",left:k==="Soluções"?"-140px":"0",background:"rgba(18,18,18,0.96)",backdropFilter:"blur(24px) saturate(1.5)",borderRadius:18,padding:isBig?"20px":"10px",boxShadow:"0 32px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06)",minWidth:isBig?580:300,animation:"ddIn .25s cubic-bezier(.22,1,.36,1)"}}>
+                  <div style={{position:"absolute",top:-6,left:k==="Soluções"?170:30,width:12,height:12,background:"rgba(18,18,18,0.96)",transform:"rotate(45deg)",borderRadius:2,borderTop:"1px solid rgba(255,255,255,.06)",borderLeft:"1px solid rgba(255,255,255,.06)"}}/>
+                  {isBig?(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 14px",borderBottom:"1px solid rgba(255,255,255,.06)",marginBottom:14}}>Todas as Soluções</div>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+                        {navLinks[k].map((item,i)=>(
+                          <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"12px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                            <div style={{width:34,height:34,borderRadius:9,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                            <div style={{minWidth:0}}>
+                              <div style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.white,marginBottom:2}}>{item.n}</div>
+                              <div style={{fontFamily:F.b,fontSize:11,color:"rgba(255,255,255,.3)",lineHeight:1.35}}>{item.d}</div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                      <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.25)"}}>Precisa de ajuda para escolher?</span>
+                        <a href="#contato" style={{fontFamily:F.b,fontSize:12,fontWeight:600,color:C.orange,textDecoration:"none",display:"flex",alignItems:"center",gap:4}}>Fale com um especialista <ArrowRight size={12}/></a>
+                      </div>
+                    </div>
+                  ):(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 12px"}}>{k}</div>
+                      {navLinks[k].map((item,i)=>(
+                        <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                          onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                          <div style={{width:36,height:36,borderRadius:10,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                          <div>
+                            <div style={{fontFamily:F.b,fontSize:13.5,fontWeight:600,color:C.white}}>{item.n}</div>
+                            <div style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.3)"}}>{item.d}</div>
+                          </div>
+                          <ArrowRight size={14} color="rgba(255,255,255,.15)" style={{marginLeft:"auto"}}/>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13.5,fontWeight:500,color:"rgba(255,255,255,.6)",padding:"8px 13px",textDecoration:"none"}}>Contato</a>
+          <div style={{width:1,height:24,background:"rgba(255,255,255,.15)",margin:"0 10px"}}/>
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13,fontWeight:700,color:C.white,background:C.orange,padding:"9px 22px",borderRadius:8,textDecoration:"none",transition:"all .2s",display:"flex",alignItems:"center",gap:6}}
+            onMouseEnter={e=>e.currentTarget.style.background=C.orangeHot} onMouseLeave={e=>e.currentTarget.style.background=C.orange}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      </div>
+      <style>{`@keyframes ddIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
+      {open==="mobile"&&(
+        <div style={{position:"absolute",top:"100%",left:0,right:0,background:"rgba(18,18,18,0.98)",backdropFilter:"blur(24px)",padding:"20px 24px 28px",borderTop:"1px solid rgba(255,255,255,.06)",maxHeight:"80vh",overflowY:"auto"}}>
+          {Object.keys(navLinks).map(section=>(
+            <div key={section} style={{marginBottom:20}}>
+              <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,marginBottom:10}}>{section}</div>
+              {navLinks[section].map((item,i)=>(
+                <a key={i} href={item.href||"#"} onClick={()=>setOpen(null)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",textDecoration:"none",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+                  <span style={{color:C.orange,display:"flex"}}>{item.ic}</span>
+                  <span style={{fontFamily:F.b,fontSize:14,color:C.white,fontWeight:500}}>{item.n}</span>
+                </a>
+              ))}
+            </div>
+          ))}
+          <a href="#contato" onClick={()=>setOpen(null)} style={{display:"flex",justifyContent:"center",alignItems:"center",gap:8,fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 0",borderRadius:10,textDecoration:"none",marginTop:8}}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+/* ══ MARQUEE ══ */
+const MarqueeStrip = () => (
+  <div style={{background:C.orange,padding:"13px 0",overflow:"hidden",display:"flex",alignItems:"center"}}>
+    <div style={{display:"inline-flex",alignItems:"center",animation:"marquee 36s linear infinite",whiteSpace:"nowrap"}}>
+      {[...Array(2)].map((_,r)=>(
+        <span key={r} style={{display:"inline-flex",alignItems:"center"}}>
+          {["BigQuery","Looker Studio","Dashboards em Tempo Real","Dados do ERP","KPIs por Segmento","Acesso Mobile","Compartilhamento Seguro","Faturamento","Estoque","Compras","Vendas","Financeiro","Margem de Lucro"].map((t,i)=>(
+            <span key={i} style={{fontFamily:F.b,fontSize:12,fontWeight:800,color:C.white,letterSpacing:1.2,textTransform:"uppercase",padding:"0 22px",display:"inline-flex",alignItems:"center",gap:12,lineHeight:1}}>
+              <span style={{width:3,height:3,borderRadius:"50%",background:"rgba(255,255,255,.5)",display:"inline-block",flexShrink:0}}/>{t}
+            </span>
+          ))}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
+/* ══ BI DASHBOARD MOCKUP ══ */
+const BIDashboardMockup = () => {
+  const bars = [
+    {l:"Jan",v:62,color:"#FF5F00"},
+    {l:"Fev",v:48,color:"#FF5F00"},
+    {l:"Mar",v:75,color:"#FF5F00"},
+    {l:"Abr",v:55,color:"#FF5F00"},
+    {l:"Mai",v:88,color:"#FF5F00"},
+    {l:"Jun",v:70,color:"#FF8A00"},
+  ];
+  const kpis = [
+    {l:"Faturamento",v:"R$ 2,4M",delta:"+18%",up:true,color:"#FF5F00"},
+    {l:"Margem Bruta",v:"34,2%",delta:"+2,1pp",up:true,color:"#22C55E"},
+    {l:"Ticket Médio",v:"R$ 4.870",delta:"+9%",up:true,color:"#1A73E8"},
+    {l:"Inadimplência",v:"1,8%",delta:"-0,4pp",up:true,color:"#F59E0B"},
+  ];
+  return (
+    <div style={{background:"#fff",borderRadius:20,overflow:"hidden",boxShadow:"0 0 80px 20px rgba(255,95,0,.08),0 40px 100px rgba(0,0,0,.15)",border:"1px solid #efefef"}}>
+      {/* Browser bar */}
+      <div style={{padding:"9px 14px",background:"#f8f8f6",borderBottom:"1px solid #efefef",display:"flex",alignItems:"center",gap:7}}>
+        <div style={{display:"flex",gap:5}}>{["#ff5f57","#febc2e","#28c840"].map((c,i)=><div key={i} style={{width:9,height:9,borderRadius:"50%",background:c}}/>)}</div>
+        <div style={{flex:1,background:"#fff",borderRadius:5,padding:"4px 10px",fontFamily:F.mono,fontSize:10.5,color:"#999",border:"1px solid #efefef",display:"flex",alignItems:"center",gap:6}}>
+          <GoogleG size={12}/>
+          <span>lookerstudio.google.com · UNO ERP</span>
+        </div>
+        <div style={{width:24,height:24,borderRadius:6,background:"rgba(26,115,232,.1)",border:"1px solid rgba(26,115,232,.2)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <Share2 size={11} color="#1A73E8"/>
+        </div>
+      </div>
+      {/* Dashboard header */}
+      <div style={{padding:"12px 16px 8px",borderBottom:"1px solid #f0f0ef",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#fff"}}>
+        <div>
+          <div style={{fontFamily:F.b,fontSize:13,fontWeight:700,color:C.black}}>Dashboard Executivo — Jun/2025</div>
+          <div style={{fontFamily:F.mono,fontSize:10,color:"#999",marginTop:1}}>Atualizado há 3 min · Fonte: UNO ERP</div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(26,115,232,.06)",border:"1px solid rgba(26,115,232,.15)",borderRadius:100,padding:"4px 10px"}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:"#1A73E8",animation:"pulse2 1.5s ease-in-out infinite"}}/>
+          <span style={{fontFamily:F.b,fontSize:10.5,fontWeight:700,color:"#1A73E8"}}>Live</span>
+        </div>
+      </div>
+      {/* KPI row */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:0,borderBottom:"1px solid #f0f0ef"}}>
+        {kpis.map((k,i)=>(
+          <div key={i} style={{padding:"10px 14px",borderRight:i<3?"1px solid #f0f0ef":"none"}}>
+            <div style={{fontFamily:F.b,fontSize:10,color:"#999",marginBottom:3}}>{k.l}</div>
+            <div style={{fontFamily:F.mono,fontSize:15,fontWeight:700,color:C.black}}>{k.v}</div>
+            <div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:k.up?"#22C55E":"#EF4444",marginTop:2}}>{k.delta} ↑</div>
+          </div>
+        ))}
+      </div>
+      {/* Chart area */}
+      <div style={{padding:"14px 16px",background:"#fafaf9"}}>
+        <div style={{fontFamily:F.b,fontSize:10,color:"#999",marginBottom:10}}>Faturamento mensal (R$ mil)</div>
+        <div style={{display:"flex",alignItems:"flex-end",gap:6,height:80}}>
+          {bars.map((b,i)=>(
+            <div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+              <div style={{fontFamily:F.mono,fontSize:8,color:"#bbb"}}>{b.v}k</div>
+              <div style={{width:"100%",borderRadius:"4px 4px 0 0",background:i===5?`linear-gradient(180deg,${b.color},${C.orangeWarm})`:`${b.color}20`,border:i===5?`none`:`1px solid ${b.color}30`,height:`${b.v}%`,transition:"height .5s ease"}}/>
+              <div style={{fontFamily:F.b,fontSize:8.5,color:"#bbb"}}>{b.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Bottom row */}
+      <div style={{padding:"10px 16px",background:"#fff",borderTop:"1px solid #f0f0ef",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{display:"flex",gap:12}}>
+          {[{l:"Vendas",v:"1.243",c:"#FF5F00"},{l:"Clientes ativos",v:"387",c:"#1A73E8"},{l:"Produtos",v:"4.820",c:"#22C55E"}].map((m,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:5}}>
+              <div style={{width:6,height:6,borderRadius:"50%",background:m.c}}/>
+              <span style={{fontFamily:F.b,fontSize:10,color:"#999"}}>{m.l}:</span>
+              <span style={{fontFamily:F.mono,fontSize:10,fontWeight:700,color:C.black}}>{m.v}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:4,fontFamily:F.b,fontSize:10,color:"#bbb"}}>
+          <GoogleG size={11}/>
+          Looker Studio
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ══ HERO ══ */
+const PageHero = () => (
+  <section className="hero-section" style={{background:C.dark,padding:"120px 40px 80px",position:"relative",overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)",backgroundSize:"56px 56px",WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",maskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",pointerEvents:"none"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 60% 55% at 60% 10%,rgba(255,95,0,.12),transparent 65%)",pointerEvents:"none"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 40% 40% at 20% 80%,rgba(26,115,232,.06),transparent 60%)",pointerEvents:"none"}}/>
+
+    <div style={{maxWidth:1240,margin:"0 auto",position:"relative",zIndex:2}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:28,animation:"heroFadeUp .6s ease both"}}>
+        <a href="index.html" style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",textDecoration:"none",transition:"color .2s"}}
+          onMouseEnter={e=>e.target.style.color="rgba(255,255,255,.7)"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.35)"}>Home</a>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)"}}>Soluções</span>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:C.orange,fontWeight:600}}>BI Google</span>
+      </div>
+
+      <div className="hero-grid" style={{display:"grid",gridTemplateColumns:"1fr 1.1fr",gap:64,alignItems:"center"}}>
+        <div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,95,0,.12)",border:"1px solid rgba(255,95,0,.2)",color:C.orange,fontFamily:F.b,fontSize:11.5,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",padding:"5px 14px",borderRadius:100,marginBottom:20,animation:"heroFadeUp .7s ease both .1s both"}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:C.orange,animation:"pulse2 1.5s ease-in-out infinite"}}/>
+            Business Intelligence
+          </div>
+          <h1 style={{fontFamily:F.h,fontSize:"clamp(30px,4vw,56px)",fontWeight:900,color:C.white,letterSpacing:-2,lineHeight:1.05,margin:"0 0 20px",animation:"heroFadeUp .8s ease both .2s"}}>
+            Dashboards que<br/>transformam dados<br/>em <span style={{color:C.orange}}>decisões.</span>
+          </h1>
+          <p style={{fontFamily:F.b,fontSize:16.5,color:"rgba(255,255,255,.55)",lineHeight:1.75,maxWidth:500,margin:"0 0 16px",animation:"heroFadeUp .8s ease both .35s"}}>
+            Conecte o UNO ERP ao BigQuery e Looker Studio do Google e tenha dashboards profissionais, atualizados em tempo real, acessíveis de qualquer dispositivo — sem planilhas, sem esforço manual.
+          </p>
+          <p style={{fontFamily:F.b,fontSize:15,color:"rgba(255,255,255,.4)",lineHeight:1.7,maxWidth:480,margin:"0 0 36px",animation:"heroFadeUp .8s ease both .4s"}}>
+            Faturamento, margem, estoque, inadimplência e performance de vendas — tudo em um painel visual, interativo e compartilhável com toda a liderança da sua empresa.
+          </p>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",animation:"heroFadeUp .7s ease both .5s"}}>
+            <a href="#contato" style={{fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 32px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,transition:"all .25s",boxShadow:"0 6px 24px rgba(255,95,0,.35)"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 36px rgba(255,95,0,.45)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 6px 24px rgba(255,95,0,.35)";}}>
+              Ver demonstração <ArrowRight size={16}/>
+            </a>
+            <a href="#dashboards" style={{fontFamily:F.b,fontSize:15,fontWeight:600,color:C.white,background:"rgba(255,255,255,.06)",padding:"14px 28px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,border:"1.5px solid rgba(255,255,255,.12)",transition:"all .25s"}}
+              onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.3)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.12)"}>
+              <Layers size={15}/> Ver dashboards
+            </a>
+          </div>
+          <div style={{display:"flex",gap:28,marginTop:32,animation:"heroFadeUp .7s ease both .65s",flexWrap:"wrap"}}>
+            {[{v:"100%",l:"Dados do ERP integrados"},{v:"Tempo real",l:"Atualização automática"},{v:"Multi-device",l:"Desktop, tablet e mobile"}].map((s,i)=>(
+              <div key={i}>
+                <div style={{fontFamily:F.mono,fontSize:18,fontWeight:700,color:C.orange}}>{s.v}</div>
+                <div style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.3)",marginTop:2}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+          {/* Powered by Google badge */}
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,marginTop:24,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",borderRadius:10,padding:"8px 14px",animation:"heroFadeUp .7s ease both .75s"}}>
+            <GoogleG size={16}/>
+            <span style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.4)"}}>Powered by</span>
+            <span style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:"rgba(255,255,255,.7)"}}>Google BigQuery & Looker Studio</span>
+          </div>
+        </div>
+        <div style={{animation:"heroFadeUp .9s ease both .3s"}}>
+          <BIDashboardMockup/>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══ FEATURES ══ */
+const Features = () => {
+  const items = [
+    {ic:<BarChart3 size={22}/>,color:"#FF5F00",t:"Dashboards Prontos por Segmento",d:"Painéis pré-configurados para indústria, distribuição e serviços. Comece a visualizar seus dados no primeiro dia, sem montar do zero.",badge:"Pronto para usar"},
+    {ic:<Clock size={22}/>,color:"#1A73E8",t:"Atualização em Tempo Real",d:"Os dados fluem do UNO ERP para o BigQuery automaticamente. Seu dashboard reflete a situação atual da empresa sem nenhuma ação manual."},
+    {ic:<Filter size={22}/>,color:"#22C55E",t:"Filtros Interativos",d:"Filtre por período, filial, vendedor, categoria de produto ou cliente com um clique. Cada usuário navega pelos dados do seu jeito, sem precisar de TI."},
+    {ic:<Share2 size={22}/>,color:"#F59E0B",t:"Compartilhamento Simplificado",d:"Compartilhe dashboards com diretores, sócios e gestores via link seguro. Controle quem pode ver e editar cada painel com permissões por usuário."},
+    {ic:<Smartphone size={22}/>,color:"#7C3AED",t:"Acesso de Qualquer Dispositivo",d:"O Looker Studio é 100% responsivo. Acesse seus KPIs pelo celular na reunião, pelo tablet na fábrica ou pelo desktop no escritório — sem instalar nada."},
+    {ic:<Database size={22}/>,color:"#0D9488",t:"BigQuery como Data Warehouse",d:"Todos os dados do ERP são centralizados no BigQuery do Google, uma das plataformas de análise de dados mais escaláveis do mundo, com SLA de 99,99%."},
+    {ic:<LineChart size={22}/>,color:"#DC2626",t:"Análise de Tendências",d:"Visualize a evolução do faturamento, margem e giro ao longo do tempo. Identifique sazonalidades e tome decisões antes que problemas se agravem.",badge:"Tendências"},
+    {ic:<Target size={22}/>,color:"#FF5F00",t:"KPIs por Área e Responsável",d:"Cada área da empresa — comercial, financeiro, logística — tem seus próprios indicadores com metas e comparativos de performance histórica."},
+    {ic:<RefreshCw size={22}/>,color:"#1A73E8",t:"Integração Nativa com o ERP",d:"Sem exportar planilhas, sem copiar dados. A integração entre UNO ERP e Google é nativa e automática, garantindo dados sempre consistentes e confiáveis."},
+  ];
+  return (
+    <section id="dashboards" style={{padding:"96px 40px",background:C.white}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:56}}>
+            <Badge>Funcionalidades</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Tudo o que você precisa<br/>para gerir com dados.</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,maxWidth:520,margin:"8px auto 0",lineHeight:1.65}}>Dashboards profissionais conectados diretamente ao UNO ERP, sem configuração complexa.</p>
+          </div>
+        </Reveal>
+        <div className="feat-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+          {items.map((item,i)=>(
+            <Reveal key={i} delay={i*.06}>
+              <div style={{background:C.gray50,border:`1px solid ${C.gray100}`,borderRadius:18,padding:"30px 28px",height:"100%",transition:"all .25s",position:"relative",overflow:"hidden"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=`${item.color}30`;e.currentTarget.style.background=C.white;e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 16px 48px ${item.color}10`;}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.background=C.gray50;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+                {item.badge&&<div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:item.color,textTransform:"uppercase",letterSpacing:1.2,marginBottom:14,background:`${item.color}10`,display:"inline-block",padding:"3px 8px",borderRadius:5}}>{item.badge}</div>}
+                <div style={{width:48,height:48,borderRadius:14,background:`${item.color}10`,border:`1.5px solid ${item.color}20`,display:"flex",alignItems:"center",justifyContent:"center",color:item.color,marginBottom:18}}>{item.ic}</div>
+                <h3 style={{fontFamily:F.h,fontSize:17,fontWeight:800,color:C.black,margin:"0 0 10px",letterSpacing:-0.3}}>{item.t}</h3>
+                <p style={{fontFamily:F.b,fontSize:14,color:C.gray500,lineHeight:1.7,margin:0}}>{item.d}</p>
+                <div style={{position:"absolute",bottom:-20,right:-20,opacity:.04}}>
+                  <LogoMark size={80} color={item.color}/>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ HOW IT WORKS ══ */
+const HowItWorks = () => {
+  const steps = [
+    {n:"01",icon:<Database size={24}/>,t:"Dados do ERP",d:"Toda a movimentação do UNO ERP — vendas, compras, estoque, financeiro — é enviada automaticamente para o BigQuery.",color:"#FF5F00"},
+    {n:"02",icon:<BarChart3 size={24}/>,t:"BigQuery processa",d:"O Google BigQuery organiza e processa volumes massivos de dados com alta velocidade, sem impacto no desempenho do ERP.",color:"#E85500"},
+    {n:"03",icon:<Monitor size={24}/>,t:"Looker Studio visualiza",d:"Os dados processados alimentam dashboards interativos no Looker Studio, com gráficos, tabelas e KPIs atualizados em tempo real.",color:"#FF5F00"},
+    {n:"04",icon:<Users size={24}/>,t:"Toda equipe decide",d:"Gestores, diretores e sócios acessam os painéis de qualquer dispositivo e tomam decisões baseadas em dados reais, sempre atualizados.",color:"#E85500"},
+  ];
+  return (
+    <section style={{padding:"96px 40px",background:C.gray50}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:64}}>
+            <Badge>Como funciona</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Do ERP ao dashboard<br/>em tempo real.</h2>
+          </div>
+        </Reveal>
+        <div className="steps-row" style={{display:"flex",alignItems:"flex-start",gap:0}}>
+          {steps.map((s,i)=>(
+            <React.Fragment key={i}>
+              <Reveal delay={i*.12} style={{flex:1,minWidth:0}}>
+                <div style={{textAlign:"center",padding:"0 16px"}}>
+                  <div style={{width:104,height:104,borderRadius:"50%",background:`linear-gradient(135deg,${s.color}20,${s.color}06)`,border:`2px solid ${s.color}25`,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",position:"relative"}}>
+                    <div style={{color:s.color}}>{s.icon}</div>
+                    <div style={{position:"absolute",top:-4,right:-4,width:24,height:24,borderRadius:"50%",background:s.color,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:F.mono,fontSize:9,fontWeight:700,color:C.white}}>{s.n}</div>
+                  </div>
+                  <h3 style={{fontFamily:F.h,fontSize:16,fontWeight:800,color:C.black,margin:"0 0 10px",letterSpacing:-.2}}>{s.t}</h3>
+                  <p style={{fontFamily:F.b,fontSize:13.5,color:C.gray500,lineHeight:1.7}}>{s.d}</p>
+                </div>
+              </Reveal>
+              {i < steps.length - 1 && (
+                <div className="step-arrow" style={{flexShrink:0,display:"flex",alignItems:"flex-start",paddingTop:40,color:"rgba(255,95,0,.35)"}}>
+                  <ChevronRight size={22}/>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ DASHBOARDS GALLERY ══ */
+const DashboardsGallery = () => {
+  const [active,setActive] = useState(0);
+  const panels = [
+    {
+      label:"Executivo",
+      icon:<Star size={16}/>,
+      color:"#FF5F00",
+      title:"Visão 360° do negócio",
+      desc:"Painel unificado com os principais indicadores da empresa: faturamento, margem, inadimplência, performance de vendas e projeções — tudo em uma tela para a diretoria tomar decisões rápidas.",
+      kpis:[
+        {l:"Faturamento YTD",v:"R$ 14,2M",delta:"+22%"},
+        {l:"Margem Bruta",v:"34,2%",delta:"+2,1pp"},
+        {l:"EBITDA",v:"18,7%",delta:"+0,9pp"},
+        {l:"ROI Médio",v:"31%",delta:"+5pp"},
+      ],
+    },
+    {
+      label:"Comercial",
+      icon:<TrendingUp size={16}/>,
+      color:"#1A73E8",
+      title:"Performance do time de vendas",
+      desc:"Acompanhe metas, funil, conversão por vendedor, ticket médio e ranking de clientes. Identifique quem precisa de suporte e onde estão as maiores oportunidades de crescimento.",
+      kpis:[
+        {l:"Pedidos no mês",v:"1.243",delta:"+14%"},
+        {l:"Ticket médio",v:"R$ 4.870",delta:"+9%"},
+        {l:"Taxa de conversão",v:"38%",delta:"+3pp"},
+        {l:"Clientes novos",v:"87",delta:"+31%"},
+      ],
+    },
+    {
+      label:"Estoque",
+      icon:<Warehouse size={16}/>,
+      color:"#22C55E",
+      title:"Giro, cobertura e rupturas",
+      desc:"Visualize o giro de estoque, dias de cobertura por produto, itens com risco de ruptura e capital parado em mercadoria encalhada. Tome decisões de compra com base em dados, não em intuição.",
+      kpis:[
+        {l:"Giro médio",v:"18 dias",delta:"-3 dias"},
+        {l:"Cobertura",v:"32 dias",delta:"adequado"},
+        {l:"Itens em risco",v:"14",delta:"-68%"},
+        {l:"Capital parado",v:"R$ 128k",delta:"-32%"},
+      ],
+    },
+    {
+      label:"Financeiro",
+      icon:<PieChart size={16}/>,
+      color:"#F59E0B",
+      title:"Fluxo de caixa e inadimplência",
+      desc:"Acompanhe contas a pagar e receber, fluxo de caixa projetado, DRE simplificado e índice de inadimplência por carteira de clientes. Nunca mais seja pego de surpresa no fechamento do mês.",
+      kpis:[
+        {l:"Saldo projetado",v:"R$ 890k",delta:"+18%"},
+        {l:"A receber 30d",v:"R$ 2,1M",delta:"normal"},
+        {l:"Inadimplência",v:"1,8%",delta:"-0,4pp"},
+        {l:"Desvio orçamento",v:"2,3%",delta:"OK"},
+      ],
+    },
+  ];
+  const p = panels[active];
+  return (
+    <section style={{padding:"96px 40px",background:C.white}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:52}}>
+            <Badge>Dashboards</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Um painel para<br/>cada área do negócio.</h2>
+          </div>
+        </Reveal>
+        {/* Tabs */}
+        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:40}}>
+          {panels.map((panel,i)=>(
+            <button key={i} onClick={()=>setActive(i)} style={{display:"flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:13,fontWeight:600,padding:"10px 20px",borderRadius:100,border:`1.5px solid ${active===i?panel.color:"transparent"}`,background:active===i?`${panel.color}12`:"rgba(0,0,0,.04)",color:active===i?panel.color:C.gray500,cursor:"pointer",transition:"all .2s"}}>
+              <span style={{color:active===i?panel.color:C.gray400,display:"flex"}}>{panel.icon}</span>
+              {panel.label}
+            </button>
+          ))}
+        </div>
+        <div className="two-col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:64,alignItems:"center"}}>
+          <Reveal direction="left" key={active}>
+            <div>
+              <div style={{display:"inline-flex",alignItems:"center",gap:6,background:`${p.color}10`,border:`1px solid ${p.color}20`,borderRadius:100,padding:"4px 12px",marginBottom:18}}>
+                <span style={{color:p.color,display:"flex"}}>{p.icon}</span>
+                <span style={{fontFamily:F.b,fontSize:11.5,fontWeight:700,color:p.color}}>{p.label}</span>
+              </div>
+              <h3 style={{fontFamily:F.h,fontSize:"clamp(22px,3vw,32px)",fontWeight:800,color:C.black,margin:"0 0 16px",letterSpacing:-.8,lineHeight:1.15}}>{p.title}</h3>
+              <p style={{fontFamily:F.b,fontSize:15.5,color:C.gray500,lineHeight:1.8,margin:"0 0 28px"}}>{p.desc}</p>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:28}}>
+                {p.kpis.map((k,i)=>(
+                  <div key={i} style={{background:C.gray50,borderRadius:12,padding:"14px 16px",border:`1px solid ${C.gray100}`}}>
+                    <div style={{fontFamily:F.b,fontSize:11,color:C.gray400,marginBottom:4}}>{k.l}</div>
+                    <div style={{fontFamily:F.mono,fontSize:18,fontWeight:700,color:C.black}}>{k.v}</div>
+                    <div style={{fontFamily:F.b,fontSize:11,color:p.color,fontWeight:600,marginTop:2}}>{k.delta}</div>
+                  </div>
+                ))}
+              </div>
+              <a href="#contato" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:14.5,fontWeight:700,color:C.white,background:C.orange,padding:"13px 28px",borderRadius:10,textDecoration:"none",transition:"all .2s",boxShadow:"0 6px 20px rgba(255,95,0,.3)"}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+                Solicitar este painel <ArrowRight size={15}/>
+              </a>
+            </div>
+          </Reveal>
+          <Reveal direction="right" key={`vis-${active}`}>
+            <div style={{background:`linear-gradient(135deg,${p.color}08,${p.color}04)`,borderRadius:20,padding:28,border:`1px solid ${p.color}18`,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:-40,right:-40,opacity:.05}}>
+                <LogoMark size={200} color={p.color}/>
+              </div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+                <div>
+                  <div style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:p.color,textTransform:"uppercase",letterSpacing:1.2}}>{p.label} Dashboard</div>
+                  <div style={{fontFamily:F.mono,fontSize:10,color:C.gray400,marginTop:2}}>Looker Studio · UNO ERP</div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:5,background:"rgba(26,115,232,.08)",border:"1px solid rgba(26,115,232,.15)",borderRadius:100,padding:"4px 10px"}}>
+                  <div style={{width:5,height:5,borderRadius:"50%",background:"#1A73E8",animation:"pulse2 1.5s ease-in-out infinite"}}/>
+                  <span style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:"#1A73E8"}}>Live</span>
+                </div>
+              </div>
+              {/* Mini chart */}
+              <div style={{background:"rgba(255,255,255,.8)",borderRadius:12,padding:"14px",marginBottom:12,backdropFilter:"blur(8px)"}}>
+                <div style={{fontFamily:F.b,fontSize:10,color:C.gray400,marginBottom:8}}>Tendência — últimos 6 meses</div>
+                <div style={{display:"flex",alignItems:"flex-end",gap:4,height:48}}>
+                  {[45,58,52,71,65,88].map((v,i)=>(
+                    <div key={i} style={{flex:1,borderRadius:"3px 3px 0 0",background:i===5?p.color:`${p.color}25`,height:`${v}%`,transition:"height .4s ease"}}/>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {p.kpis.slice(0,2).map((k,i)=>(
+                  <div key={i} style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"12px 14px",backdropFilter:"blur(8px)"}}>
+                    <div style={{fontFamily:F.b,fontSize:10,color:C.gray400,marginBottom:3}}>{k.l}</div>
+                    <div style={{fontFamily:F.mono,fontSize:16,fontWeight:700,color:p.color}}>{k.v}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{marginTop:10,background:"rgba(255,255,255,.7)",borderRadius:10,padding:"10px 14px",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",gap:8}}>
+                <GoogleG size={14}/>
+                <span style={{fontFamily:F.mono,fontSize:10,color:C.gray500}}>Powered by Google BigQuery</span>
+                <div style={{marginLeft:"auto",width:6,height:6,borderRadius:"50%",background:"#22C55E",animation:"pulse2 1.5s ease-in-out infinite"}}/>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ DIFERENCIAIS ══ */
+const Diferenciais = () => {
+  const items = [
+    {ic:<Shield size={20}/>,color:"#1A73E8",t:"Infraestrutura Google",d:"Seus dados ficam no ambiente seguro do Google Cloud, com criptografia, backups automáticos e SLA de disponibilidade de 99,99% — sem custo adicional de servidor."},
+    {ic:<Plug size={20}/>,color:C.orange,t:"Integração nativa com ERP",d:"A conexão entre UNO ERP e Google BigQuery é mantida pela nossa equipe. Você não precisa de um analista de dados ou engenheiro para configurar nada."},
+    {ic:<Users size={20}/>,color:"#22C55E",t:"Acesso para toda a equipe",d:"Distribua painéis para diretores, gerentes e coordenadores com controle de permissões. Cada um vê apenas o que precisa, de qualquer lugar."},
+    {ic:<Zap size={20}/>,color:"#F59E0B",t:"Setup em 48 horas",d:"Implantamos os dashboards padrão em até 48 horas após a contratação. Dashboards customizados têm prazo de entrega acordado com seu especialista."},
+  ];
+  return (
+    <section style={{padding:"96px 40px",background:C.dark,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 60% at 50% 50%,rgba(255,95,0,.07),transparent 65%)",pointerEvents:"none"}}/>
+      <div style={{maxWidth:1240,margin:"0 auto",position:"relative",zIndex:1}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:56}}>
+            <Badge>Por que BI Google?</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.white,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>A infraestrutura do Google.<br/><span style={{color:C.orange}}>A simplicidade do UNO.</span></h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:"rgba(255,255,255,.4)",maxWidth:520,margin:"12px auto 0",lineHeight:1.65}}>Tecnologia de nível enterprise acessível para pequenas e médias empresas — sem equipe de TI, sem complexidade.</p>
+          </div>
+        </Reveal>
+        <div className="two-col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:52}}>
+          {items.map((item,i)=>(
+            <Reveal key={i} delay={i*.08}>
+              <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.07)",borderRadius:18,padding:"28px 28px",display:"flex",gap:20,alignItems:"flex-start",transition:"all .25s"}}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.05)";e.currentTarget.style.borderColor="rgba(255,95,0,.15)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.03)";e.currentTarget.style.borderColor="rgba(255,255,255,.07)";}}>
+                <div style={{width:50,height:50,borderRadius:14,background:`${item.color}15`,border:`1.5px solid ${item.color}25`,display:"flex",alignItems:"center",justifyContent:"center",color:item.color,flexShrink:0}}>{item.ic}</div>
+                <div>
+                  <h3 style={{fontFamily:F.h,fontSize:17,fontWeight:800,color:C.white,margin:"0 0 8px",letterSpacing:-.3}}>{item.t}</h3>
+                  <p style={{fontFamily:F.b,fontSize:14,color:"rgba(255,255,255,.4)",lineHeight:1.7,margin:0}}>{item.d}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        {/* Stats */}
+        <Reveal>
+          <div className="stats-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:20}}>
+            {[
+              {v:"99,99%",l:"SLA Google Cloud"},
+              {v:"48h",l:"Setup dos primeiros dashboards"},
+              {v:"10+",l:"Painéis pré-configurados"},
+              {v:"∞",l:"Escala de dados no BigQuery"},
+            ].map((s,i)=>(
+              <div key={i} style={{textAlign:"center",padding:"24px 16px",background:"rgba(255,255,255,.03)",borderRadius:16,border:"1px solid rgba(255,255,255,.06)"}}>
+                <div style={{fontFamily:F.mono,fontSize:28,fontWeight:700,color:C.orange,marginBottom:6}}>{s.v}</div>
+                <div style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",lineHeight:1.5}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ══ CTA ══ */
+const CTA = () => (
+  <section id="contato" style={{padding:"96px 40px",background:C.white}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="cta-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:64,alignItems:"center"}}>
+        <Reveal direction="left">
+          <div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:C.orangeSoft,border:`1px solid ${C.orangeBorder}`,borderRadius:100,padding:"5px 14px",marginBottom:18}}>
+              <BarChart3 size={13} color={C.orange}/>
+              <span style={{fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.2,textTransform:"uppercase"}}>Demonstração Gratuita</span>
+            </div>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"0 0 16px",letterSpacing:-1.2,lineHeight:1.1}}>Veja seus dados do<br/>ERP em um dashboard<br/><span style={{color:C.orange}}>em menos de 48h.</span></h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,lineHeight:1.75,margin:"0 0 24px",maxWidth:440}}>
+              Agende uma demonstração e veja como ficaria o seu dashboard executivo com dados reais da sua empresa — sem compromisso.
+            </p>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {["Demonstração sem compromisso","Setup completo em até 48 horas","Dashboards personalizados para seu segmento","Suporte dedicado em português"].map((t,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:22,height:22,borderRadius:6,background:C.orangeSoft,border:`1px solid ${C.orangeBorder}`,display:"flex",alignItems:"center",justifyContent:"center",color:C.orange,flexShrink:0}}>
+                    <Check size={12}/>
+                  </div>
+                  <span style={{fontFamily:F.b,fontSize:14.5,color:C.black,fontWeight:500}}>{t}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginTop:28,padding:"12px 16px",background:C.gray50,borderRadius:12,border:`1px solid ${C.gray100}`,maxWidth:360}}>
+              <GoogleG size={20}/>
+              <div>
+                <div style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:C.black}}>Google BigQuery + Looker Studio</div>
+                <div style={{fontFamily:F.b,fontSize:11,color:C.gray400}}>Integrado nativamente ao UNO ERP</div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+        <Reveal direction="right">
+          <div style={{background:C.gray50,borderRadius:20,padding:32,border:`1px solid ${C.gray100}`}}>
+            <div style={{fontFamily:F.h,fontSize:20,fontWeight:800,color:C.black,marginBottom:20}}>Solicite uma demonstração</div>
+            {[
+              {l:"Nome completo",p:"Seu nome",t:"text"},
+              {l:"E-mail corporativo",p:"email@empresa.com.br",t:"email"},
+              {l:"WhatsApp",p:"(11) 99999-9999",t:"tel"},
+              {l:"Nome da empresa",p:"Empresa S.A.",t:"text"},
+            ].map((f,i)=>(
+              <div key={i} style={{marginBottom:14}}>
+                <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>{f.l}</label>
+                <input type={f.t} placeholder={f.p} style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",background:C.white,boxSizing:"border-box",transition:"border-color .2s"}}
+                  onFocus={e=>e.target.style.borderColor=C.orange} onBlur={e=>e.target.style.borderColor=C.gray200}/>
+              </div>
+            ))}
+            <div style={{marginBottom:18}}>
+              <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>Segmento</label>
+              <select style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",background:C.white,color:C.gray600,cursor:"pointer",boxSizing:"border-box"}}>
+                <option>Selecione seu segmento</option>
+                <option>Indústria</option><option>Distribuição & Atacado</option>
+                <option>Serviços</option><option>Varejo / E-commerce</option><option>Outros</option>
+              </select>
+            </div>
+            <button style={{width:"100%",padding:"14px 0",borderRadius:10,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:15,fontWeight:700,cursor:"pointer",transition:"all .2s",boxShadow:"0 4px 16px rgba(255,95,0,.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
+              onMouseEnter={e=>{e.currentTarget.style.background=C.orangeHot;e.currentTarget.style.boxShadow="0 8px 28px rgba(255,95,0,.4)";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.orange;e.currentTarget.style.boxShadow="0 4px 16px rgba(255,95,0,.25)";e.currentTarget.style.transform="none";}}>
+              <BarChart3 size={16}/> Agendar Demonstração Gratuita
+            </button>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══ FOOTER ══ */
+const Footer = () => (
+  <footer style={{background:C.black,padding:"56px 40px 28px"}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="footer-grid" style={{display:"grid",gridTemplateColumns:"1.6fr 1fr 1fr 1fr 1.2fr",gap:32,marginBottom:48}}>
+        <div>
+          <div style={{marginBottom:14}}><Logo height={36}/></div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.7,maxWidth:220}}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
+          <div style={{display:"flex",gap:16,marginTop:16}}>
+            {[<Mail size={16}/>,<Phone size={16}/>,<MapPin size={16}/>].map((ic,i)=>(
+              <div key={i} style={{width:32,height:32,borderRadius:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(255,255,255,.35)",cursor:"pointer",transition:"all .2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.color=C.orange;e.currentTarget.style.borderColor="rgba(255,95,0,.3)";}}
+                onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.35)";e.currentTarget.style.borderColor="rgba(255,255,255,.06)";}}>
+                {ic}
+              </div>
+            ))}
+          </div>
+        </div>
+        {[
+          {t:"Soluções",ls:["Sistema de Gestão","CRM","IAU — IA","BI (Google)","App Mobile","WMS","M-Commerce"]},
+          {t:"Segmentos",ls:["Indústria","Distribuição","Serviços","Cosméticos","Alimentos","Química","Metalúrgica"]},
+          {t:"Empresa",ls:["Sobre","Blog","Planos","Integrações","Desenvolvimento","Suporte","Contato"]},
+        ].map((col,i)=>(
+          <div key={i}>
+            <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>{col.t}</div>
+            {col.ls.map((l,j)=>(
+              <a key={j} href="#" style={{display:"block",fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.4)",textDecoration:"none",marginBottom:9,transition:"color .15s"}}
+                onMouseEnter={e=>e.target.style.color=C.orange} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.4)"}>{l}</a>
+            ))}
+          </div>
+        ))}
+        <div>
+          <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>Newsletter</div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.6,marginBottom:12}}>Receba dicas de gestão e novidades do UNO ERP.</p>
+          <input type="email" placeholder="Seu e-mail" style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.04)",fontFamily:F.b,fontSize:13,color:C.white,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
+          <button style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:13,fontWeight:700,cursor:"pointer"}}>Inscrever-se</button>
+        </div>
+      </div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:20,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+        <span style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)"}}>© 2025 UNO ERP · Todos os direitos reservados.</span>
+        <div style={{display:"flex",gap:20}}>
+          {["Política de Privacidade","Termos e Condições"].map((t,i)=>(
+            <a key={i} href="#" style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)",textDecoration:"none"}}>{t}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ══ APP ══ */
+function BIGooglePage() {
+  return (
+    <>
+      <Nav/>
+      <PageHero/>
+      <MarqueeStrip/>
+      <Features/>
+      <HowItWorks/>
+      <DashboardsGallery/>
+      <Diferenciais/>
+      <CTA/>
+      <Footer/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(BIGooglePage));
+</script>
+</body>
+</html>

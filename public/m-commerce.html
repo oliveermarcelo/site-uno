@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-Commerce UNO ERP — App B2B de Catálogo e Pedidos para Revendas</title>
+<meta name="description" content="O M-Commerce UNO ERP é um app B2B white label com catálogo digital, pedidos online, tabelas de preço e cálculo automático de impostos — publicado na App Store e Google Play com a sua marca.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:#FDFCFA;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,95,0,.12);color:#0D0D0D}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#f8f8f6}
+::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#FF5F00}
+input::placeholder{color:#bbb}
+select{appearance:none}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes phoneFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes notifPop{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:none}}
+.nav-mobile-btn{display:none!important}
+@media(max-width:900px){
+  .nav-links{display:none!important}
+  .nav-mobile-btn{display:flex!important}
+  .hero-section{padding:100px 16px 56px!important}
+  section:not(.hero-section){padding:56px 16px!important}
+  .hero-grid{grid-template-columns:1fr!important;gap:40px!important}
+  .feat-grid{grid-template-columns:1fr 1fr!important;gap:14px!important}
+  .two-col{grid-template-columns:1fr!important;gap:36px!important}
+  .steps-row{grid-template-columns:1fr 1fr!important;gap:16px!important}
+  .step-arrow{display:none!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important;gap:12px!important}
+  .hero-ring{display:none!important}
+  .cta-grid{grid-template-columns:1fr!important;gap:36px!important}
+  .footer-grid{grid-template-columns:1fr 1fr!important;gap:24px!important}
+  .phone-center{transform:scale(.88);transform-origin:center top}
+}
+@media(max-width:560px){
+  .hero-section{padding:96px 16px 48px!important}
+  .feat-grid{grid-template-columns:1fr!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important}
+  .footer-grid{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef} = React;
+
+/* ══ ICONS ══ */
+const mkIc = (p,vb="0 0 24 24") => ({size=24,color="currentColor",style={},...r}) =>
+  <svg width={size} height={size} viewBox={vb} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style} {...r}>{p}</svg>;
+
+const ArrowRight    = mkIc(<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>);
+const ArrowUpRight  = mkIc(<><path d="M7 7h10v10"/><path d="M7 17 17 7"/></>);
+const ChevronDown   = mkIc(<path d="m6 9 6 6 6-6"/>);
+const ChevronRight  = mkIc(<path d="m9 18 6-6-6-6"/>);
+const Check         = mkIc(<path d="M20 6 9 17l-5-5"/>);
+const Brain         = mkIc(<><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></>);
+const BarChart3     = mkIc(<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>);
+const ClipboardList = mkIc(<><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>);
+const Handshake     = mkIc(<><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>);
+const Smartphone    = mkIc(<><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></>);
+const Warehouse     = mkIc(<><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></>);
+const ShoppingCart  = mkIc(<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>);
+const Factory       = mkIc(<><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></>);
+const Truck         = mkIc(<><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></>);
+const Settings      = mkIc(<><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></>);
+const Plug          = mkIc(<><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z"/></>);
+const Globe         = mkIc(<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>);
+const Monitor       = mkIc(<><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></>);
+const Package       = mkIc(<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>);
+const Code          = mkIc(<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>);
+const Mail          = mkIc(<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>);
+const Phone         = mkIc(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>);
+const MapPin        = mkIc(<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>);
+const Star          = mkIc(<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>);
+const Tag           = mkIc(<><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></>);
+const Bell          = mkIc(<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>);
+const Zap           = mkIc(<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>);
+const Image         = mkIc(<><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>);
+const Database      = mkIc(<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></>);
+const Shield        = mkIc(<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></>);
+const Layers        = mkIc(<><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>);
+const TrendingUp    = mkIc(<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>);
+const Users         = mkIc(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>);
+const Palette       = mkIc(<><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></>);
+const Percent       = mkIc(<><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></>);
+const Calculator    = mkIc(<><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="11" y2="16"/><line x1="12" x2="12" y1="11" y2="16"/><line x1="8" x2="8" y1="11" y2="13"/><line x1="8" x2="8" y1="15" y2="16"/></>);
+
+/* ══ TOKENS ══ */
+const C = {
+  orange:"#FF5F00",orangeHot:"#E85500",orangeWarm:"#FF8A00",
+  orangeSoft:"#FFF3EB",orangeBorder:"rgba(255,95,0,0.15)",
+  black:"#0D0D0D",dark:"#141414",gray800:"#2a2a2a",
+  gray600:"#555",gray500:"#717171",gray400:"#999",gray300:"#bbb",
+  gray200:"#ddd",gray100:"#efefef",gray50:"#f8f8f6",
+  cream:"#FDFCFA",white:"#fff",
+};
+const F = { h:"'Inter', sans-serif", b:"'Inter', sans-serif", mono:"'JetBrains Mono', monospace" };
+
+/* ══ LOGO ══ */
+const Logo = ({height=32}) => (
+  <svg viewBox="0 0 512.82 213.17" height={height} style={{display:"block"}}>
+    <g>
+      <path d="M305.22,91.78c0,6.8-1.4,11.5-4.3,14.3s-6.6,4.2-11.1,4.2-4.3-.3-6.2-1c-1.9-.6-3.5-1.7-4.8-3.2s-2.4-3.4-3.1-5.8c-.8-2.4-1.1-5.2-1.1-8.6v-50.4h-18.8v51.9c0,4.9.7,9.4,2,13.4,1.3,4.1,3.4,7.6,6.1,10.5,2.8,2.9,6.3,5.2,10.5,6.9,4.3,1.7,9.3,2.5,15.2,2.5s11.1-.8,15.4-2.4,7.9-3.9,10.7-6.8c2.8-2.9,4.9-6.4,6.3-10.5s2-8.6,2-13.5v-51.9h-18.8v50.4h0Z" fill="#FFFFFF"/>
+      <path d="M360.72,70.18c7.1,8.3,13.7,17.1,20,26.4s12.1,18.8,17.5,28.3h15.8V41.38h-18.7v49.3c-2.9-4.3-6-8.9-9.3-13.6s-6.6-9.2-9.9-13.6-6.6-8.5-9.8-12.4c-3.2-3.9-6.1-7.1-8.8-9.8h-15.3v83.5h18.6v-54.7h-.1v.1h0Z" fill="#FFFFFF"/>
+      <path d="M441.82,115.58c3.8,3.7,8.2,6.4,13.3,8.2,5.1,1.8,10.4,2.8,16.1,2.8s11.4-.9,16.5-2.8,9.5-4.6,13.2-8.2c3.7-3.7,6.6-8.2,8.7-13.6s3.2-11.7,3.2-18.9-1.1-13.4-3.2-18.9-5.1-10-8.9-13.7-8.2-6.5-13.3-8.3-10.5-2.8-16.1-2.8-10.8.9-15.9,2.8c-5,1.8-9.4,4.6-13.3,8.3s-6.9,8.2-9.1,13.7c-2.2,5.4-3.4,11.7-3.4,18.9s1.1,13.4,3.2,18.9,5.1,10,8.9,13.6h.1,0ZM450.52,71.98c1-3.3,2.5-6.2,4.3-8.6,1.9-2.4,4.2-4.2,6.9-5.5,2.7-1.3,5.9-2,9.4-2s6.6.6,9.3,1.9,5.1,3.1,7,5.5,3.3,5.2,4.3,8.6c1,3.3,1.5,7.1,1.5,11.2s-.5,7.8-1.5,11.1-2.5,6.1-4.3,8.5c-1.9,2.4-4.2,4.2-7,5.5s-5.9,1.9-9.3,1.9-6.7-.6-9.4-1.9c-2.7-1.3-5-3.1-6.9-5.5s-3.3-5.2-4.3-8.5-1.5-7-1.5-11.1.5-7.7,1.5-11h0v-.1Z" fill="#FFFFFF"/>
+      <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill="#FFFFFF"/>
+      <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill="#FFFFFF"/>
+      <path d="M284.25,192.08v-43.66h28.04v6.74h-20.1v10.77h17.89v6.61h-17.89v12.79h21.61v6.74h-29.55Z" fill="#EE5820"/>
+      <path d="M377.3,147.98c6.3,0,11.12,1.16,14.46,3.46,3.34,2.31,5.01,5.84,5.01,10.58,0,5.92-2.92,9.93-8.76,12.03.8.97,1.7,2.14,2.71,3.53,1.01,1.39,2.04,2.89,3.09,4.5,1.05,1.62,2.06,3.28,3.02,4.98.97,1.7,1.83,3.37,2.58,5.01h-8.88c-.8-1.51-1.66-3.03-2.58-4.57s-1.86-3.02-2.8-4.47-1.88-2.81-2.8-4.1c-.92-1.28-1.79-2.42-2.58-3.43-.59.04-1.09.06-1.51.06h-5.04v16.51h-7.94v-43.03c1.93-.42,3.99-.7,6.17-.85,2.18-.15,4.14-.22,5.86-.22h0ZM377.87,154.85c-1.68,0-3.23.06-4.66.19v14.11h3.46c1.93,0,3.63-.1,5.1-.32,1.47-.21,2.7-.59,3.69-1.13.99-.55,1.73-1.28,2.24-2.21s.76-2.1.76-3.53c0-1.34-.25-2.48-.76-3.4s-1.23-1.66-2.17-2.21-2.07-.93-3.37-1.17c-1.3-.23-2.73-.35-4.28-.35v.02Z" fill="#EE5820"/>
+      <path d="M462.04,147.98c6.34,0,11.2,1.16,14.58,3.46,3.38,2.31,5.07,5.92,5.07,10.84,0,2.56-.45,4.76-1.35,6.58-.9,1.83-2.22,3.32-3.94,4.47-1.72,1.16-3.82,2.01-6.3,2.55-2.48.55-5.31.82-8.5.82h-3.97v15.37h-7.94v-43.03c1.85-.42,3.89-.7,6.14-.85,2.25-.15,4.32-.22,6.21-.22h0ZM462.6,154.85c-2.02,0-3.68.06-4.98.19v14.87h3.84c3.82,0,6.76-.54,8.82-1.61s3.09-3.1,3.09-6.08c0-1.43-.27-2.62-.82-3.59-.55-.97-1.3-1.72-2.27-2.27s-2.11-.93-3.43-1.17c-1.32-.23-2.74-.35-4.25-.35h0Z" fill="#EE5820"/>
+    </g>
+  </svg>
+);
+
+const LogoMark = ({size=80,color="#e8e8e6"}) => (
+  <svg viewBox="0 0 200 200" width={size} height={size} style={{display:"block"}}>
+    <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+    <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+  </svg>
+);
+
+if(typeof gsap!=="undefined"&&typeof ScrollTrigger!=="undefined"){gsap.registerPlugin(ScrollTrigger);}
+
+const Reveal = ({children,delay=0,style={},direction="up"}) => {
+  const ref = useRef(null);
+  useEffect(()=>{
+    if(typeof gsap==="undefined"||!ref.current)return;
+    const dirs={up:{y:40},down:{y:-40},left:{x:-50},right:{x:50}};
+    const from={opacity:0,...dirs[direction]};
+    gsap.fromTo(ref.current,from,{opacity:1,x:0,y:0,duration:0.85,delay,ease:"power3.out",scrollTrigger:{trigger:ref.current,start:"top 88%",toggleActions:"play none none none"}});
+  },[]);
+  return <div ref={ref} style={{...style}}>{children}</div>;
+};
+
+const Badge = ({children}) => (
+  <span style={{display:"inline-block",fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.8,textTransform:"uppercase",marginBottom:10}}>{children}</span>
+);
+
+/* ══ NAV ══ */
+const navLinks = {
+  "Soluções":[
+    {n:"Sistema de Gestão",d:"Plataforma completa para PME",ic:<ClipboardList size={16}/>,href:"sistema-de-gestao.html"},
+    {n:"CRM",d:"Gestão intuitiva de clientes e oportunidades",ic:<Handshake size={16}/>,href:"crm.html"},
+    {n:"IAU — IA",d:"Inteligência artificial preditiva",ic:<Brain size={16}/>,href:"iau.html"},
+    {n:"BI (Google)",d:"BigQuery & Looker Studio",ic:<BarChart3 size={16}/>,href:"bi-google.html"},
+    {n:"App UNO ERP",d:"Força de vendas mobile",ic:<Smartphone size={16}/>,href:"app-uno-erp.html"},
+    {n:"M-Commerce",d:"App B2B para revendas",ic:<ShoppingCart size={16}/>,href:"m-commerce.html"},
+    {n:"WMS para PME",d:"Gestão de armazém",ic:<Warehouse size={16}/>,href:"wms-para-pme.html"},
+    {n:"Site B2B",d:"Portal com preços exclusivos",ic:<Globe size={16}/>,href:"site-b2b.html"},
+    {n:"Integrações B2C",d:"Marketplaces e e-commerce",ic:<Plug size={16}/>,href:"integracoes-b2c.html"},
+  ],
+  "Segmentos":[
+    {n:"Indústria",d:"Produção e manufatura",ic:<Factory size={16}/>,href:"#"},
+    {n:"Distribuição & Revenda",d:"Atacado e distribuição",ic:<Truck size={16}/>,href:"#"},
+    {n:"Serviços",d:"Automação e TI",ic:<Settings size={16}/>,href:"#"},
+  ],
+  "Personalização":[
+    {n:"Desenvolvimento",d:"Customizações sob medida",ic:<Code size={16}/>,href:"desenvolvimento.html"},
+    {n:"Integrações & Plugins",d:"20+ integrações nativas",ic:<Plug size={16}/>,href:"integracoes-e-plugins.html"},
+    {n:"Dashboards",d:"Painéis personalizados",ic:<Monitor size={16}/>,href:"#"},
+    {n:"Planos",d:"Encontre o ideal",ic:<Package size={16}/>,href:"#"},
+  ],
+};
+
+const Nav = () => {
+  const [sc,setSc] = useState(false);
+  const [open,setOpen] = useState(null);
+  useEffect(()=>{const fn=()=>setSc(window.scrollY>30);window.addEventListener("scroll",fn);return()=>window.removeEventListener("scroll",fn);},[]);
+  const isBig = open==="Soluções";
+  return (
+    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:sc?"rgba(20,20,20,0.95)":"transparent",backdropFilter:sc?"blur(16px)":"none",borderBottom:sc?"1px solid rgba(255,255,255,0.06)":"1px solid transparent",transition:"all .3s"}}>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:"0 40px",height:72,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <a href="index.html" style={{display:"flex",alignItems:"center",textDecoration:"none"}}><Logo height={40}/></a>
+        <button className="nav-mobile-btn" onClick={()=>setOpen(open==="mobile"?null:"mobile")} style={{display:"none",background:"none",border:"none",color:C.white,cursor:"pointer",padding:8}}>
+          {open==="mobile"?<span style={{fontSize:24}}>✕</span>:<span style={{fontSize:24}}>☰</span>}
+        </button>
+        <div className="nav-links" style={{display:"flex",alignItems:"center",gap:2}}>
+          {Object.keys(navLinks).map(k=>(
+            <div key={k} style={{position:"relative"}} onMouseEnter={()=>setOpen(k)} onMouseLeave={()=>setOpen(null)}>
+              <button style={{background:"none",border:"none",cursor:"pointer",padding:"8px 13px",fontFamily:F.b,fontSize:13.5,fontWeight:500,color:open===k?C.orange:"rgba(255,255,255,.6)",borderRadius:8,display:"flex",alignItems:"center",gap:3,transition:".2s"}}>
+                {k} <ChevronDown size={13} style={{transition:".2s",transform:open===k?"rotate(180deg)":"none"}}/>
+              </button>
+              {open===k&&<div style={{position:"absolute",top:"100%",left:0,width:"100%",height:12,background:"transparent"}}/>}
+              {open===k&&(
+                <div style={{position:"absolute",top:"calc(100% + 8px)",left:k==="Soluções"?"-140px":"0",background:"rgba(18,18,18,0.96)",backdropFilter:"blur(24px) saturate(1.5)",borderRadius:18,padding:isBig?"20px":"10px",boxShadow:"0 32px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06)",minWidth:isBig?580:300,animation:"ddIn .25s cubic-bezier(.22,1,.36,1)"}}>
+                  <div style={{position:"absolute",top:-6,left:k==="Soluções"?170:30,width:12,height:12,background:"rgba(18,18,18,0.96)",transform:"rotate(45deg)",borderRadius:2,borderTop:"1px solid rgba(255,255,255,.06)",borderLeft:"1px solid rgba(255,255,255,.06)"}}/>
+                  {isBig?(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 14px",borderBottom:"1px solid rgba(255,255,255,.06)",marginBottom:14}}>Todas as Soluções</div>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+                        {navLinks[k].map((item,i)=>(
+                          <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"12px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                            <div style={{width:34,height:34,borderRadius:9,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                            <div style={{minWidth:0}}>
+                              <div style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.white,marginBottom:2}}>{item.n}</div>
+                              <div style={{fontFamily:F.b,fontSize:11,color:"rgba(255,255,255,.3)",lineHeight:1.35}}>{item.d}</div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                      <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.25)"}}>Precisa de ajuda para escolher?</span>
+                        <a href="#contato" style={{fontFamily:F.b,fontSize:12,fontWeight:600,color:C.orange,textDecoration:"none",display:"flex",alignItems:"center",gap:4}}>Fale com um especialista <ArrowRight size={12}/></a>
+                      </div>
+                    </div>
+                  ):(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 12px"}}>{k}</div>
+                      {navLinks[k].map((item,i)=>(
+                        <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                          onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                          <div style={{width:36,height:36,borderRadius:10,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                          <div>
+                            <div style={{fontFamily:F.b,fontSize:13.5,fontWeight:600,color:C.white}}>{item.n}</div>
+                            <div style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.3)"}}>{item.d}</div>
+                          </div>
+                          <ArrowRight size={14} color="rgba(255,255,255,.15)" style={{marginLeft:"auto"}}/>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13.5,fontWeight:500,color:"rgba(255,255,255,.6)",padding:"8px 13px",textDecoration:"none"}}>Contato</a>
+          <div style={{width:1,height:24,background:"rgba(255,255,255,.15)",margin:"0 10px"}}/>
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13,fontWeight:700,color:C.white,background:C.orange,padding:"9px 22px",borderRadius:8,textDecoration:"none",transition:"all .2s",display:"flex",alignItems:"center",gap:6}}
+            onMouseEnter={e=>e.currentTarget.style.background=C.orangeHot} onMouseLeave={e=>e.currentTarget.style.background=C.orange}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      </div>
+      <style>{`@keyframes ddIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
+      {open==="mobile"&&(
+        <div style={{position:"absolute",top:"100%",left:0,right:0,background:"rgba(18,18,18,0.98)",backdropFilter:"blur(24px)",padding:"20px 24px 28px",borderTop:"1px solid rgba(255,255,255,.06)",maxHeight:"80vh",overflowY:"auto"}}>
+          {Object.keys(navLinks).map(section=>(
+            <div key={section} style={{marginBottom:20}}>
+              <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,marginBottom:10}}>{section}</div>
+              {navLinks[section].map((item,i)=>(
+                <a key={i} href={item.href||"#"} onClick={()=>setOpen(null)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",textDecoration:"none",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+                  <span style={{color:C.orange,display:"flex"}}>{item.ic}</span>
+                  <span style={{fontFamily:F.b,fontSize:14,color:C.white,fontWeight:500}}>{item.n}</span>
+                </a>
+              ))}
+            </div>
+          ))}
+          <a href="#contato" onClick={()=>setOpen(null)} style={{display:"flex",justifyContent:"center",alignItems:"center",gap:8,fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 0",borderRadius:10,textDecoration:"none",marginTop:8}}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+/* ══ PHONE MOCKUP (B2B Catalog) ══ */
+const CatalogMockup = () => {
+  const [screen,setScreen] = useState(0);
+  useEffect(()=>{const iv=setInterval(()=>setScreen(s=>(s+1)%3),3500);return()=>clearInterval(iv);},[]);
+
+  const prods = [
+    {n:"Cabo USB-C 2m",cod:"COD-1024",pr:"R$ 12,90",ok:true},
+    {n:"Fone Bluetooth Pro",cod:"COD-2210",pr:"R$ 89,90",ok:true},
+    {n:"Carregador 65W",cod:"COD-8891",pr:"R$ 45,00",ok:false},
+    {n:"Hub USB 7 portas",cod:"COD-3312",pr:"R$ 67,80",ok:true},
+  ];
+
+  const screens = [
+    // Catálogo
+    <div style={{padding:"10px 12px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+        <div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2}}>Catálogo de Produtos</div>
+        <div style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,95,0,.15)",borderRadius:100,padding:"2px 8px"}}>
+          <Tag size={8} color={C.orange}/>
+          <span style={{fontFamily:F.mono,fontSize:8,color:C.orange,fontWeight:700}}>Tabela VIP</span>
+        </div>
+      </div>
+      <div style={{background:"rgba(255,255,255,.06)",borderRadius:8,padding:"6px 10px",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+        <span style={{fontSize:9,color:"rgba(255,255,255,.3)"}}>🔍</span>
+        <span style={{fontFamily:F.b,fontSize:9,color:"rgba(255,255,255,.25)"}}>Buscar produto ou código</span>
+      </div>
+      {prods.map((p,i)=>(
+        <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 10px",background:"rgba(255,255,255,.04)",borderRadius:8,marginBottom:4,border:"1px solid rgba(255,255,255,.06)"}}>
+          <div>
+            <div style={{fontFamily:F.b,fontSize:10.5,fontWeight:600,color:"#fff"}}>{p.n}</div>
+            <div style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.35)"}}>{p.cod}</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:F.mono,fontSize:10,fontWeight:700,color:C.orange}}>{p.pr}</div>
+            <div style={{fontFamily:F.b,fontSize:8.5,fontWeight:700,color:p.ok?"#22C55E":"#EF4444",marginTop:1}}>{p.ok?"Disponível":"Sem estoque"}</div>
+          </div>
+        </div>
+      ))}
+    </div>,
+
+    // Carrinho / Pedido
+    <div style={{padding:"10px 12px"}}>
+      <div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:10}}>Meu Pedido</div>
+      <div style={{background:"rgba(255,255,255,.06)",borderRadius:10,padding:"10px",marginBottom:8,border:"1px solid rgba(255,255,255,.06)"}}>
+        <div style={{fontFamily:F.b,fontSize:9,color:"rgba(255,255,255,.35)",marginBottom:2}}>Distribuidor</div>
+        <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"#fff"}}>Revenda Comercial Ltda.</div>
+        <div style={{fontFamily:F.mono,fontSize:9,color:C.orange,marginTop:2}}>Tabela Revendedor · Limite: R$ 30k</div>
+      </div>
+      {[{n:"Cabo USB-C 2m",q:"24",u:"R$ 11,61",t:"R$ 278,64"},{n:"Fone Bluetooth Pro",q:"6",u:"R$ 80,91",t:"R$ 485,46"},{n:"Hub USB 7 portas",q:"10",u:"R$ 61,02",t:"R$ 610,20"}].map((i,idx)=>(
+        <div key={idx} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 10px",background:"rgba(255,255,255,.04)",borderRadius:7,marginBottom:4,border:"1px solid rgba(255,255,255,.06)"}}>
+          <div>
+            <div style={{fontFamily:F.b,fontSize:10,fontWeight:600,color:"#fff"}}>{i.n}</div>
+            <div style={{fontFamily:F.mono,fontSize:8.5,color:"rgba(255,255,255,.3)"}}>Qtd: {i.q} · Unit: {i.u}</div>
+          </div>
+          <div style={{fontFamily:F.mono,fontSize:10,fontWeight:700,color:"#fff"}}>{i.t}</div>
+        </div>
+      ))}
+      <div style={{background:C.orange,borderRadius:9,padding:"10px",marginTop:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"#fff"}}>Total: R$ 1.374,30</span>
+        <span style={{fontFamily:F.b,fontSize:9,fontWeight:700,color:"rgba(255,255,255,.8)"}}>Enviar →</span>
+      </div>
+    </div>,
+
+    // Confirmação / Notificações
+    <div style={{padding:"10px 12px"}}>
+      <div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1.2,marginBottom:12}}>Pedido Confirmado</div>
+      <div style={{background:"rgba(34,197,94,.1)",border:"1px solid rgba(34,197,94,.2)",borderRadius:12,padding:"14px",marginBottom:10,textAlign:"center"}}>
+        <div style={{fontSize:20,marginBottom:4}}>✅</div>
+        <div style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:"#fff"}}>Pedido #3847 enviado</div>
+        <div style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.4)",marginTop:3}}>Integrado ao ERP automaticamente</div>
+      </div>
+      {[
+        {ic:"📦",l:"Status do pedido",v:"Em separação"},
+        {ic:"💰",l:"Desconto por volume",v:"10% aplicado"},
+        {ic:"🏷️",l:"Impostos calculados",v:"IPI + ICMS + ST"},
+        {ic:"🔔",l:"Notificações push",v:"Ativas"},
+      ].map((m,i)=>(
+        <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"7px 10px",background:"rgba(255,255,255,.04)",borderRadius:7,marginBottom:4,border:"1px solid rgba(255,255,255,.06)"}}>
+          <span style={{fontFamily:F.b,fontSize:10.5,color:"rgba(255,255,255,.6)"}}>{m.ic} {m.l}</span>
+          <span style={{fontFamily:F.mono,fontSize:9.5,fontWeight:700,color:C.orange}}>{m.v}</span>
+        </div>
+      ))}
+    </div>
+  ];
+
+  return (
+    <div className="phone-center" style={{display:"flex",justifyContent:"center",alignItems:"center",position:"relative"}}>
+      <div style={{width:290,position:"relative",animation:"phoneFloat 4s ease-in-out infinite",filter:"drop-shadow(0 40px 80px rgba(255,95,0,.25)) drop-shadow(0 0 40px rgba(255,95,0,.15))"}}>
+        <div style={{background:"linear-gradient(160deg,#2a2a2a,#141414)",borderRadius:40,padding:"12px",border:"2px solid rgba(255,255,255,.1)",boxShadow:"inset 0 1px 0 rgba(255,255,255,.08)"}}>
+          <div style={{background:"#0D0D0D",borderRadius:28,overflow:"hidden",position:"relative"}}>
+            {/* Status bar */}
+            <div style={{padding:"10px 14px 0",display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0D0D0D"}}>
+              <span style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.6)"}}>9:41</span>
+              <div style={{width:80,height:18,background:"#1a1a1a",borderRadius:9}}/>
+              <div style={{display:"flex",gap:4,alignItems:"center"}}>
+                <span style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.5)"}}>●●●</span>
+              </div>
+            </div>
+            {/* App header branded */}
+            <div style={{padding:"8px 12px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid rgba(255,255,255,.06)"}}>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <div style={{width:22,height:22,borderRadius:6,background:"rgba(255,95,0,.2)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <ShoppingCart size={11} color={C.orange}/>
+                </div>
+                <div>
+                  <span style={{fontFamily:F.b,fontSize:9,fontWeight:700,color:"rgba(255,255,255,.4)",letterSpacing:.5}}>SUA MARCA</span>
+                  <div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:"#fff",lineHeight:1}}>Loja B2B</div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <div style={{position:"relative"}}>
+                  <Bell size={12} color="rgba(255,255,255,.4)"/>
+                  <div style={{position:"absolute",top:-2,right:-2,width:5,height:5,borderRadius:"50%",background:C.orange}}/>
+                </div>
+                <div style={{background:"rgba(255,95,0,.15)",borderRadius:6,padding:"2px 6px"}}>
+                  <span style={{fontFamily:F.mono,fontSize:8,color:C.orange,fontWeight:700}}>3 itens</span>
+                </div>
+              </div>
+            </div>
+            {/* Screen content */}
+            <div style={{minHeight:340,transition:"opacity .3s",opacity:1}}>
+              {screens[screen]}
+            </div>
+            {/* Bottom nav */}
+            <div style={{display:"flex",justifyContent:"space-around",padding:"8px 0 12px",borderTop:"1px solid rgba(255,255,255,.06)",background:"#0D0D0D"}}>
+              {[{ic:<Package size={14}/>,l:"Catálogo",a:screen===0},{ic:<ShoppingCart size={14}/>,l:"Pedido",a:screen===1},{ic:<Bell size={14}/>,l:"Avisos",a:screen===2},{ic:<Users size={14}/>,l:"Conta",a:false}].map((b,i)=>(
+                <div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,opacity:b.a?1:.4}}>
+                  <div style={{color:b.a?C.orange:"rgba(255,255,255,.4)"}}>{b.ic}</div>
+                  <span style={{fontFamily:F.b,fontSize:7.5,color:b.a?C.orange:"rgba(255,255,255,.3)",fontWeight:b.a?700:400}}>{b.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{width:80,height:3,background:"rgba(255,255,255,.15)",borderRadius:100,margin:"6px auto 0"}}/>
+      </div>
+
+      {/* Floating: novo pedido */}
+      <div style={{position:"absolute",top:"8%",right:"-8%",background:C.dark,borderRadius:14,padding:"10px 14px",border:"1px solid rgba(255,255,255,.08)",boxShadow:"0 16px 48px rgba(0,0,0,.4)",animation:"notifPop .6s ease both .8s, phoneFloat 5s ease-in-out 1s infinite",minWidth:156,opacity:0,animationFillMode:"forwards"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:"#22C55E",animation:"pulse2 1.5s infinite"}}/>
+          <span style={{fontFamily:F.b,fontSize:9,fontWeight:700,color:"rgba(255,255,255,.4)",textTransform:"uppercase",letterSpacing:1}}>Novo pedido</span>
+        </div>
+        <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"#fff"}}>Revenda Norte — R$ 3.240</div>
+        <div style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.3)",marginTop:2}}>Integrado ao ERP</div>
+      </div>
+
+      {/* Floating: desconto aplicado */}
+      <div style={{position:"absolute",bottom:"14%",left:"-6%",background:C.dark,borderRadius:14,padding:"10px 14px",border:"1px solid rgba(255,95,0,.15)",boxShadow:"0 16px 48px rgba(0,0,0,.4)",animation:"notifPop .6s ease both 1.2s, phoneFloat 6s ease-in-out 1.5s infinite",minWidth:152,opacity:0,animationFillMode:"forwards"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+          <Tag size={10} color={C.orange}/>
+          <span style={{fontFamily:F.b,fontSize:9,fontWeight:700,color:C.orange,textTransform:"uppercase",letterSpacing:1}}>Desconto aplicado</span>
+        </div>
+        <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"#fff"}}>10% por volume</div>
+        <div style={{fontFamily:F.mono,fontSize:9,color:"rgba(255,255,255,.3)",marginTop:2}}>Tabela Revendedor VIP</div>
+      </div>
+    </div>
+  );
+};
+
+/* ══ MARQUEE ══ */
+const MarqueeStrip = () => {
+  const items = ["Catálogo Digital","Pedidos B2B","App White Label","Tabelas de Preço","Descontos por Volume","Notificações Push","Banners Promocionais","ICMS · IPI · ST","App Store & Google Play","Integração ERP","Multi Empresa","Implantação Rápida"];
+  const doubled = [...items,...items];
+  return (
+    <div style={{background:C.orange,padding:"10px 0",overflow:"hidden",display:"flex",alignItems:"center"}}>
+      <div style={{display:"flex",gap:0,animation:"marquee 28s linear infinite",whiteSpace:"nowrap"}}>
+        {doubled.map((t,i)=>(
+          <span key={i} style={{display:"inline-flex",alignItems:"center",gap:12,fontFamily:F.b,fontSize:12,fontWeight:700,color:C.white,padding:"0 20px",textTransform:"uppercase",letterSpacing:1}}>
+            <span style={{opacity:.5}}>✦</span>{t}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ══ HERO ══ */
+const PageHero = () => (
+  <section className="hero-section" style={{background:C.dark,padding:"120px 40px 80px",position:"relative",overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)",backgroundSize:"56px 56px",WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",maskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",pointerEvents:"none"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 55% 55% at 65% 10%,rgba(255,95,0,.14),transparent 65%)",pointerEvents:"none"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 35% 35% at 15% 80%,rgba(255,95,0,.06),transparent 60%)",pointerEvents:"none"}}/>
+
+    <div style={{maxWidth:1240,margin:"0 auto",position:"relative",zIndex:2}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:28,animation:"heroFadeUp .6s ease both"}}>
+        <a href="index.html" style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",textDecoration:"none",transition:"color .2s"}}
+          onMouseEnter={e=>e.target.style.color="rgba(255,255,255,.7)"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.35)"}>Home</a>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)"}}>Soluções</span>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:C.orange,fontWeight:600}}>M-Commerce</span>
+      </div>
+
+      <div className="hero-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:64,alignItems:"center"}}>
+        <div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,95,0,.12)",border:"1px solid rgba(255,95,0,.2)",color:C.orange,fontFamily:F.b,fontSize:11.5,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",padding:"5px 14px",borderRadius:100,marginBottom:20,animation:"heroFadeUp .7s ease both .1s both"}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:C.orange,animation:"pulse2 1.5s ease-in-out infinite"}}/>
+            App B2B · iOS & Android
+          </div>
+          <h1 style={{fontFamily:F.h,fontSize:"clamp(30px,4vw,56px)",fontWeight:900,color:C.white,letterSpacing:-2,lineHeight:1.05,margin:"0 0 20px",animation:"heroFadeUp .8s ease both .2s"}}>
+            Seu catálogo de<br/>produtos na palma <span style={{color:C.orange}}>do cliente.</span>
+          </h1>
+          <p style={{fontFamily:F.b,fontSize:16.5,color:"rgba(255,255,255,.55)",lineHeight:1.75,maxWidth:500,margin:"0 0 16px",animation:"heroFadeUp .8s ease both .35s"}}>
+            O M-Commerce UNO ERP é um app B2B white label com catálogo digital, pedidos online e tabelas de preço personalizadas — publicado na App Store e Google Play com a sua marca.
+          </p>
+          <p style={{fontFamily:F.b,fontSize:15,color:"rgba(255,255,255,.4)",lineHeight:1.7,maxWidth:480,margin:"0 0 36px",animation:"heroFadeUp .8s ease both .4s"}}>
+            Distribuidores e indústrias entregam um aplicativo próprio para revendas e clientes fazerem pedidos com descontos automáticos, cálculo de impostos (ICMS, IPI, ST) e integração nativa ao ERP.
+          </p>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",animation:"heroFadeUp .7s ease both .5s"}}>
+            <a href="#contato" style={{fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 32px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,transition:"all .25s",boxShadow:"0 6px 24px rgba(255,95,0,.35)"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 36px rgba(255,95,0,.45)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 6px 24px rgba(255,95,0,.35)";}}>
+              Solicitar demonstração<ArrowRight size={16}/>
+            </a>
+            <a href="#funcionalidades" style={{fontFamily:F.b,fontSize:15,fontWeight:600,color:C.white,background:"rgba(255,255,255,.06)",padding:"14px 28px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,border:"1.5px solid rgba(255,255,255,.12)",transition:"all .25s"}}
+              onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.3)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.12)"}>
+              <Layers size={15}/>Ver funcionalidades
+            </a>
+          </div>
+          <div style={{display:"flex",gap:24,marginTop:32,flexWrap:"wrap",animation:"heroFadeUp .7s ease both .65s"}}>
+            {[{v:"White Label",l:"App com sua marca"},{v:"B2B Nativo",l:"Para revendas e clientes"},{v:"Impostos",l:"ICMS · IPI · ST automáticos"}].map((s,i)=>(
+              <div key={i}>
+                <div style={{fontFamily:F.mono,fontSize:15,fontWeight:700,color:C.orange}}>{s.v}</div>
+                <div style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.3)",marginTop:2}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+          {/* Store badges */}
+          <div style={{display:"flex",gap:10,marginTop:24,animation:"heroFadeUp .7s ease both .75s"}}>
+            {[{ic:"🍎",l:"App Store",s:"iOS 14+"},{ic:"🤖",l:"Google Play",s:"Android 8+"}].map((b,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,padding:"8px 14px",cursor:"pointer",transition:"all .2s"}}
+                onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(255,95,0,.3)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.1)"}>
+                <span style={{fontSize:16}}>{b.ic}</span>
+                <div>
+                  <div style={{fontFamily:F.b,fontSize:10,color:"rgba(255,255,255,.35)"}}>Disponível na</div>
+                  <div style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:C.white}}>{b.l}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{animation:"heroFadeUp .9s ease both .3s"}}>
+          <CatalogMockup/>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══ FEATURES ══ */
+const Features = () => {
+  const items = [
+    {ic:<Package size={22}/>,color:"#FF5F00",t:"Catálogo Digital de Produtos",d:"Catálogo completo com fotos, descrições, preços e disponibilidade. Seus clientes e revendas navegam por produtos com filtros por categoria, marca ou código e adicionam favoritos.",badge:"Core"},
+    {ic:<ShoppingCart size={22}/>,color:"#E85500",t:"Pedidos Online Integrados",d:"O cliente faz o pedido no app e ele chega automaticamente no ERP — sem digitação manual, sem risco de erro e com rastreamento em tempo real do status."},
+    {ic:<Tag size={22}/>,color:"#0369a1",t:"Múltiplas Tabelas de Preço",d:"Configure tabelas de preço diferentes por cliente, segmento ou perfil de compra. Cada revenda vê somente os preços negociados com sua empresa — sem confusão."},
+    {ic:<Percent size={22}/>,color:"#22C55E",t:"Descontos por Quantidade",d:"Defina descontos progressivos por volume e por condição de pagamento. O app calcula automaticamente o melhor preço conforme a quantidade selecionada.",badge:"Diferencial"},
+    {ic:<Calculator size={22}/>,color:"#F59E0B",t:"Cálculo Automático de Impostos",d:"ICMS, IPI e Substituição Tributária calculados automaticamente no pedido. Seus clientes veem o valor final real sem surpresas no faturamento."},
+    {ic:<Bell size={22}/>,color:"#DC2626",t:"Notificações Push",d:"Comunique-se diretamente com seus clientes via push notifications — novos produtos, promoções, atualizações de pedido e comunicados da empresa, sem custo de SMS."},
+    {ic:<Image size={22}/>,color:"#0D9488",t:"Banners Promocionais",d:"Destaque lançamentos, campanhas sazonais e produtos em promoção com banners na tela inicial do app. Atualize de forma simples pelo painel administrativo."},
+    {ic:<Palette size={22}/>,color:"#7C3AED",t:"App White Label",d:"O app é publicado com o nome, logo e cores da sua empresa na App Store e Google Play. Seus clientes baixam o aplicativo da sua marca — não do UNO ERP.",badge:"Exclusivo"},
+    {ic:<Database size={22}/>,color:"#FF5F00",t:"Integração Multi Empresa",d:"Suporte a múltiplas empresas em uma única plataforma. Ideal para grupos empresariais e distribuidoras que operam com diferentes CNPJs e filiais."},
+  ];
+  return (
+    <section id="funcionalidades" style={{padding:"96px 40px",background:C.white}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:56}}>
+            <Badge>Funcionalidades</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Potencialize as vendas<br/>das suas revendas.</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,maxWidth:540,margin:"8px auto 0",lineHeight:1.65}}>Catálogo, pedidos, tabelas de preço e impostos — tudo em um app B2B publicado com a sua marca.</p>
+          </div>
+        </Reveal>
+        <div className="feat-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>
+          {items.map((item,i)=>(
+            <Reveal key={i} delay={i*.06}>
+              <div style={{background:C.gray50,border:`1px solid ${C.gray100}`,borderRadius:18,padding:"30px 28px",height:"100%",transition:"all .25s",position:"relative",overflow:"hidden"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=`${item.color}30`;e.currentTarget.style.background=C.white;e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 16px 48px ${item.color}10`;}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.background=C.gray50;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+                {item.badge&&<div style={{fontFamily:F.b,fontSize:10,fontWeight:700,color:item.color,textTransform:"uppercase",letterSpacing:1.2,marginBottom:14,background:`${item.color}10`,display:"inline-block",padding:"3px 8px",borderRadius:5}}>{item.badge}</div>}
+                <div style={{width:48,height:48,borderRadius:14,background:`${item.color}10`,border:`1.5px solid ${item.color}20`,display:"flex",alignItems:"center",justifyContent:"center",color:item.color,marginBottom:18}}>{item.ic}</div>
+                <h3 style={{fontFamily:F.h,fontSize:17,fontWeight:800,color:C.black,margin:"0 0 10px",letterSpacing:-0.3}}>{item.t}</h3>
+                <p style={{fontFamily:F.b,fontSize:14,color:C.gray500,lineHeight:1.7,margin:0}}>{item.d}</p>
+                <div style={{position:"absolute",bottom:-20,right:-20,opacity:.04}}><LogoMark size={80} color={item.color}/></div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ COMO FUNCIONA ══ */
+const ComoFunciona = () => {
+  const steps = [
+    {n:"01",t:"Configuração e branding",d:"Enviamos logo, cores e nome da sua empresa. O app é personalizado e publicado nas lojas com a identidade da sua marca.",ic:<Palette size={22}/>},
+    {n:"02",t:"Cadastro de clientes e tabelas",d:"Seus clientes e revendas recebem acesso com login próprio, tabela de preço e limite de crédito exclusivos.",ic:<Users size={22}/>},
+    {n:"03",t:"Pedido no app",d:"O cliente navega pelo catálogo, seleciona produtos, aplica descontos e envia o pedido — diretamente pelo app com a sua marca.",ic:<ShoppingCart size={22}/>},
+    {n:"04",t:"Integração automática ao ERP",d:"O pedido entra no UNO ERP em tempo real, com impostos calculados, estoque reservado e faturamento liberado.",ic:<Database size={22}/>},
+  ];
+  return (
+    <section style={{padding:"96px 40px",background:C.gray50}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:60}}>
+            <Badge>Como funciona</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Do cadastro ao pedido<br/>em 4 etapas.</h2>
+          </div>
+        </Reveal>
+        <div className="steps-row" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:0,alignItems:"start"}}>
+          {steps.map((s,i)=>(
+            <React.Fragment key={i}>
+              <Reveal delay={i*.1}>
+                <div style={{position:"relative",padding:"0 16px",textAlign:"center"}}>
+                  <div style={{width:64,height:64,borderRadius:18,background:C.orange,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",color:C.white,boxShadow:`0 8px 28px rgba(255,95,0,.3)`}}>{s.ic}</div>
+                  <div style={{fontFamily:F.mono,fontSize:11,fontWeight:700,color:C.orange,letterSpacing:2,marginBottom:8}}>{s.n}</div>
+                  <h3 style={{fontFamily:F.h,fontSize:16,fontWeight:800,color:C.black,margin:"0 0 10px",letterSpacing:-.3}}>{s.t}</h3>
+                  <p style={{fontFamily:F.b,fontSize:13.5,color:C.gray500,lineHeight:1.7,margin:0}}>{s.d}</p>
+                </div>
+              </Reveal>
+              {i<steps.length-1&&(
+                <div className="step-arrow" style={{display:"flex",alignItems:"flex-start",justifyContent:"center",paddingTop:20,gridColumn:"auto"}}>
+                  <ChevronRight size={22} color="rgba(255,95,0,.3)"/>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ USE CASES ══ */
+const UseCases = () => {
+  const [active,setActive] = useState(0);
+  const cases = [
+    {
+      seg:"Distribuição & Atacado",icon:<Truck size={18}/>,color:"#FF5F00",
+      title:"Seu app nas mãos das revendas",
+      desc:"Revendas e distribuidores fazem pedidos pelo app com catálogo atualizado, tabela de preço exclusiva e descontos por volume — sem ligações, sem e-mails, sem digitação manual no ERP.",
+      results:["Pedidos online 24h/7 dias","Tabela de preço por cliente","Desconto por quantidade automático","Faturamento integrado ao ERP"],
+    },
+    {
+      seg:"Indústria",icon:<Factory size={18}/>,color:"#E85500",
+      title:"Representantes e promotores mais produtivos",
+      desc:"Representantes comerciais e promotores acessam o catálogo completo, fazem pedidos de reposição em campo e acompanham o status de entrega — tudo pelo app da sua indústria.",
+      results:["Catálogo com fotos e preços","Pedido de reposição em campo","Status de entrega em tempo real","Push notification para novidades"],
+    },
+    {
+      seg:"Revendas & Varejo",icon:<ShoppingCart size={18}/>,color:"#0369a1",
+      title:"Canal digital próprio para seus clientes",
+      desc:"Seus clientes finais e lojistas têm um canal de compra exclusivo com a sua marca — catálogo B2B, condições personalizadas e experiência de e-commerce dentro do seu ecossistema.",
+      results:["App com a marca da empresa","Condições exclusivas por perfil","Banners e campanhas promocionais","Notificações push de promoções"],
+    },
+  ];
+  const c = cases[active];
+  return (
+    <section style={{padding:"96px 40px",background:C.white}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:52}}>
+            <Badge>Para cada segmento</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Um app para cada<br/>canal de vendas.</h2>
+          </div>
+        </Reveal>
+        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginBottom:40}}>
+          {cases.map((cs,i)=>(
+            <button key={i} onClick={()=>setActive(i)} style={{display:"flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:13,fontWeight:600,padding:"10px 20px",borderRadius:100,border:`1.5px solid ${active===i?cs.color:"transparent"}`,background:active===i?`${cs.color}12`:"rgba(0,0,0,.04)",color:active===i?cs.color:C.gray500,cursor:"pointer",transition:"all .2s"}}>
+              <span style={{color:active===i?cs.color:C.gray400,display:"flex"}}>{cs.icon}</span>{cs.seg}
+            </button>
+          ))}
+        </div>
+        <div className="two-col" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:64,alignItems:"center"}}>
+          <Reveal direction="left" key={active}>
+            <div>
+              <div style={{display:"inline-flex",alignItems:"center",gap:6,background:`${c.color}10`,border:`1px solid ${c.color}20`,borderRadius:100,padding:"4px 12px",marginBottom:18}}>
+                <span style={{color:c.color,display:"flex"}}>{c.icon}</span>
+                <span style={{fontFamily:F.b,fontSize:11.5,fontWeight:700,color:c.color}}>{c.seg}</span>
+              </div>
+              <h3 style={{fontFamily:F.h,fontSize:"clamp(22px,3vw,32px)",fontWeight:800,color:C.black,margin:"0 0 16px",letterSpacing:-.8,lineHeight:1.15}}>{c.title}</h3>
+              <p style={{fontFamily:F.b,fontSize:15.5,color:C.gray500,lineHeight:1.8,margin:"0 0 28px"}}>{c.desc}</p>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                {c.results.map((r,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:10}}>
+                    <div style={{width:22,height:22,borderRadius:6,background:`${c.color}15`,border:`1px solid ${c.color}25`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:c.color}}>
+                      <Check size={12}/>
+                    </div>
+                    <span style={{fontFamily:F.b,fontSize:14.5,color:C.black,fontWeight:600}}>{r}</span>
+                  </div>
+                ))}
+              </div>
+              <a href="#contato" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:14.5,fontWeight:700,color:C.white,background:c.color,padding:"13px 28px",borderRadius:10,textDecoration:"none",marginTop:28,transition:"all .2s",boxShadow:`0 6px 20px ${c.color}30`}}
+                onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";}}>
+                Ver demonstração<ArrowRight size={15}/>
+              </a>
+            </div>
+          </Reveal>
+          <Reveal direction="right" key={`vis-${active}`}>
+            <div style={{background:`linear-gradient(135deg,${c.color}10,${c.color}05)`,borderRadius:20,padding:32,border:`1px solid ${c.color}18`,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",top:-40,right:-40,opacity:.05}}><LogoMark size={200} color={c.color}/></div>
+              <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:c.color,textTransform:"uppercase",letterSpacing:1.5,marginBottom:20}}>Resultado — M-Commerce em campo</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {[
+                  {l:"Pedidos/mês (média)",v:"+340"},
+                  {l:"Tempo por pedido",v:"< 4min"},
+                  {l:"Erros eliminados",v:"95%"},
+                  {l:"Cobertura de revendas",v:"+60%"},
+                ].map((m,i)=>(
+                  <div key={i} style={{background:"rgba(255,255,255,.7)",borderRadius:12,padding:"16px 18px",backdropFilter:"blur(8px)"}}>
+                    <div style={{fontFamily:F.b,fontSize:11,color:C.gray500,marginBottom:6}}>{m.l}</div>
+                    <div style={{fontFamily:F.mono,fontSize:20,fontWeight:700,color:c.color}}>{m.v}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{marginTop:14,background:"rgba(255,255,255,.8)",borderRadius:12,padding:"12px 16px",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:7,height:7,borderRadius:"50%",background:"#22C55E",animation:"pulse2 1.5s ease-in-out infinite",flexShrink:0}}/>
+                <span style={{fontFamily:F.mono,fontSize:11,color:C.gray600}}>Pedidos sincronizados com UNO ERP em tempo real</span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ══ DIFERENCIAIS ══ */
+const Diferenciais = () => {
+  const items = [
+    {ic:<Palette size={20}/>,color:"#FF5F00",t:"App White Label com sua marca",d:"Não é um app genérico. O M-Commerce é publicado na App Store e Google Play com o nome, logo e identidade visual da sua empresa — seus clientes baixam o app da sua marca."},
+    {ic:<Database size={20}/>,color:"#0369a1",t:"100% integrado ao ERP",d:"Não é uma loja virtual isolada. Catálogo, estoque, tabelas de preço, clientes e pedidos fluem direto do UNO ERP — sem sincronização manual ou integrações extras."},
+    {ic:<Zap size={20}/>,color:"#22C55E",t:"Implantação rápida",d:"Envie logo, imagens e cores — seu app está pronto para homologação rapidamente. Pague a implantação em 5x sem juros e só comece a pagar a mensalidade 60 dias após a homologação."},
+    {ic:<Shield size={20}/>,color:"#F59E0B",t:"Segurança e controle de acesso",d:"Cada cliente acessa apenas sua tabela de preço e condições negociadas. O administrador controla o catálogo, banners, notificações e descontos pelo painel do ERP."},
+  ];
+  return (
+    <section id="diferenciais" style={{padding:"96px 40px",background:C.dark,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 60% 55% at 50% 50%,rgba(255,95,0,.07),transparent 65%)",pointerEvents:"none"}}/>
+      <div style={{maxWidth:1240,margin:"0 auto",position:"relative",zIndex:1}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:56}}>
+            <Badge>Diferenciais</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.white,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Mais que um catálogo.<br/>Um canal de vendas completo.</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:"rgba(255,255,255,.4)",maxWidth:520,margin:"12px auto 0",lineHeight:1.65}}>White label, integração nativa ao ERP, impostos automáticos e implantação com condições especiais.</p>
+          </div>
+        </Reveal>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20,marginBottom:52}} className="two-col">
+          {items.map((item,i)=>(
+            <Reveal key={i} delay={i*.08}>
+              <div style={{background:"rgba(255,255,255,.04)",border:`1px solid rgba(255,255,255,.07)`,borderRadius:18,padding:"28px 28px",display:"flex",gap:20,alignItems:"flex-start",transition:"all .25s"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=`${item.color}30`;e.currentTarget.style.background="rgba(255,255,255,.06)";e.currentTarget.style.boxShadow=`0 12px 40px ${item.color}08`;}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.07)";e.currentTarget.style.background="rgba(255,255,255,.04)";e.currentTarget.style.boxShadow="none";}}>
+                <div style={{width:50,height:50,borderRadius:14,background:`${item.color}15`,border:`1.5px solid ${item.color}25`,display:"flex",alignItems:"center",justifyContent:"center",color:item.color,flexShrink:0}}>{item.ic}</div>
+                <div>
+                  <h3 style={{fontFamily:F.h,fontSize:17,fontWeight:800,color:C.white,margin:"0 0 8px",letterSpacing:-.3}}>{item.t}</h3>
+                  <p style={{fontFamily:F.b,fontSize:14,color:"rgba(255,255,255,.45)",lineHeight:1.7,margin:0}}>{item.d}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal>
+          <div className="stats-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:20}}>
+            {[
+              {v:"iOS & Android",l:"App Store e Google Play"},
+              {v:"White Label",l:"Publicado com sua marca"},
+              {v:"5x sem juros",l:"Implantação parcelada"},
+              {v:"Automático",l:"ICMS · IPI · ST no pedido"},
+            ].map((s,i)=>(
+              <div key={i} style={{textAlign:"center",padding:"24px 16px",background:"rgba(255,255,255,.04)",borderRadius:16,border:`1px solid rgba(255,255,255,.07)`}}>
+                <div style={{fontFamily:F.mono,fontSize:20,fontWeight:700,color:C.orange,marginBottom:6}}>{s.v}</div>
+                <div style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",lineHeight:1.5}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ══ CTA ══ */
+const CTA = () => (
+  <section id="contato" style={{padding:"96px 40px",background:C.gray50}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="cta-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:64,alignItems:"center"}}>
+        <Reveal direction="left">
+          <div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:C.orangeSoft,border:`1px solid ${C.orangeBorder}`,borderRadius:100,padding:"5px 14px",marginBottom:18}}>
+              <ShoppingCart size={13} color={C.orange}/>
+              <span style={{fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.2,textTransform:"uppercase"}}>Demonstração Gratuita</span>
+            </div>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:800,color:C.black,margin:"0 0 16px",letterSpacing:-1.2,lineHeight:1.1}}>Seu app B2B pronto<br/>para vender<br/><span style={{color:C.orange}}>mais.</span></h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,lineHeight:1.75,margin:"0 0 24px",maxWidth:440}}>
+              Agende uma demonstração e veja como o M-Commerce funciona com os seus produtos, clientes e tabelas de preço — sem compromisso.
+            </p>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {["App publicado com a sua marca","Implantação em 5x sem juros","Catálogo integrado ao UNO ERP","Cálculo automático de ICMS, IPI e ST"].map((t,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:22,height:22,borderRadius:6,background:C.orangeSoft,border:`1px solid ${C.orangeBorder}`,display:"flex",alignItems:"center",justifyContent:"center",color:C.orange,flexShrink:0}}>
+                    <Check size={12}/>
+                  </div>
+                  <span style={{fontFamily:F.b,fontSize:14.5,color:C.black,fontWeight:500}}>{t}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:10,marginTop:28}}>
+              {[{ic:"🍎",l:"App Store",s:"iOS"},{ic:"🤖",l:"Google Play",s:"Android"}].map((b,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:8,background:C.white,border:`1px solid ${C.gray200}`,borderRadius:10,padding:"8px 14px",cursor:"pointer",transition:"all .2s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orange;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray200;}}>
+                  <span style={{fontSize:16}}>{b.ic}</span>
+                  <div>
+                    <div style={{fontFamily:F.b,fontSize:10,color:C.gray400}}>Disponível na</div>
+                    <div style={{fontFamily:F.b,fontSize:12,fontWeight:700,color:C.black}}>{b.l}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+        <Reveal direction="right">
+          <div style={{background:C.white,borderRadius:20,padding:32,border:`1px solid ${C.gray100}`,boxShadow:"0 8px 48px rgba(0,0,0,.06)"}}>
+            <div style={{fontFamily:F.h,fontSize:20,fontWeight:800,color:C.black,marginBottom:20}}>Solicite uma demonstração</div>
+            {[
+              {l:"Nome completo",p:"Seu nome",t:"text"},
+              {l:"E-mail corporativo",p:"email@empresa.com.br",t:"email"},
+              {l:"WhatsApp",p:"(11) 99999-9999",t:"tel"},
+              {l:"Nome da empresa",p:"Empresa S.A.",t:"text"},
+            ].map((f,i)=>(
+              <div key={i} style={{marginBottom:14}}>
+                <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>{f.l}</label>
+                <input type={f.t} placeholder={f.p} style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",background:C.white,boxSizing:"border-box",transition:"border-color .2s"}}
+                  onFocus={e=>e.target.style.borderColor=C.orange} onBlur={e=>e.target.style.borderColor=C.gray200}/>
+              </div>
+            ))}
+            <div style={{marginBottom:18}}>
+              <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>Segmento</label>
+              <select style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",background:C.white,color:C.gray600,cursor:"pointer",boxSizing:"border-box"}}>
+                <option>Selecione seu segmento</option>
+                <option>Distribuição & Atacado</option><option>Indústria</option>
+                <option>Revendas & Varejo</option><option>Outros</option>
+              </select>
+            </div>
+            <button style={{width:"100%",padding:"14px 0",borderRadius:10,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:15,fontWeight:700,cursor:"pointer",transition:"all .2s",boxShadow:"0 4px 16px rgba(255,95,0,.25)",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
+              onMouseEnter={e=>{e.currentTarget.style.background=C.orangeHot;e.currentTarget.style.boxShadow="0 8px 28px rgba(255,95,0,.4)";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background=C.orange;e.currentTarget.style.boxShadow="0 4px 16px rgba(255,95,0,.25)";e.currentTarget.style.transform="none";}}>
+              <ShoppingCart size={16}/>Agendar Demonstração Gratuita
+            </button>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══ FOOTER ══ */
+const Footer = () => (
+  <footer style={{background:C.black,padding:"56px 40px 28px"}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="footer-grid" style={{display:"grid",gridTemplateColumns:"1.6fr 1fr 1fr 1fr 1.2fr",gap:32,marginBottom:48}}>
+        <div>
+          <div style={{marginBottom:14}}><Logo height={36}/></div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.7,maxWidth:220}}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
+          <div style={{display:"flex",gap:16,marginTop:16}}>
+            {[<Mail size={16}/>,<Phone size={16}/>,<MapPin size={16}/>].map((ic,i)=>(
+              <div key={i} style={{width:32,height:32,borderRadius:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(255,255,255,.35)",cursor:"pointer",transition:"all .2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.color=C.orange;e.currentTarget.style.borderColor="rgba(255,95,0,.3)";}}
+                onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.35)";e.currentTarget.style.borderColor="rgba(255,255,255,.06)";}}>
+                {ic}
+              </div>
+            ))}
+          </div>
+        </div>
+        {[
+          {t:"Soluções",ls:["Sistema de Gestão","CRM","IAU — IA","BI (Google)","App Mobile","WMS","M-Commerce"]},
+          {t:"Segmentos",ls:["Indústria","Distribuição","Serviços","Cosméticos","Alimentos","Química","Metalúrgica"]},
+          {t:"Empresa",ls:["Sobre","Blog","Planos","Integrações","Desenvolvimento","Suporte","Contato"]},
+        ].map((col,i)=>(
+          <div key={i}>
+            <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>{col.t}</div>
+            {col.ls.map((l,j)=>(
+              <a key={j} href="#" style={{display:"block",fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.4)",textDecoration:"none",marginBottom:9,transition:"color .15s"}}
+                onMouseEnter={e=>e.target.style.color=C.orange} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.4)"}>{l}</a>
+            ))}
+          </div>
+        ))}
+        <div>
+          <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>Newsletter</div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.6,marginBottom:12}}>Receba dicas de gestão e novidades do UNO ERP.</p>
+          <input type="email" placeholder="Seu e-mail" style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.04)",fontFamily:F.b,fontSize:13,color:C.white,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
+          <button style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:13,fontWeight:700,cursor:"pointer"}}>Inscrever-se</button>
+        </div>
+      </div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:20,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+        <span style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)"}}>© 2025 UNO ERP · Todos os direitos reservados.</span>
+        <div style={{display:"flex",gap:20}}>
+          {["Política de Privacidade","Termos e Condições"].map((t,i)=>(
+            <a key={i} href="#" style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)",textDecoration:"none"}}>{t}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ══ APP ══ */
+function MCommercePage() {
+  return (
+    <>
+      <Nav/>
+      <PageHero/>
+      <MarqueeStrip/>
+      <Features/>
+      <ComoFunciona/>
+      <UseCases/>
+      <Diferenciais/>
+      <CTA/>
+      <Footer/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(MCommercePage));
+</script>
+</body>
+</html>

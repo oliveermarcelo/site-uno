@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Gestão ERP | UNO ERP — Gerencia sua empresa com precisão</title>
+<meta name="description" content="Tenha controle total sobre o seu negócio em tempo real com o UNO sistema de gestão ERP. Todos os processos automatizados em uma plataforma única, 100% web e mobile.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:#FDFCFA;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,95,0,.12);color:#0D0D0D}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#f8f8f6}
+::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#FF5F00}
+input::placeholder{color:#bbb}
+select{appearance:none}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes blink{50%{opacity:0}}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes floatDown{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Responsive */
+@media(max-width:900px){
+  .nav-links{display:none!important}
+  .nav-mobile-btn{display:flex!important}
+  .hero-section{padding:100px 16px 56px!important}
+  .page-hero-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .page-hero-grid h1{font-size:34px!important}
+  .stats-row{grid-template-columns:1fr 1fr!important}
+  .mod-pills{flex-wrap:nowrap!important;overflow-x:auto!important;justify-content:flex-start!important;gap:6px!important;padding:0 0 10px!important;margin-left:-16px!important;margin-right:-16px!important;padding-left:16px!important;padding-right:16px!important;-webkit-overflow-scrolling:touch}
+  .mod-pills::-webkit-scrollbar{display:none}
+  .mod-pills button{padding:8px 16px!important;font-size:12px!important;white-space:nowrap!important;flex-shrink:0!important}
+  .mod-panel-header{flex-direction:column!important;gap:16px!important;padding:20px 16px!important;align-items:flex-start!important}
+  .mod-panel-header>svg{display:none!important}
+  .mod-features{grid-template-columns:1fr!important;gap:8px!important}
+  .mod-features>div{padding:12px 14px!important}
+  .mod-features-wrap{padding:16px!important}
+  .mod-footer{flex-direction:column!important;gap:12px!important;align-items:flex-start!important;padding:16px!important}
+  .mod-panel{border-radius:16px!important;margin:0 -8px!important}
+  .why-grid{grid-template-columns:1fr!important}
+  .diff-grid{grid-template-columns:1fr!important}
+  .int-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .seg-grid{grid-template-columns:1fr 1fr!important}
+  .cta-grid{grid-template-columns:1fr!important;gap:32px!important}
+  .footer-grid{grid-template-columns:1fr 1fr!important;gap:24px!important}
+  section:not(.hero-section){padding:56px 16px!important}
+  h2{font-size:28px!important}
+  .marquee-strip{padding:10px 0!important}
+}
+@media(max-width:480px){
+  .hero-section{padding:96px 16px 48px!important}
+  .stats-row{grid-template-columns:1fr!important}
+  .seg-grid{grid-template-columns:1fr 1fr!important}
+  .footer-grid{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ══════════════ ICON SYSTEM ══════════════ */
+const mkIc = (paths) => ({size=16,color="currentColor",style:s={}}={}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{display:"inline-block",verticalAlign:"middle",flexShrink:0,...s}}>{paths}</svg>
+);
+const Zap       = mkIc(<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>);
+const Brain     = mkIc(<><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/></>);
+const BarChart3 = mkIc(<><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></>);
+const ClipboardList = mkIc(<><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></>);
+const Handshake = mkIc(<><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></>);
+const Smartphone= mkIc(<><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></>);
+const Warehouse = mkIc(<><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></>);
+const ShoppingCart = mkIc(<><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></>);
+const Factory   = mkIc(<><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></>);
+const Truck     = mkIc(<><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 13.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></>);
+const Settings  = mkIc(<><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></>);
+const ArrowRight= mkIc(<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>);
+const ArrowUpRight = mkIc(<><path d="M7 7h10v10"/><path d="M7 17 17 7"/></>);
+const Check     = mkIc(<path d="M20 6 9 17l-5-5"/>);
+const Shield    = mkIc(<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>);
+const Clock     = mkIc(<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>);
+const Users     = mkIc(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>);
+const Plug      = mkIc(<><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z"/></>);
+const Monitor   = mkIc(<><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></>);
+const Globe     = mkIc(<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>);
+const Package   = mkIc(<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>);
+const Code      = mkIc(<><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></>);
+const ChevronDown = mkIc(<path d="m6 9 6 6 6-6"/>);
+const ChevronRight= mkIc(<path d="m9 18 6-6-6-6"/>);
+const Headphones  = mkIc(<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>);
+const Mail      = mkIc(<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>);
+const Phone     = mkIc(<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>);
+const MapPin    = mkIc(<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>);
+const TrendingUp= mkIc(<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>);
+const Cpu       = mkIc(<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></>);
+const Layers    = mkIc(<><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></>);
+
+/* ══════════════ DESIGN TOKENS ══════════════ */
+const C = {
+  orange:"#FF5F00", orangeHot:"#E85500", orangeWarm:"#FF8A00",
+  orangeSoft:"#FFF3EB", orangeBorder:"rgba(255,95,0,0.15)",
+  black:"#0D0D0D", dark:"#141414", gray800:"#2a2a2a",
+  gray600:"#555", gray500:"#717171", gray400:"#999", gray300:"#bbb",
+  gray200:"#ddd", gray100:"#efefef", gray50:"#f8f8f6",
+  cream:"#FDFCFA", white:"#fff",
+};
+const F = { h:"'Inter', sans-serif", b:"'Inter', sans-serif", mono:"'JetBrains Mono', monospace" };
+
+/* ══════════════ LOGO ══════════════ */
+const Logo = ({ height=32 }) => (
+  <svg viewBox="0 0 512.82 213.17" height={height} style={{display:"block"}}>
+    <g>
+      <path d="M305.22,91.78c0,6.8-1.4,11.5-4.3,14.3s-6.6,4.2-11.1,4.2-4.3-.3-6.2-1c-1.9-.6-3.5-1.7-4.8-3.2s-2.4-3.4-3.1-5.8c-.8-2.4-1.1-5.2-1.1-8.6v-50.4h-18.8v51.9c0,4.9.7,9.4,2,13.4,1.3,4.1,3.4,7.6,6.1,10.5,2.8,2.9,6.3,5.2,10.5,6.9,4.3,1.7,9.3,2.5,15.2,2.5s11.1-.8,15.4-2.4,7.9-3.9,10.7-6.8c2.8-2.9,4.9-6.4,6.3-10.5s2-8.6,2-13.5v-51.9h-18.8v50.4h0Z" fill="#FFFFFF"/>
+      <path d="M360.72,70.18c7.1,8.3,13.7,17.1,20,26.4s12.1,18.8,17.5,28.3h15.8V41.38h-18.7v49.3c-2.9-4.3-6-8.9-9.3-13.6s-6.6-9.2-9.9-13.6-6.6-8.5-9.8-12.4c-3.2-3.9-6.1-7.1-8.8-9.8h-15.3v83.5h18.6v-54.7h-.1v.1h0Z" fill="#FFFFFF"/>
+      <path d="M441.82,115.58c3.8,3.7,8.2,6.4,13.3,8.2,5.1,1.8,10.4,2.8,16.1,2.8s11.4-.9,16.5-2.8,9.5-4.6,13.2-8.2c3.7-3.7,6.6-8.2,8.7-13.6s3.2-11.7,3.2-18.9-1.1-13.4-3.2-18.9-5.1-10-8.9-13.7-8.2-6.5-13.3-8.3-10.5-2.8-16.1-2.8-10.8.9-15.9,2.8c-5,1.8-9.4,4.6-13.3,8.3s-6.9,8.2-9.1,13.7c-2.2,5.4-3.4,11.7-3.4,18.9s1.1,13.4,3.2,18.9,5.1,10,8.9,13.6h.1,0ZM450.52,71.98c1-3.3,2.5-6.2,4.3-8.6,1.9-2.4,4.2-4.2,6.9-5.5,2.7-1.3,5.9-2,9.4-2s6.6.6,9.3,1.9,5.1,3.1,7,5.5,3.3,5.2,4.3,8.6c1,3.3,1.5,7.1,1.5,11.2s-.5,7.8-1.5,11.1-2.5,6.1-4.3,8.5c-1.9,2.4-4.2,4.2-7,5.5s-5.9,1.9-9.3,1.9-6.7-.6-9.4-1.9c-2.7-1.3-5-3.1-6.9-5.5s-3.3-5.2-4.3-8.5-1.5-7-1.5-11.1.5-7.7,1.5-11h0v-.1Z" fill="#FFFFFF"/>
+      <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill="#FFFFFF"/>
+      <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill="#FFFFFF"/>
+      <path d="M284.25,192.08v-43.66h28.04v6.74h-20.1v10.77h17.89v6.61h-17.89v12.79h21.61v6.74h-29.55Z" fill="#EE5820"/>
+      <path d="M377.3,147.98c6.3,0,11.12,1.16,14.46,3.46,3.34,2.31,5.01,5.84,5.01,10.58,0,5.92-2.92,9.93-8.76,12.03.8.97,1.7,2.14,2.71,3.53,1.01,1.39,2.04,2.89,3.09,4.5,1.05,1.62,2.06,3.28,3.02,4.98.97,1.7,1.83,3.37,2.58,5.01h-8.88c-.8-1.51-1.66-3.03-2.58-4.57s-1.86-3.02-2.8-4.47-1.88-2.81-2.8-4.1c-.92-1.28-1.79-2.42-2.58-3.43-.59.04-1.09.06-1.51.06h-5.04v16.51h-7.94v-43.03c1.93-.42,3.99-.7,6.17-.85,2.18-.15,4.14-.22,5.86-.22h0ZM377.87,154.85c-1.68,0-3.23.06-4.66.19v14.11h3.46c1.93,0,3.63-.1,5.1-.32,1.47-.21,2.7-.59,3.69-1.13.99-.55,1.73-1.28,2.24-2.21s.76-2.1.76-3.53c0-1.34-.25-2.48-.76-3.4s-1.23-1.66-2.17-2.21-2.07-.93-3.37-1.17c-1.3-.23-2.73-.35-4.28-.35v.02Z" fill="#EE5820"/>
+      <path d="M462.04,147.98c6.34,0,11.2,1.16,14.58,3.46,3.38,2.31,5.07,5.92,5.07,10.84,0,2.56-.45,4.76-1.35,6.58-.9,1.83-2.22,3.32-3.94,4.47-1.72,1.16-3.82,2.01-6.3,2.55-2.48.55-5.31.82-8.5.82h-3.97v15.37h-7.94v-43.03c1.85-.42,3.89-.7,6.14-.85,2.25-.15,4.32-.22,6.21-.22h0ZM462.6,154.85c-2.02,0-3.68.06-4.98.19v14.87h3.84c3.82,0,6.76-.54,8.82-1.61s3.09-3.1,3.09-6.08c0-1.43-.27-2.62-.82-3.59-.55-.97-1.3-1.72-2.27-2.27s-2.11-.93-3.43-1.17c-1.32-.23-2.74-.35-4.25-.35h0Z" fill="#EE5820"/>
+    </g>
+  </svg>
+);
+
+const LogoMark = ({ size=80, color="#e8e8e6" }) => (
+  <svg viewBox="0 0 200 200" width={size} height={size} style={{display:"block"}}>
+    <path d="M63.02,16.48l2.7,8.2c31-16.3,67.7-13.7,90.8,9.5,29.5,29.5,26,80.7-7.8,114.4-33.8,33.8-84.9,37.2-114.4,7.8-23.8-23.8-26.1-61.9-8.2-93.4l-8.1-2.7c-26.1,42.3-24.2,94.5,8,126.8,38.6,38.6,105.9,33.8,150.4-10.6,44.5-44.4,49.2-111.8,10.6-150.4C155.62-5.52,104.82-8.02,63.02,16.48Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+    <path d="M40.82,145.58c25,25,68.8,21.9,97.8-7.1,29-29,32.2-72.8,7.2-97.8-19.6-19.6-50.6-21.8-77.1-8l2.8,8.5c15.9-6.3,33.5-4,45,7.5,16.2,16.2,14.2,44.5-4.5,63.2s-47,20.7-63.2,4.5c-12.2-12.2-14.1-31.1-6.4-47.7l-8.3-2.7c-15.3,27-13.5,59.5,6.7,79.7h0v-.1h0Z" fill={color} transform="translate(10,10) scale(0.9)"/>
+  </svg>
+);
+
+if(typeof gsap!=="undefined"&&typeof ScrollTrigger!=="undefined"){gsap.registerPlugin(ScrollTrigger);}
+
+const useMobile = (bp=900) => {
+  const [m,setM] = useState(window.innerWidth<=bp);
+  useEffect(()=>{const fn=()=>setM(window.innerWidth<=bp);window.addEventListener("resize",fn);return()=>window.removeEventListener("resize",fn);},[]);
+  return m;
+};
+
+const Reveal = ({children,delay=0,style={},direction="up"}) => {
+  const ref = useRef(null);
+  useEffect(()=>{
+    if(typeof gsap==="undefined"||!ref.current)return;
+    const dirs={up:{y:40},down:{y:-40},left:{x:-50},right:{x:50}};
+    const from={opacity:0,...dirs[direction]};
+    gsap.fromTo(ref.current,from,{opacity:1,x:0,y:0,duration:0.85,delay,ease:"power3.out",scrollTrigger:{trigger:ref.current,start:"top 88%",toggleActions:"play none none none"}});
+  },[]);
+  return <div ref={ref} style={{...style}}>{children}</div>;
+};
+
+const Badge = ({children}) => (
+  <span style={{display:"inline-block",fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.8,textTransform:"uppercase",marginBottom:10}}>{children}</span>
+);
+
+/* ══════════════ NAV (idêntico ao index.html) ══════════════ */
+const navLinks = {
+  "Soluções":[
+    {n:"Sistema de Gestão",d:"Plataforma completa para PME",ic:<ClipboardList size={16}/>,href:"sistema-de-gestao.html"},
+    {n:"CRM",d:"Clientes e oportunidades",ic:<Handshake size={16}/>,href:"crm.html"},
+    {n:"IAU — IA",d:"Inteligência artificial preditiva",ic:<Brain size={16}/>,href:"iau.html"},
+    {n:"BI (Google)",d:"BigQuery & Looker",ic:<BarChart3 size={16}/>,href:"bi-google.html"},
+    {n:"App UNO ERP",d:"Força de vendas mobile",ic:<Smartphone size={16}/>,href:"app-uno-erp.html"},
+    {n:"M-Commerce",d:"App B2B para revendas",ic:<ShoppingCart size={16}/>,href:"m-commerce.html"},
+    {n:"WMS para PME",d:"Gestão de armazém",ic:<Warehouse size={16}/>,href:"wms-para-pme.html"},
+    {n:"Site B2B",d:"Portal com preços exclusivos",ic:<Globe size={16}/>,href:"site-b2b.html"},
+    {n:"Integrações B2C",d:"Marketplaces e e-commerce",ic:<Plug size={16}/>,href:"integracoes-b2c.html"},
+  ],
+  "Segmentos":[
+    {n:"Indústria",d:"Produção e manufatura",ic:<Factory size={16}/>,href:"#"},
+    {n:"Distribuição & Revenda",d:"Atacado e distribuição",ic:<Truck size={16}/>,href:"#"},
+    {n:"Serviços",d:"Automação e TI",ic:<Settings size={16}/>,href:"#"},
+  ],
+  "Personalização":[
+    {n:"Desenvolvimento",d:"Customizações sob medida",ic:<Code size={16}/>,href:"desenvolvimento.html"},
+    {n:"Integrações & Plugins",d:"20+ integrações nativas",ic:<Plug size={16}/>,href:"integracoes-e-plugins.html"},
+    {n:"Dashboards",d:"Painéis personalizados",ic:<Monitor size={16}/>,href:"#"},
+    {n:"Planos",d:"Encontre o ideal",ic:<Package size={16}/>,href:"#"},
+  ],
+};
+
+const Nav = () => {
+  const [sc,setSc] = useState(false);
+  const [open,setOpen] = useState(null);
+  useEffect(()=>{const fn=()=>setSc(window.scrollY>30);window.addEventListener("scroll",fn);return()=>window.removeEventListener("scroll",fn);},[]);
+  const isBig = open==="Soluções";
+  return (
+    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:sc?"rgba(20,20,20,0.95)":"transparent",backdropFilter:sc?"blur(16px)":"none",borderBottom:sc?"1px solid rgba(255,255,255,0.06)":"1px solid transparent",transition:"all .3s"}}>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:"0 40px",height:72,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <a href="index.html" style={{display:"flex",alignItems:"center",textDecoration:"none"}}>
+          <Logo height={40}/>
+        </a>
+        <button className="nav-mobile-btn" onClick={()=>setOpen(open==="mobile"?null:"mobile")} style={{display:"none",background:"none",border:"none",color:C.white,cursor:"pointer",padding:8}}>
+          {open==="mobile"?<span style={{fontSize:24}}>✕</span>:<span style={{fontSize:24}}>☰</span>}
+        </button>
+        <div className="nav-links" style={{display:"flex",alignItems:"center",gap:2}}>
+          {Object.keys(navLinks).map(k=>(
+            <div key={k} style={{position:"relative"}} onMouseEnter={()=>setOpen(k)} onMouseLeave={()=>setOpen(null)}>
+              <button style={{background:"none",border:"none",cursor:"pointer",padding:"8px 13px",fontFamily:F.b,fontSize:13.5,fontWeight:500,color:open===k?C.orange:"rgba(255,255,255,.6)",borderRadius:8,display:"flex",alignItems:"center",gap:3,transition:".2s"}}>
+                {k} <ChevronDown size={13} style={{transition:".2s",transform:open===k?"rotate(180deg)":"none"}}/>
+              </button>
+              {open===k&&(<div style={{position:"absolute",top:"100%",left:0,width:"100%",height:12,background:"transparent"}}/>)}
+              {open===k&&(
+                <div style={{position:"absolute",top:"calc(100% + 8px)",left:k==="Soluções"?"-140px":"0",background:"rgba(18,18,18,0.96)",backdropFilter:"blur(24px) saturate(1.5)",borderRadius:18,padding:isBig?"20px":"10px",boxShadow:"0 32px 100px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.04)",minWidth:isBig?580:300,animation:"ddIn .25s cubic-bezier(.22,1,.36,1)"}}>
+                  <div style={{position:"absolute",top:-6,left:k==="Soluções"?170:30,width:12,height:12,background:"rgba(18,18,18,0.96)",transform:"rotate(45deg)",borderRadius:2,borderTop:"1px solid rgba(255,255,255,.06)",borderLeft:"1px solid rgba(255,255,255,.06)"}}/>
+                  {isBig?(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 14px",borderBottom:"1px solid rgba(255,255,255,.06)",marginBottom:14}}>Todas as Soluções</div>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+                        {navLinks[k].map((item,i)=>(
+                          <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"12px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                            <div style={{width:34,height:34,borderRadius:9,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                            <div style={{minWidth:0}}>
+                              <div style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.white,marginBottom:2}}>{item.n}</div>
+                              <div style={{fontFamily:F.b,fontSize:11,color:"rgba(255,255,255,.3)",lineHeight:1.35}}>{item.d}</div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                      <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.25)"}}>Precisa de ajuda para escolher?</span>
+                        <a href="#contato" style={{fontFamily:F.b,fontSize:12,fontWeight:600,color:C.orange,textDecoration:"none",display:"flex",alignItems:"center",gap:4}}>Fale com um especialista <ArrowRight size={12}/></a>
+                      </div>
+                    </div>
+                  ):(
+                    <div>
+                      <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,padding:"4px 10px 12px"}}>{k}</div>
+                      {navLinks[k].map((item,i)=>(
+                        <a key={i} href={item.href||"#"} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 12px",borderRadius:12,textDecoration:"none",transition:"all .2s",border:"1px solid transparent"}}
+                          onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.12)";}}
+                          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.borderColor="transparent";}}>
+                          <div style={{width:36,height:36,borderRadius:10,flexShrink:0,background:"rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.12)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center"}}>{item.ic}</div>
+                          <div>
+                            <div style={{fontFamily:F.b,fontSize:13.5,fontWeight:600,color:C.white}}>{item.n}</div>
+                            <div style={{fontFamily:F.b,fontSize:11.5,color:"rgba(255,255,255,.3)"}}>{item.d}</div>
+                          </div>
+                          <ArrowRight size={14} color="rgba(255,255,255,.15)" style={{marginLeft:"auto"}}/>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13.5,fontWeight:500,color:"rgba(255,255,255,.6)",padding:"8px 13px",textDecoration:"none"}}>Contato</a>
+          <div style={{width:1,height:24,background:"rgba(255,255,255,.15)",margin:"0 10px"}}/>
+          <a href="#contato" style={{fontFamily:F.b,fontSize:13,fontWeight:700,color:C.white,background:C.orange,padding:"9px 22px",borderRadius:8,textDecoration:"none",transition:"all .2s",display:"flex",alignItems:"center",gap:6}}
+            onMouseEnter={e=>e.currentTarget.style.background=C.orangeHot} onMouseLeave={e=>e.currentTarget.style.background=C.orange}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      </div>
+      <style>{`@keyframes ddIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
+      {open==="mobile"&&(
+        <div style={{position:"absolute",top:"100%",left:0,right:0,background:"rgba(18,18,18,0.98)",backdropFilter:"blur(24px)",padding:"20px 24px 28px",borderTop:"1px solid rgba(255,255,255,.06)",maxHeight:"80vh",overflowY:"auto"}}>
+          {Object.keys(navLinks).map(section=>(
+            <div key={section} style={{marginBottom:20}}>
+              <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,marginBottom:10}}>{section}</div>
+              {navLinks[section].map((item,i)=>(
+                <a key={i} href={item.href||"#"} onClick={()=>setOpen(null)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",textDecoration:"none",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
+                  <span style={{color:C.orange,display:"flex"}}>{item.ic}</span>
+                  <span style={{fontFamily:F.b,fontSize:14,color:C.white,fontWeight:500}}>{item.n}</span>
+                </a>
+              ))}
+            </div>
+          ))}
+          <a href="#contato" onClick={()=>setOpen(null)} style={{display:"flex",justifyContent:"center",alignItems:"center",gap:8,fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 0",borderRadius:10,textDecoration:"none",marginTop:8}}>
+            Fale Conosco <ArrowUpRight size={14}/>
+          </a>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+/* ══════════════ PAGE HERO ══════════════ */
+const PageHero = () => (
+  <section className="hero-section" style={{background:C.dark,padding:"120px 40px 80px",position:"relative",overflow:"hidden"}}>
+    {/* grid bg */}
+    <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)",backgroundSize:"56px 56px",WebkitMaskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",maskImage:"radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)",pointerEvents:"none"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 70% 60% at 50% 0%,rgba(255,95,0,.1),transparent 65%)",pointerEvents:"none"}}/>
+    <div style={{maxWidth:1240,margin:"0 auto",position:"relative",zIndex:2}}>
+      {/* Breadcrumb */}
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:28,animation:"heroFadeUp .6s ease both"}}>
+        <a href="index.html" style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",textDecoration:"none",transition:"color .2s"}}
+          onMouseEnter={e=>e.target.style.color="rgba(255,255,255,.7)"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.35)"}>
+          Home
+        </a>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)"}}>Soluções</span>
+        <ChevronRight size={12} color="rgba(255,255,255,.2)"/>
+        <span style={{fontFamily:F.b,fontSize:12.5,color:C.orange,fontWeight:600}}>Sistema de Gestão</span>
+      </div>
+
+      <div className="page-hero-grid" style={{display:"grid",gridTemplateColumns:"1fr 480px",gap:64,alignItems:"center"}}>
+        <div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,95,0,.12)",border:"1px solid rgba(255,95,0,.2)",color:C.orange,fontFamily:F.b,fontSize:11.5,fontWeight:700,letterSpacing:1.5,textTransform:"uppercase",padding:"5px 14px",borderRadius:100,marginBottom:20,animation:"heroFadeUp .7s ease both .1s both"}}>
+            <div style={{width:5,height:5,borderRadius:"50%",background:C.orange,animation:"pulse2 1.5s ease-in-out infinite"}}/>
+            ERP Completo e Personalizável
+          </div>
+          <h1 style={{fontFamily:F.h,fontSize:"clamp(34px,4.2vw,58px)",fontWeight:900,color:C.white,letterSpacing:-2,lineHeight:1.06,margin:"0 0 20px",animation:"heroFadeUp .8s ease both .2s"}}>
+            Gerencia a sua empresa<br/>com <span style={{color:C.orange}}>precisão.</span>
+          </h1>
+          <p style={{fontFamily:F.b,fontSize:17,color:"rgba(255,255,255,.55)",lineHeight:1.75,maxWidth:520,margin:"0 0 36px",animation:"heroFadeUp .8s ease both .35s"}}>
+            Tenha controle total sobre o seu negócio em tempo real. Com o UNO sistema de gestão ERP, todos os processos são automatizados em uma plataforma única, acessível <strong style={{color:"rgba(255,255,255,.85)"}}>100% via web e mobile.</strong>
+          </p>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",animation:"heroFadeUp .7s ease both .5s"}}>
+            <a href="#contato" style={{fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"14px 32px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,transition:"all .25s",boxShadow:"0 6px 24px rgba(255,95,0,.35)"}}
+              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 36px rgba(255,95,0,.45)";}}
+              onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 6px 24px rgba(255,95,0,.35)";}}>
+              Solicite uma proposta <ArrowRight size={16}/>
+            </a>
+            <a href="#modulos" style={{fontFamily:F.b,fontSize:15,fontWeight:600,color:C.white,background:"rgba(255,255,255,.06)",padding:"14px 28px",borderRadius:10,textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8,border:"1.5px solid rgba(255,255,255,.12)",transition:"all .25s"}}
+              onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.3)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(255,255,255,.12)"}>
+              <Layers size={15}/> Ver módulos
+            </a>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,animation:"heroFadeUp .9s ease both .4s"}} className="stats-row">
+          {[
+            {num:"+20",label:"Anos de mercado",ic:<Shield size={20}/>},
+            {num:"500+",label:"Empresas ativas",ic:<Users size={20}/>},
+            {num:"100%",label:"Web & Mobile",ic:<Smartphone size={20}/>},
+            {num:"+50",label:"Integrações nativas",ic:<Plug size={20}/>},
+          ].map((s,i)=>(
+            <div key={i} style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:16,padding:"22px 20px",transition:"all .25s"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.borderColor="rgba(255,95,0,.2)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,.04)";e.currentTarget.style.borderColor="rgba(255,255,255,.07)";}}>
+              <div style={{color:C.orange,marginBottom:12,opacity:.8}}>{s.ic}</div>
+              <div style={{fontFamily:F.h,fontSize:30,fontWeight:900,color:C.white,letterSpacing:-1,lineHeight:1}}>{s.num}</div>
+              <div style={{fontFamily:F.b,fontSize:12.5,color:"rgba(255,255,255,.35)",fontWeight:500,marginTop:4}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══════════════ MARQUEE ══════════════ */
+const MarqueeStrip = () => (
+  <div className="marquee-strip" style={{background:C.orange,padding:"13px 0",overflow:"hidden",display:"flex",alignItems:"center"}}>
+    <div style={{display:"inline-flex",alignItems:"center",animation:"marquee 32s linear infinite",whiteSpace:"nowrap"}}>
+      {[...Array(2)].map((_,r)=>(
+        <span key={r} style={{display:"inline-flex",alignItems:"center"}}>
+          {["Sistema de Gestão","CRM Integrado","IAU — Inteligência Artificial","BI Google & Looker","App Mobile Nativo","WMS Logístico","M-Commerce","Site B2B","50+ Integrações","Dashboards em Tempo Real","Totalmente Customizável","Atendimento Humanizado"].map((t,i)=>(
+            <span key={i} style={{fontFamily:F.b,fontSize:12,fontWeight:800,color:C.white,letterSpacing:1.2,textTransform:"uppercase",padding:"0 22px",display:"inline-flex",alignItems:"center",gap:12,lineHeight:1}}>
+              <span style={{width:3,height:3,borderRadius:"50%",background:"rgba(255,255,255,.5)",display:"inline-block",flexShrink:0}}/>{t}
+            </span>
+          ))}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
+/* ══════════════ OVERVIEW (destaques do site original) ══════════════ */
+const Overview = () => (
+  <section style={{padding:"80px 40px",background:C.cream}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,marginBottom:24}} className="diff-grid">
+        <Reveal>
+          <div style={{background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,padding:"40px",height:"100%",boxShadow:"0 2px 20px rgba(0,0,0,.04)",transition:"all .25s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orangeBorder;e.currentTarget.style.boxShadow="0 8px 40px rgba(255,95,0,.07)";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.boxShadow="0 2px 20px rgba(0,0,0,.04)";}}>
+            <Badge>Customização</Badge>
+            <h3 style={{fontFamily:F.h,fontSize:26,fontWeight:800,color:C.black,letterSpacing:-0.8,lineHeight:1.15,margin:"4px 0 14px"}}>Totalmente customizável.</h3>
+            <p style={{fontFamily:F.b,fontSize:15,color:C.gray500,lineHeight:1.75}}>Nosso sistema se adapta à realidade de cada cliente, atendendo aos desafios e particularidades do seu negócio. Oferecemos uma solução sob medida para impulsionar sua operação com eficiência e controle.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={.1}>
+          <div style={{background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,padding:"40px",height:"100%",boxShadow:"0 2px 20px rgba(0,0,0,.04)",transition:"all .25s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orangeBorder;e.currentTarget.style.boxShadow="0 8px 40px rgba(255,95,0,.07)";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.boxShadow="0 2px 20px rgba(0,0,0,.04)";}}>
+            <Badge>Atendimento Humanizado</Badge>
+            <h3 style={{fontFamily:F.h,fontSize:26,fontWeight:800,color:C.black,letterSpacing:-0.8,lineHeight:1.15,margin:"4px 0 14px"}}>Não somos apenas um sistema para emitir NFs.</h3>
+            <p style={{fontFamily:F.b,fontSize:15,color:C.gray500,lineHeight:1.75}}>Nosso atendimento é humanizado, com um time de implantação especializado e suporte dedicado, onde nossos analistas conhecem profundamente a sua empresa. Clique abaixo e descubra nossa política comercial.</p>
+            <a href="#contato" style={{display:"inline-flex",alignItems:"center",gap:8,marginTop:24,fontFamily:F.b,fontSize:14,fontWeight:700,color:C.orange,textDecoration:"none"}}
+              onMouseEnter={e=>e.currentTarget.style.gap="12px"} onMouseLeave={e=>e.currentTarget.style.gap="8px"}>
+              Ver política comercial <ArrowRight size={15}/>
+            </a>
+          </div>
+        </Reveal>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24}} className="diff-grid">
+        <Reveal delay={.1}>
+          <div style={{background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,padding:"40px",height:"100%",boxShadow:"0 2px 20px rgba(0,0,0,.04)",transition:"all .25s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orangeBorder;e.currentTarget.style.boxShadow="0 8px 40px rgba(255,95,0,.07)";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.boxShadow="0 2px 20px rgba(0,0,0,.04)";}}>
+            <Badge>Integrações</Badge>
+            <h3 style={{fontFamily:F.h,fontSize:26,fontWeight:800,color:C.black,letterSpacing:-0.8,lineHeight:1.15,margin:"4px 0 14px"}}>+20 anos de experiência.</h3>
+            <p style={{fontFamily:F.b,fontSize:15,color:C.gray500,lineHeight:1.75}}>Oferecemos funcionalidades específicas e integrações com empresas terceiras, como E-Commerce, Marketplaces, Logística, Contábil, Fiscal, Marketing Digital, PDV, Bancos e muitas outras.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={.15}>
+          <div style={{background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,padding:"40px",height:"100%",boxShadow:"0 2px 20px rgba(0,0,0,.04)",transition:"all .25s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orangeBorder;e.currentTarget.style.boxShadow="0 8px 40px rgba(255,95,0,.07)";}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.boxShadow="0 2px 20px rgba(0,0,0,.04)";}}>
+            <Badge>Dashboards</Badge>
+            <h3 style={{fontFamily:F.h,fontSize:26,fontWeight:800,color:C.black,letterSpacing:-0.8,lineHeight:1.15,margin:"4px 0 14px"}}>Elimine as planilhas.</h3>
+            <p style={{fontFamily:F.b,fontSize:15,color:C.gray500,lineHeight:1.75}}>Elimine planilhas e monitore sua empresa com as características únicas que ela tem. Decisões baseadas em dados, em tempo real.</p>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══════════════ MODULES ══════════════ */
+const modulesData = {
+  "Comercial":{ic:<ClipboardList size={20}/>,color:"#FF5F00",desc:"Gestão completa do ciclo de vendas, desde orçamento até faturamento, NF-e, CRM e portal de atendimento.",items:["Orçamentos","Pedido de vendas","Faturamento","Comissão","Emissão de nota fiscal NFe | NFSe | NFCe | SAT","NF modelos 21 e 22","CRM","Portal de atendimento"]},
+  "Financeiro":{ic:<TrendingUp size={20}/>,color:"#0d9488",desc:"Controle financeiro completo: contas, fluxo de caixa, boletos, conciliações bancárias e cobranças automáticas.",items:["Contas a pagar","Contas a receber","Fluxo de caixa","Emissão de boleto","Conciliações bancárias","Pagamento Escritural","Cobranças automáticas","Painel de projetos","Centro de custo","Plano de contas"]},
+  "Produção":{ic:<Cpu size={20}/>,color:"#7c3aed",desc:"Controle total da produção: PCP, MRP, rastreabilidade e simulação de produção em tempo real.",items:["PCP — Planejamento e Controle de Produção","MRP","WMS","Estrutura de produto","Ordem de produção / Roteiro e linha","Planejamento de produção","Relatório de perdas","Rastreabilidade","Simulação de produção"]},
+  "Gestão de Pessoas & Processos":{ic:<BarChart3 size={20}/>,color:"#b45309",desc:"Business Intelligence, KPIs, dashboards e gestão de processos com multiempresa e assinatura eletrônica.",items:["BI / Business Intelligence","Dashboards | KPIs","Multiempresa","Assinatura eletrônica","Tela de diretoria, compras e produtos"]},
+  "Inteligência Artificial UNO (A.I.U)":{ic:<Brain size={20}/>,color:"#FF5F00",desc:"O UNO ERP predict — a mais nova versão com IA, análises preditivas e prescritivas, antecipando problemas e auxiliando nas tomadas de decisões em tempo real.",items:["Contabilidade","Lojas Virtuais","E-commerce","Hubs","Whatsapp","WMS","B2B Catálogo de produtos"]},
+  "Estoque":{ic:<Package size={20}/>,color:"#0369a1",desc:"Mobilidade, rastreabilidade e controle total do estoque com leitor de código de barras e separação mobile.",items:["Mobilidade e Rastreabilidade","Inventário","Romaneio","Controle de estoque","Recebimento","Separação por leitor/coletor de código de barras","Controle de estoque em terceiros"]},
+  "APP Mobile":{ic:<Smartphone size={20}/>,color:"#0d9488",desc:"Força de vendas, OS, inventário e picking no celular. Funciona offline com sincronização em tempo real.",items:["Força de Vendas","Catálogo de produtos","CRM","Ordem de serviço","Automação de entrega","Separação / Picking","Abastecimento aeronave","Inventário + Transferência de estoque","Apontamentos"]},
+};
+
+const ModulesSection = () => {
+  const [active,setActive] = useState("Comercial");
+  const keys = Object.keys(modulesData);
+  const data = modulesData[active];
+  return (
+    <section id="modulos" style={{padding:"96px 40px",background:C.white}}>
+      <div style={{maxWidth:1240,margin:"0 auto"}}>
+        <Reveal>
+          <div style={{textAlign:"center",marginBottom:48}}>
+            <Badge>ERP para empresas</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,42px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Módulos que cobrem toda a operação</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,maxWidth:500,margin:"8px auto 0",lineHeight:1.65}}>Cada módulo foi construído para resolver problemas reais. Ative apenas o que você precisa.</p>
+          </div>
+        </Reveal>
+        <Reveal delay={.1}>
+          <div className="mod-pills" style={{display:"flex",justifyContent:"center",gap:6,flexWrap:"wrap",marginBottom:40}}>
+            {keys.map(k=>{
+              const isActive = active===k;
+              const mod = modulesData[k];
+              return(
+                <button key={k} onClick={()=>setActive(k)} style={{display:"flex",alignItems:"center",gap:8,padding:"10px 20px",borderRadius:50,border:isActive?"none":`1.5px solid ${C.gray200}`,background:isActive?C.black:C.white,cursor:"pointer",transition:"all .25s"}}
+                  onMouseEnter={e=>{if(!isActive){e.currentTarget.style.borderColor=C.orange;e.currentTarget.style.background=C.orangeSoft;}}}
+                  onMouseLeave={e=>{if(!isActive){e.currentTarget.style.borderColor=C.gray200;e.currentTarget.style.background=C.white;}}}>
+                  <span style={{color:isActive?C.orange:mod.color,display:"flex"}}>{mod.ic}</span>
+                  <span style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:isActive?C.white:C.gray600}}>{k}</span>
+                </button>
+              );
+            })}
+          </div>
+        </Reveal>
+        <Reveal delay={.15}>
+          <div className="mod-panel" style={{background:C.gray50,borderRadius:24,border:`1px solid ${C.gray100}`,overflow:"hidden"}}>
+            <div className="mod-panel-header" style={{padding:"32px 40px",borderBottom:`1px solid ${C.gray100}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:C.white}}>
+              <div style={{display:"flex",alignItems:"center",gap:16}}>
+                <div style={{width:52,height:52,borderRadius:14,background:`${data.color}12`,border:`1.5px solid ${data.color}25`,display:"flex",alignItems:"center",justifyContent:"center",color:data.color}}>{data.ic}</div>
+                <div>
+                  <h3 style={{fontFamily:F.h,fontSize:24,fontWeight:800,color:C.black,margin:0,letterSpacing:-0.5}}>{active}</h3>
+                  <p style={{fontFamily:F.b,fontSize:14,color:C.gray500,margin:"2px 0 0",maxWidth:480}}>{data.desc}</p>
+                </div>
+              </div>
+              <LogoMark size={64} color={`${data.color}10`}/>
+            </div>
+            <div className="mod-features-wrap" style={{padding:"32px 40px"}}>
+              <div className="mod-features" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                {data.items.map((item,i)=>(
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",borderRadius:12,background:C.white,border:`1px solid ${C.gray100}`,transition:"all .2s"}}
+                    onMouseEnter={e=>{e.currentTarget.style.borderColor=`${data.color}30`;e.currentTarget.style.boxShadow=`0 4px 16px ${data.color}0a`;}}
+                    onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.boxShadow="none";}}>
+                    <div style={{width:24,height:24,borderRadius:7,background:`${data.color}10`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <Check size={12} color={data.color}/>
+                    </div>
+                    <span style={{fontFamily:F.b,fontSize:14,color:C.gray600,fontWeight:500}}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mod-footer" style={{padding:"20px 40px 28px",display:"flex",justifyContent:"space-between",alignItems:"center",borderTop:`1px solid ${C.gray100}`}}>
+              <span style={{fontFamily:F.b,fontSize:13,color:C.gray400}}>Funcionalidades adicionais disponíveis conforme o plano.</span>
+              <a href="#contato" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:13.5,fontWeight:700,color:C.white,background:C.orange,padding:"10px 22px",borderRadius:9,textDecoration:"none",transition:"background .2s",boxShadow:"0 4px 14px rgba(255,95,0,.25)"}}
+                onMouseEnter={e=>e.currentTarget.style.background=C.orangeHot} onMouseLeave={e=>e.currentTarget.style.background=C.orange}>
+                Solicitar demonstração <ArrowRight size={14}/>
+              </a>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ══════════════ IAU / PREDICT ══════════════ */
+const IAUSection = () => (
+  <section style={{padding:"96px 40px",background:C.black,position:"relative",overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 60% 80% at 100% 50%,rgba(255,95,0,.07),transparent 60%)",pointerEvents:"none"}}/>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="diff-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:72,alignItems:"center"}}>
+        <Reveal direction="left">
+          <div>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"linear-gradient(135deg,rgba(255,95,0,.2),rgba(255,95,0,.08))",border:"1px solid rgba(255,95,0,.3)",color:C.orange,fontFamily:F.b,fontSize:10.5,fontWeight:800,letterSpacing:1.2,textTransform:"uppercase",padding:"5px 12px",borderRadius:100,marginBottom:20}}>
+              <div style={{width:5,height:5,borderRadius:"50%",background:C.orange,animation:"pulse2 1.5s ease-in-out infinite"}}/>
+              UNO ERP Predict — Novo
+            </div>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:900,color:C.white,letterSpacing:-1.5,lineHeight:1.08,margin:"0 0 16px"}}>
+              Guia para o <span style={{color:C.orange}}>progresso.</span>
+            </h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:"rgba(255,255,255,.5)",lineHeight:1.75,margin:"0 0 36px",maxWidth:460}}>
+              O UNO ERP predict é a mais nova versão com inteligência artificial, com análises preditivas e prescritivas, antecipando problemas e auxiliando nas tomadas de decisões em tempo real.
+            </p>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {[
+                {ic:<Brain size={16}/>, t:"Inteligência Artificial integrada nativamente"},
+                {ic:<BarChart3 size={16}/>, t:"Kanban para organização eficiente de fluxos"},
+                {ic:<Monitor size={16}/>, t:"BI Google e Looker integrados para análises avançadas"},
+                {ic:<TrendingUp size={16}/>, t:"Análise preditiva e prescritiva em tempo real"},
+                {ic:<Smartphone size={16}/>, t:"Interface intuitiva com dashboards e apps nativos"},
+              ].map((f,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:14,padding:"13px 18px",borderRadius:12,border:"1px solid rgba(255,255,255,.06)",background:"rgba(255,255,255,.02)",transition:"all .25s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,95,0,.2)";e.currentTarget.style.background="rgba(255,95,0,.04)";e.currentTarget.style.transform="translateX(4px)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.06)";e.currentTarget.style.background="rgba(255,255,255,.02)";e.currentTarget.style.transform="none";}}>
+                  <div style={{width:32,height:32,borderRadius:9,background:"rgba(255,95,0,.1)",border:"1px solid rgba(255,95,0,.2)",color:C.orange,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{f.ic}</div>
+                  <span style={{fontFamily:F.b,fontSize:14,color:"rgba(255,255,255,.65)",fontWeight:500}}>{f.t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+        {/* Vídeo IAU */}
+        <Reveal direction="right" delay={.15}>
+          <div style={{borderRadius:20,overflow:"hidden",boxShadow:"0 40px 80px rgba(0,0,0,.5),0 0 60px rgba(255,95,0,.08)",border:"1px solid rgba(255,95,0,.15)"}}>
+            <div style={{position:"relative",paddingBottom:"56.25%",height:0,background:"#000"}}>
+              <iframe
+                src="https://www.youtube.com/embed/ehqSvOp6cws?rel=0&modestbranding=1"
+                title="IAU — Inteligência Artificial UNO ERP"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+              />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══════════════ VANTAGENS ══════════════ */
+const Vantagens = () => (
+  <section style={{padding:"96px 40px",background:C.gray50}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <Reveal>
+        <div style={{textAlign:"center",marginBottom:56}}>
+          <Badge>Vantagens</Badge>
+          <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,42px)",fontWeight:800,color:C.black,margin:"4px 0 0",letterSpacing:-1.2,lineHeight:1.1}}>Por que escolher a UNO para fazer a sua gestão ERP?</h2>
+          <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,maxWidth:600,margin:"8px auto 0",lineHeight:1.65}}>Entendemos que cada empresa é única, por isso o UNO sistema de gestão ERP é altamente personalizável. Com uma ampla gama de módulos e funcionalidades, você pode adaptar o sistema para se adequar perfeitamente ao seu fluxo de trabalho. Escolha as ferramentas que são essenciais para o seu negócio e personalize cada aspecto do UNO ERP de acordo com as suas necessidades.</p>
+        </div>
+      </Reveal>
+      <div className="why-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:24}}>
+        {[
+          {num:"01",ic:<Headphones size={24}/>,t:"Atendimento Preferencial",d:"Oferecemos um suporte excepcional. Com o UNO ERP, você é nossa prioridade. Nossa equipe está pronta para atender suas necessidades de forma rápida e eficiente, garantindo que você aproveite ao máximo o sistema.",color:"#0d9488"},
+          {num:"02",ic:<Smartphone size={24}/>,t:"Apps Móveis Nativos",d:"Mantenha o controle de sua empresa onde quer que você esteja. Com nossos aplicativos móveis nativos, você pode acessar informações críticas e realizar tarefas importantes a partir de dispositivos móveis, proporcionando flexibilidade e agilidade aos processos de negócios.",color:C.orange},
+          {num:"03",ic:<Handshake size={24}/>,t:"CRM Poderoso",d:"Mais de 25 anos no mercado levando Soluções Integradas em Sistema ERP — Software de Gestão Empresarial 100% Online, Consultoria Empresarial, Aplicativos Móveis e CRM nativos.",color:"#7c3aed"},
+        ].map((v,i)=>(
+          <Reveal key={i} delay={i*.1}>
+            <div style={{background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,padding:"36px 32px",height:"100%",transition:"all .25s",position:"relative",overflow:"hidden"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor=`${v.color}30`;e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 20px 50px ${v.color}12`;}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+              <div style={{fontFamily:F.b,fontSize:11,fontWeight:800,letterSpacing:2,textTransform:"uppercase",color:v.color,opacity:.5,marginBottom:20}}>{v.num}</div>
+              <div style={{width:52,height:52,borderRadius:14,background:`${v.color}10`,border:`1.5px solid ${v.color}20`,display:"flex",alignItems:"center",justifyContent:"center",color:v.color,marginBottom:20}}>{v.ic}</div>
+              <h3 style={{fontFamily:F.h,fontSize:19,fontWeight:800,color:C.black,margin:"0 0 10px",letterSpacing:-0.3}}>{v.t}</h3>
+              <p style={{fontFamily:F.b,fontSize:14.5,color:C.gray500,lineHeight:1.7,margin:0}}>{v.d}</p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ══════════════ INTEGRAÇÕES ══════════════ */
+const Integrations = () => (
+  <section style={{padding:"96px 40px",background:C.white}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="int-grid" style={{display:"grid",gridTemplateColumns:"1fr 1.1fr",gap:72,alignItems:"center"}}>
+        <Reveal>
+          <div>
+            <Badge>Integrações</Badge>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,42px)",fontWeight:800,color:C.black,margin:"4px 0 14px",letterSpacing:-1.2,lineHeight:1.1}}>+50 integrações<br/>nativas.</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,lineHeight:1.7,margin:"0 0 28px",maxWidth:420}}>Com mais de 20 anos de experiência, oferecemos funcionalidades específicas e integrações com empresas terceiras. Elimine planilhas e monitore sua empresa com as características únicas que ela tem.</p>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {["E-Commerce","Marketplaces","Logística","Contábil","Fiscal","Marketing Digital","PDV","Bancos","WhatsApp","WMS"].map((t,i)=>(
+                <span key={i} style={{display:"flex",alignItems:"center",gap:6,background:C.gray50,border:`1px solid ${C.gray200}`,borderRadius:100,padding:"7px 14px",fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,cursor:"default",transition:"all .2s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orange;e.currentTarget.style.color=C.orange;e.currentTarget.style.background=C.orangeSoft;}}
+                  onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray200;e.currentTarget.style.color=C.gray600;e.currentTarget.style.background=C.gray50;}}>
+                  <div style={{width:5,height:5,borderRadius:"50%",background:C.orange,flexShrink:0}}/>{t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+        <Reveal delay={.15}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10}}>
+            {[
+              {em:"🛒",l:"Shopify"},{em:"📦",l:"Mercado Livre"},{em:"🚚",l:"Loggi"},{em:"📊",l:"Google BI"},
+              {em:"💬",l:"WhatsApp"},{em:"🏦",l:"Bancos"},{em:"📑",l:"SEFAZ"},{em:"🛍️",l:"Amazon"},
+              {em:"💳",l:"PagSeguro"},{em:"📱",l:"App Nativo"},{em:"📈",l:"Looker"},{em:"⚙️",l:"+20 mais"},
+            ].map((c,i)=>(
+              <div key={i} style={{background:C.gray50,border:`1px solid ${C.gray100}`,borderRadius:12,padding:"18px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,transition:"all .2s",cursor:"default"}}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor=C.orangeBorder;e.currentTarget.style.background=C.orangeSoft;e.currentTarget.style.transform="translateY(-2px)";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor=C.gray100;e.currentTarget.style.background=C.gray50;e.currentTarget.style.transform="none";}}>
+                <div style={{width:36,height:36,borderRadius:10,background:C.white,border:`1px solid ${C.gray200}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{c.em}</div>
+                <span style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:C.gray500,textAlign:"center"}}>{c.l}</span>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ══════════════ CLIENTES / SEGMENTOS ══════════════ */
+const Clients = () => (
+  <section style={{padding:"96px 40px",background:C.black,position:"relative",overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,95,0,.06),transparent 60%)",pointerEvents:"none"}}/>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      {/* Text + vídeos layout igual ao site original */}
+      <div className="diff-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:72,alignItems:"center",marginBottom:72}}>
+        <Reveal direction="left">
+          <div>
+            <div style={{display:"inline-block",fontFamily:F.b,fontSize:11.5,fontWeight:700,color:C.orange,letterSpacing:1.8,textTransform:"uppercase",marginBottom:10}}>Nossos Clientes</div>
+            <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,44px)",fontWeight:900,color:C.white,margin:"4px 0 16px",letterSpacing:-1.5,lineHeight:1.08}}>Parceiros de sucesso!</h2>
+            <p style={{fontFamily:F.b,fontSize:16,color:"rgba(255,255,255,.5)",lineHeight:1.75,margin:"0 0 36px",maxWidth:440}}>
+              Na UNO sistema de gestão ERP, nossos clientes são nossos parceiros de sucesso. Atendemos diversos setores, de distribuidores a indústrias, varejo e serviços. Com nosso sistema personalizável, eles alcançam uma gestão eficiente e inteligente.
+            </p>
+            <a href="#contato" style={{display:"inline-flex",alignItems:"center",gap:8,fontFamily:F.b,fontSize:15,fontWeight:700,color:C.white,background:C.orange,padding:"13px 28px",borderRadius:10,textDecoration:"none",transition:"all .2s",boxShadow:"0 4px 20px rgba(255,95,0,.3)"}}
+              onMouseEnter={e=>e.currentTarget.style.background=C.orangeHot} onMouseLeave={e=>e.currentTarget.style.background=C.orange}>
+              Fale com um consultor <ArrowRight size={15}/>
+            </a>
+          </div>
+        </Reveal>
+        {/* Vídeos */}
+        <Reveal direction="right" delay={.15}>
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            {/* Vídeo 1 — Caso de Sucesso RS1 */}
+            <div style={{borderRadius:16,overflow:"hidden",boxShadow:"0 20px 60px rgba(0,0,0,.5)",border:"1px solid rgba(255,255,255,.07)"}}>
+              <div style={{position:"relative",paddingBottom:"56.25%",height:0,background:"#000"}}>
+                <iframe
+                  src="https://www.youtube.com/embed/o8BLBpyEK60?rel=0&modestbranding=1"
+                  title="Caso de Sucesso RS1 — UNO ERP"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:"none"}}
+                />
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      {/* Segmentos */}
+      <Reveal delay={.1}>
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.25)",textTransform:"uppercase",letterSpacing:2,marginBottom:8}}>Ramos de Atividade</div>
+        </div>
+        <div className="seg-grid" style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:10}}>
+          {[
+            {em:"🏭",n:"Indústria"},{em:"🚛",n:"Distribuição & Revenda"},{em:"🧪",n:"Química"},
+            {em:"💄",n:"Cosméticos"},{em:"🍽️",n:"Alimentos"},{em:"⚙️",n:"Automação"},
+            {em:"📦",n:"Embalagens"},{em:"💻",n:"TI"},{em:"❄️",n:"Climatização"},
+            {em:"🔩",n:"Metalúrgica"},{em:"🧴",n:"Plástico"},{em:"🛠️",n:"Serviços"},
+          ].map((s,i)=>(
+            <div key={i} style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:14,padding:"20px 10px",textAlign:"center",transition:"all .25s",cursor:"default"}}
+              onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(255,95,0,.25)";e.currentTarget.style.background="rgba(255,95,0,.06)";e.currentTarget.style.transform="translateY(-3px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,.07)";e.currentTarget.style.background="rgba(255,255,255,.04)";e.currentTarget.style.transform="none";}}>
+              <div style={{fontSize:24,marginBottom:8}}>{s.em}</div>
+              <div style={{fontFamily:F.b,fontSize:11.5,fontWeight:700,color:"rgba(255,255,255,.5)"}}>{s.n}</div>
+            </div>
+          ))}
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
+
+/* ══════════════ CTA (idêntico ao index.html) ══════════════ */
+const CTA = () => (
+  <section id="contato" style={{padding:"80px 40px",background:C.gray50}}>
+    <div className="cta-grid" style={{maxWidth:1240,margin:"0 auto",display:"grid",gridTemplateColumns:"1.1fr .9fr",gap:56,alignItems:"center"}}>
+      <Reveal>
+        <div>
+          <Badge>Comece agora</Badge>
+          <h2 style={{fontFamily:F.h,fontSize:"clamp(28px,3.5vw,42px)",fontWeight:800,color:C.black,margin:"4px 0 14px",letterSpacing:-1.2,lineHeight:1.1}}>Pronto para transformar a gestão da sua empresa?</h2>
+          <p style={{fontFamily:F.b,fontSize:16,color:C.gray500,lineHeight:1.7,margin:"0 0 28px",maxWidth:420}}>Solicite agora um orçamento e obtenha uma solução personalizada para impulsionar o seu negócio.</p>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {["Demonstração 100% gratuita e sem compromisso","Setup completo em até 48 horas","Suporte humanizado com analistas dedicados","Sem cartão de crédito para começar"].map((t,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:22,height:22,borderRadius:6,flexShrink:0,background:"rgba(40,200,64,.08)",display:"flex",alignItems:"center",justifyContent:"center"}}><Check size={13} color="#28c840"/></div>
+                <span style={{fontFamily:F.b,fontSize:14,color:C.gray600}}>{t}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+      <Reveal delay={.1}>
+        <div style={{background:C.white,borderRadius:18,padding:"32px 28px",border:`1px solid ${C.gray100}`,boxShadow:"0 16px 60px rgba(0,0,0,.04)"}}>
+          <h3 style={{fontFamily:F.h,fontSize:19,fontWeight:800,color:C.black,margin:"0 0 22px"}}>Agende sua demonstração</h3>
+          {[{l:"Nome completo",ph:"Seu nome",t:"text"},{l:"E-mail corporativo",ph:"email@empresa.com.br",t:"email"},{l:"WhatsApp",ph:"(00) 00000-0000",t:"tel"}].map((f,i)=>(
+            <div key={i} style={{marginBottom:14}}>
+              <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>{f.l}</label>
+              <input type={f.t} placeholder={f.ph} style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",transition:"border .2s",background:C.white,color:C.black,boxSizing:"border-box"}}
+                onFocus={e=>e.target.style.borderColor=C.orange} onBlur={e=>e.target.style.borderColor=C.gray200}/>
+            </div>
+          ))}
+          <div style={{marginBottom:18}}>
+            <label style={{fontFamily:F.b,fontSize:13,fontWeight:600,color:C.gray600,marginBottom:5,display:"block"}}>Faturamento mensal</label>
+            <select style={{width:"100%",padding:"11px 14px",borderRadius:9,border:`1.5px solid ${C.gray200}`,fontFamily:F.b,fontSize:14,outline:"none",background:C.white,color:C.gray600,cursor:"pointer",boxSizing:"border-box"}}>
+              <option>Selecione uma faixa</option>
+              <option>Abaixo de R$ 200.000</option>
+              <option>R$ 200.000 a R$ 500.000</option>
+              <option>R$ 500.000 a R$ 1.000.000</option>
+              <option>Acima de R$ 1.000.000</option>
+            </select>
+          </div>
+          <button style={{width:"100%",padding:"14px 0",borderRadius:10,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:15,fontWeight:700,cursor:"pointer",transition:"all .2s",boxShadow:"0 4px 16px rgba(255,95,0,.25)"}}
+            onMouseEnter={e=>e.target.style.background=C.orangeHot} onMouseLeave={e=>e.target.style.background=C.orange}>
+            Agendar Demonstração Gratuita
+          </button>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
+
+/* ══════════════ FOOTER (idêntico ao index.html) ══════════════ */
+const Footer = () => (
+  <footer style={{background:C.black,padding:"56px 40px 28px"}}>
+    <div style={{maxWidth:1240,margin:"0 auto"}}>
+      <div className="footer-grid" style={{display:"grid",gridTemplateColumns:"1.6fr 1fr 1fr 1fr 1.2fr",gap:32,marginBottom:48}}>
+        <div>
+          <div style={{marginBottom:14}}><Logo height={36}/></div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.7,maxWidth:220}}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
+          <div style={{display:"flex",gap:16,marginTop:16}}>
+            {[<Mail size={16}/>,<Phone size={16}/>,<MapPin size={16}/>].map((ic,i)=>(
+              <div key={i} style={{width:32,height:32,borderRadius:8,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"center",color:"rgba(255,255,255,.35)",cursor:"pointer",transition:"all .2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.color=C.orange;e.currentTarget.style.borderColor="rgba(255,95,0,.3)";}}
+                onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,.35)";e.currentTarget.style.borderColor="rgba(255,255,255,.06)";}}>
+                {ic}
+              </div>
+            ))}
+          </div>
+        </div>
+        {[
+          {t:"Soluções",ls:["Sistema de Gestão","CRM","IAU — IA","BI (Google)","App Mobile","WMS","M-Commerce"]},
+          {t:"Segmentos",ls:["Indústria","Distribuição","Serviços","Cosméticos","Alimentos","Química","Metalúrgica"]},
+          {t:"Empresa",ls:["Sobre","Blog","Planos","Integrações","Desenvolvimento","Suporte","Contato"]},
+        ].map((col,i)=>(
+          <div key={i}>
+            <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>{col.t}</div>
+            {col.ls.map((l,j)=>(
+              <a key={j} href="#" style={{display:"block",fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.4)",textDecoration:"none",marginBottom:9,transition:"color .15s"}}
+                onMouseEnter={e=>e.target.style.color=C.orange} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,.4)"}>{l}</a>
+            ))}
+          </div>
+        ))}
+        <div>
+          <div style={{fontFamily:F.b,fontSize:11,fontWeight:700,color:"rgba(255,255,255,.2)",textTransform:"uppercase",letterSpacing:2,marginBottom:16}}>Newsletter</div>
+          <p style={{fontFamily:F.b,fontSize:13,color:"rgba(255,255,255,.3)",lineHeight:1.6,marginBottom:12}}>Receba dicas de gestão e novidades do UNO ERP.</p>
+          <input type="email" placeholder="Seu e-mail" style={{width:"100%",padding:"10px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.04)",fontFamily:F.b,fontSize:13,color:C.white,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
+          <button style={{width:"100%",padding:"10px 0",borderRadius:8,border:"none",background:C.orange,color:C.white,fontFamily:F.b,fontSize:13,fontWeight:700,cursor:"pointer"}}>Inscrever-se</button>
+        </div>
+      </div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:20,display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+        <span style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)"}}>© 2025 UNO ERP · Todos os direitos reservados.</span>
+        <div style={{display:"flex",gap:20}}>
+          {["Política de Privacidade","Termos e Condições"].map((t,i)=>(
+            <a key={i} href="#" style={{fontFamily:F.b,fontSize:12,color:"rgba(255,255,255,.18)",textDecoration:"none"}}>{t}</a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ══════════════ APP ══════════════ */
+function SistemaDeGestaoPage() {
+  return (
+    <>
+      <Nav/>
+      <PageHero/>
+      <MarqueeStrip/>
+      <Overview/>
+      <ModulesSection/>
+      <IAUSection/>
+      <Vantagens/>
+      <Integrations/>
+      <Clients/>
+      <CTA/>
+      <Footer/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(SistemaDeGestaoPage));
+</script>
+</body>
+</html>
