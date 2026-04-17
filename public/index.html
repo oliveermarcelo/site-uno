@@ -416,15 +416,15 @@ const Nav = () => {
   return (
     <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: sc ? "rgba(20,20,20,0.95)" : "transparent", backdropFilter: sc ? "blur(16px)" : "none", borderBottom: sc ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent", transition: "all .3s" }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 40px", height: 72, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <a href="#" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+        <a href="/" aria-label="UNO ERP — Página inicial" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
           <Logo height={40} />
         </a>
-        <button className="nav-mobile-btn" onClick={() => setOpen(open === "mobile" ? null : "mobile")} style={{ display: "none", background: "none", border: "none", color: C.white, cursor: "pointer", padding: 8 }}>{open === "mobile" ? <span style={{fontSize:24}}>✕</span> : <span style={{fontSize:24}}>☰</span>}</button>
+        <button className="nav-mobile-btn" aria-label={open === "mobile" ? "Fechar menu" : "Abrir menu"} aria-expanded={open === "mobile"} onClick={() => setOpen(open === "mobile" ? null : "mobile")} style={{ display: "none", background: "none", border: "none", color: C.white, cursor: "pointer", padding: 8 }}>{open === "mobile" ? <span aria-hidden="true" style={{fontSize:24}}>✕</span> : <span aria-hidden="true" style={{fontSize:24}}>☰</span>}</button>
         <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>
           {Object.keys(navLinks).map(k => (
             <div key={k} style={{ position: "relative" }} onMouseEnter={() => setOpen(k)} onMouseLeave={() => setOpen(null)}>
-              <button style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 13px", fontFamily: F.b, fontSize: 13.5, fontWeight: 500, color: open === k ? C.orange : "rgba(255,255,255,.6)", borderRadius: 8, display: "flex", alignItems: "center", gap: 3, transition: ".2s" }}>
-                {k} <ChevronDown size={13} style={{ transition: ".2s", transform: open === k ? "rotate(180deg)" : "none" }} />
+              <button aria-haspopup="menu" aria-expanded={open === k} aria-label={k} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 13px", fontFamily: F.b, fontSize: 13.5, fontWeight: 500, color: open === k ? C.orange : "rgba(255,255,255,.6)", borderRadius: 8, display: "flex", alignItems: "center", gap: 3, transition: ".2s" }}>
+                {k} <ChevronDown size={13} aria-hidden="true" style={{ transition: ".2s", transform: open === k ? "rotate(180deg)" : "none" }} />
               </button>
               {open === k && (
                 <div style={{ position: "absolute", top: "100%", left: 0, width: "100%", height: 12, background: "transparent" }} />
@@ -451,7 +451,7 @@ const Nav = () => {
                   {isBig ? (
                     /* Soluções — 3 column mega menu */
                     <div>
-                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 14px", borderBottom: "1px solid rgba(255,255,255,.06)", marginBottom: 14 }}>
+                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 14px", borderBottom: "1px solid rgba(255,255,255,.06)", marginBottom: 14 }}>
                         Todas as Soluções
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
@@ -471,13 +471,13 @@ const Nav = () => {
                             }}>{item.ic}</div>
                             <div style={{ minWidth: 0 }}>
                               <div style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.white, marginBottom: 2 }}>{item.n}</div>
-                              <div style={{ fontFamily: F.b, fontSize: 11, color: "rgba(255,255,255,.3)", lineHeight: 1.35 }}>{item.d}</div>
+                              <div style={{ fontFamily: F.b, fontSize: 11, color: "rgba(255,255,255,.55)", lineHeight: 1.35 }}>{item.d}</div>
                             </div>
                           </a>
                         ))}
                       </div>
                       <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.25)" }}>Precisa de ajuda para escolher?</span>
+                        <span style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.5)" }}>Precisa de ajuda para escolher?</span>
                         <a href="#contato" style={{ fontFamily: F.b, fontSize: 12, fontWeight: 600, color: C.orange, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
                           Fale com um especialista <ArrowRight size={12} />
                         </a>
@@ -486,7 +486,7 @@ const Nav = () => {
                   ) : (
                     /* Segmentos / Personalização — single column */
                     <div>
-                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 12px" }}>
+                      <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: 2, padding: "4px 10px 12px" }}>
                         {k}
                       </div>
                       {navLinks[k].map((item, i) => (
@@ -504,7 +504,7 @@ const Nav = () => {
                           }}>{item.ic}</div>
                           <div>
                             <div style={{ fontFamily: F.b, fontSize: 13.5, fontWeight: 600, color: C.white }}>{item.n}</div>
-                            <div style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.3)" }}>{item.d}</div>
+                            <div style={{ fontFamily: F.b, fontSize: 11.5, color: "rgba(255,255,255,.55)" }}>{item.d}</div>
                           </div>
                           <ArrowRight size={14} color="rgba(255,255,255,.15)" style={{ marginLeft: "auto" }} />
                         </a>
@@ -534,7 +534,7 @@ const Nav = () => {
         }}>
           {Object.keys(navLinks).map(section => (
             <div key={section} style={{ marginBottom: 20 }}>
-              <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.25)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{section}</div>
+              <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{section}</div>
               {navLinks[section].map((item, i) => (
                 <a key={i} href="#" onClick={() => setOpen(null)} style={{
                   display: "flex", alignItems: "center", gap: 10, padding: "10px 0",
@@ -1603,16 +1603,16 @@ const CTA = () => (
       <Reveal delay={.1}>
         <div style={{ background: C.white, borderRadius: 18, padding: "32px 28px", border: `1px solid ${C.gray100}`, boxShadow: "0 16px 60px rgba(0,0,0,.04)" }}>
           <h3 style={{ fontFamily: F.h, fontSize: 19, fontWeight: 800, color: C.black, margin: "0 0 22px" }}>Agende sua demonstração</h3>
-          {[{ l: "Nome completo", ph: "Seu nome", t: "text" },{ l: "E-mail corporativo", ph: "email@empresa.com.br", t: "email" },{ l: "WhatsApp", ph: "(00) 00000-0000", t: "tel" }].map((f, i) => (
+          {[{ l: "Nome completo", ph: "Seu nome", t: "text", id: "campo-nome" },{ l: "E-mail corporativo", ph: "email@empresa.com.br", t: "email", id: "campo-email" },{ l: "WhatsApp", ph: "(00) 00000-0000", t: "tel", id: "campo-whatsapp" }].map((f, i) => (
             <div key={i} style={{ marginBottom: 14 }}>
-              <label style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>{f.l}</label>
-              <input type={f.t} placeholder={f.ph} style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", transition: "border .2s", background: C.white, color: C.black, boxSizing: "border-box" }}
+              <label htmlFor={f.id} style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>{f.l}</label>
+              <input id={f.id} type={f.t} placeholder={f.ph} style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", transition: "border .2s", background: C.white, color: C.black, boxSizing: "border-box" }}
                 onFocus={e => e.target.style.borderColor = C.orange} onBlur={e => e.target.style.borderColor = C.gray200} />
             </div>
           ))}
           <div style={{ marginBottom: 18 }}>
-            <label style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>Faturamento mensal</label>
-            <select style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", background: C.white, color: C.gray600, cursor: "pointer", boxSizing: "border-box" }}>
+            <label htmlFor="campo-faturamento" style={{ fontFamily: F.b, fontSize: 13, fontWeight: 600, color: C.gray600, marginBottom: 5, display: "block" }}>Faturamento mensal</label>
+            <select id="campo-faturamento" style={{ width: "100%", padding: "11px 14px", borderRadius: 9, border: `1.5px solid ${C.gray200}`, fontFamily: F.b, fontSize: 14, outline: "none", background: C.white, color: C.gray600, cursor: "pointer", boxSizing: "border-box" }}>
               <option>Selecione uma faixa</option><option>Abaixo de R$ 200.000</option><option>R$ 200.000 a R$ 500.000</option><option>R$ 500.000 a R$ 1.000.000</option><option>Acima de R$ 1.000.000</option>
             </select>
           </div>
@@ -1635,7 +1635,7 @@ const Footer = () => (
           <div style={{ marginBottom: 14 }}>
             <Logo height={36} />
           </div>
-          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.3)", lineHeight: 1.7, maxWidth: 220 }}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
+          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.7, maxWidth: 220 }}>Mais de 20 anos transformando a gestão de PMEs brasileiras com tecnologia e inteligência artificial.</p>
           <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
             {[<Mail size={16} />, <Phone size={16} />, <MapPin size={16} />].map((ic, i) => (
               <div key={i} style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,.35)", cursor: "pointer", transition: "all .2s" }}
@@ -1652,7 +1652,7 @@ const Footer = () => (
           { t: "Empresa", ls: ["Sobre","Blog","Planos","Integrações","Desenvolvimento","Suporte","Contato"] },
         ].map((col, i) => (
           <div key={i}>
-            <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.2)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>{col.t}</div>
+            <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>{col.t}</div>
             {col.ls.map((l, j) => (
               <a key={j} href="#" style={{ display: "block", fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.4)", textDecoration: "none", marginBottom: 9, transition: "color .15s" }}
                 onMouseEnter={e => e.target.style.color = C.orange} onMouseLeave={e => e.target.style.color = "rgba(255,255,255,.4)"}>{l}</a>
@@ -1661,17 +1661,18 @@ const Footer = () => (
         ))}
         {/* Newsletter */}
         <div>
-          <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.2)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Newsletter</div>
-          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.3)", lineHeight: 1.6, marginBottom: 12 }}>Receba dicas de gestão e novidades do UNO ERP.</p>
-          <input type="email" placeholder="Seu e-mail" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", fontFamily: F.b, fontSize: 13, color: C.white, outline: "none", marginBottom: 8, boxSizing: "border-box" }} />
+          <div style={{ fontFamily: F.b, fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: 2, marginBottom: 16 }}>Newsletter</div>
+          <p style={{ fontFamily: F.b, fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.6, marginBottom: 12 }}>Receba dicas de gestão e novidades do UNO ERP.</p>
+          <label htmlFor="newsletter-email" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>E-mail para newsletter</label>
+          <input id="newsletter-email" type="email" placeholder="Seu e-mail" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.04)", fontFamily: F.b, fontSize: 13, color: C.white, outline: "none", marginBottom: 8, boxSizing: "border-box" }} />
           <button style={{ width: "100%", padding: "10px 0", borderRadius: 8, border: "none", background: C.orange, color: C.white, fontFamily: F.b, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Inscrever-se</button>
         </div>
       </div>
       <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 20, display: "flex", justifyContent: "space-between" }}>
-        <span style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.18)" }}>© 2025 UNO ERP · Todos os direitos reservados.</span>
+        <span style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.5)" }}>© 2025 UNO ERP · Todos os direitos reservados.</span>
         <div style={{ display: "flex", gap: 20 }}>
           {["Política de Privacidade","Termos e Condições"].map((t, i) => (
-            <a key={i} href="#" style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.18)", textDecoration: "none" }}>{t}</a>
+            <a key={i} href="#" style={{ fontFamily: F.b, fontSize: 12, color: "rgba(255,255,255,.5)", textDecoration: "none" }}>{t}</a>
           ))}
         </div>
       </div>
