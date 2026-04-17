@@ -24,9 +24,10 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-const staticOptions = publicDir === distDir
-  ? { maxAge: "7d", etag: true, lastModified: true }
-  : {};
+const staticOptions = {
+  index: "index.html",
+  ...(publicDir === distDir ? { maxAge: "7d", etag: true, lastModified: true } : {}),
+};
 
 // Static files
 app.use(express.static(publicDir, staticOptions));
