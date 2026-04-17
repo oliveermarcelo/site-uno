@@ -7,22 +7,24 @@ const blogRoutes = require("./routes/blog");
 const integrationRoutes = require("./routes/integrations");
 const pluginRoutes = require("./routes/plugins");
 
+const fs = require("fs");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === "production";
 
-// Em produção serve os arquivos otimizados do build; em dev serve direto de public/
-const publicDir = isProd
-  ? path.join(__dirname, "..", "dist", "public")
-  : path.join(__dirname, "..", "public");
+const distDir = path.join(__dirname, "..", "dist", "public");
+const srcDir  = path.join(__dirname, "..", "public");
+
+// Usa dist/ se existir (pós-build), senão serve direto de public/
+const publicDir = (isProd && fs.existsSync(distDir)) ? distDir : srcDir;
 
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Cache headers para assets estáticos em produção
-const staticOptions = isProd
+const staticOptions = publicDir === distDir
   ? { maxAge: "7d", etag: true, lastModified: true }
   : {};
 
