@@ -114,71 +114,20 @@ function compileJSX(code) {
   return result.code;
 }
 
-// ── Build performance/font head tags ────────────────────────────────────────
-function buildHeadTags(filename) {
+// ── Process one HTML file ────────────────────────────────────────────────────
+function processHtml(content, filename) {
   const seo = SEO[filename] || {};
   const canonicalUrl = seo.canonical ? `${SITE_URL}${seo.canonical}` : SITE_URL;
 
-  const tags = [];
-
-  // Preconnects
-  tags.push(`  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`);
-  tags.push(`  <link rel="preconnect" href="https://cdnjs.cloudflare.com">`);
-
-  // SEO meta tags
-  if (seo.description) {
-    tags.push(`  <meta name="description" content="${seo.description}">`);
-  }
-  if (seo.keywords) {
-    tags.push(`  <meta name="keywords" content="${seo.keywords}">`);
-  }
-  tags.push(`  <meta name="robots" content="index, follow">`);
-  tags.push(`  <link rel="canonical" href="${canonicalUrl}">`);
-
-  // Open Graph
-  tags.push(`  <meta property="og:type" content="website">`);
-  tags.push(`  <meta property="og:url" content="${canonicalUrl}">`);
-  if (seo.description) {
-    tags.push(`  <meta property="og:description" content="${seo.description}">`);
-  }
-  tags.push(`  <meta property="og:image" content="${SITE_URL}/og-image.png">`);
-  tags.push(`  <meta property="og:site_name" content="UNO ERP">`);
-  tags.push(`  <meta property="og:locale" content="pt_BR">`);
-
-  // Twitter Card
-  tags.push(`  <meta name="twitter:card" content="summary_large_image">`);
-  tags.push(`  <meta name="twitter:site" content="@unoerp">`);
-  if (seo.description) {
-    tags.push(`  <meta name="twitter:description" content="${seo.description}">`);
-  }
-  tags.push(`  <meta name="twitter:image" content="${SITE_URL}/og-image.png">`);
-
-  // JSON-LD
-  if (seo.jsonld) {
-    for (const schema of seo.jsonld) {
-      tags.push(
-        `  <script type="application/ld+json">${JSON.stringify(schema)}</script>`
-      );
-    }
-  }
-
-  return tags.join("\n");
-}
-
-// ── Process one HTML file ────────────────────────────────────────────────────
-function processHtml(content, filename) {
   // 1. Remove babel-standalone script tag
-  content = content.replace(
-    /<script[^>]*babel-standalone[^>]*><\/script>\n?/g,
-    ""
-  );
+  content = content.replace(/<script[^>]*babel-standalone[^>]*><\/script>\n?/g, "");
 
   // 2. Swap dev React CDN → production
   for (const [from, to] of CDN_REPLACEMENTS) {
     content = content.replace(from, to);
   }
 
-  // 3. Add defer to GSAP (non-critical animations)
+  // 3. Add defer to GSAP
   content = content.replace(
     /(<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/gsap[^"]*")(>)/g,
     "$1 defer$2"
@@ -189,8 +138,7 @@ function processHtml(content, filename) {
     /<script type="text\/babel">([\s\S]*?)<\/script>/g,
     (_, code) => {
       try {
-        const compiled = compileJSX(code);
-        return `<script>${compiled}</script>`;
+        return `<script>${compileJSX(code)}</script>`;
       } catch (e) {
         console.error(`  ✗ Babel error in ${filename}:`, e.message);
         return `<script type="text/babel">${code}</script>`;
@@ -198,17 +146,65 @@ function processHtml(content, filename) {
     }
   );
 
-  // 5. Inject SEO + performance tags after <head>
-  const headTags = buildHeadTags(filename);
-  content = content.replace("<head>", `<head>\n${headTags}`);
+  // 5. Remove duplicate preconnect for gstatic added by sed (keep only one)
+  content = content.replace(
+    /(<link rel="preconnect" href="https:\/\/fonts\.gstatic\.com"[^>]*>\n?)(?=[\s\S]*<link rel="preconnect" href="https:\/\/fonts\.gstatic\.com")/,
+    ""
+  );
 
-  // 6. Inject og:title matching the page <title>
+  // 6. Extract <title> text for OG tags
   const titleMatch = content.match(/<title>(.*?)<\/title>/);
-  if (titleMatch) {
-    const ogTitle = `  <meta property="og:title" content="${titleMatch[1]}">`;
-    const twitterTitle = `  <meta name="twitter:title" content="${titleMatch[1]}">`;
-    content = content.replace("</title>", `</title>\n${ogTitle}\n${twitterTitle}`);
-  }
+  const pageTitle = titleMatch ? titleMatch[1] : "UNO ERP";
+
+  // 7. Build SEO meta block
+  const jsonldTags = (seo.jsonld || [])
+    .map(s => `  <script type="application/ld+json">${JSON.stringify(s)}</script>`)
+    .join("\n");
+
+  const seoBlock = [
+    `  <meta name="description" content="${seo.description || "UNO ERP — Sistema ERP com IA para PMEs brasileiras."}">`,
+    seo.keywords ? `  <meta name="keywords" content="${seo.keywords}">` : "",
+    `  <meta name="robots" content="index, follow">`,
+    `  <link rel="canonical" href="${canonicalUrl}">`,
+    `  <meta property="og:type" content="website">`,
+    `  <meta property="og:title" content="${pageTitle}">`,
+    `  <meta property="og:url" content="${canonicalUrl}">`,
+    `  <meta property="og:description" content="${seo.description || ""}">`,
+    `  <meta property="og:image" content="${SITE_URL}/og-image.png">`,
+    `  <meta property="og:site_name" content="UNO ERP">`,
+    `  <meta property="og:locale" content="pt_BR">`,
+    `  <meta name="twitter:card" content="summary_large_image">`,
+    `  <meta name="twitter:title" content="${pageTitle}">`,
+    `  <meta name="twitter:description" content="${seo.description || ""}">`,
+    `  <meta name="twitter:image" content="${SITE_URL}/og-image.png">`,
+    jsonldTags,
+  ].filter(Boolean).join("\n");
+
+  // 8. Rebuild <head> in correct order: charset first, then everything else
+  content = content.replace(
+    /<head>[\s\S]*?(<style[\s\S]*)/,
+    (_, styleAndRest) => {
+      // Extract existing <title>
+      const titleTag = titleMatch ? `  <title>${pageTitle}</title>` : "";
+      // Determine if it's the lang attribute already on <html>
+      return `<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  ${titleTag}
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
+${seoBlock}
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  ${styleAndRest}`;
+    }
+  );
 
   return content;
 }
