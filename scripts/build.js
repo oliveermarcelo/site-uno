@@ -204,9 +204,9 @@ ${seoBlock}
     }
   );
 
-  // Move React/ReactDOM para fim do body (não bloqueia renderização do CSS/HTML)
+  // Move React/ReactDOM para antes do script compilado (não bloqueia HTML/CSS mas garante ordem)
   const reactScripts = `<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>\n<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>`;
-  content = content.replace("</body>", `${reactScripts}\n</body>`);
+  content = content.replace(/(<script>[\s\S]*?ReactDOM\.createRoot)/, `${reactScripts}\n$1`);
 
   return content;
 }
