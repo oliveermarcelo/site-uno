@@ -175,7 +175,7 @@ input::placeholder{color:#bbb}
 }
 
 /* Journey section */
-.journey-flow { display: flex; gap: 20px; align-items: flex-start; }
+.journey-flow { display: flex; gap: 20px; align-items: stretch; }
 
 @media (max-width: 900px) {
   .journey-section-pad { padding: 60px 20px 52px !important; }
@@ -1430,7 +1430,7 @@ const IAUSection = () => (
 /* ═══════════ JORNADA IA — DESCOMPLICA SECTION ═══════════ */
 /* ── Journey step — uniform card + circle badge ── */
 const JourneyStep = ({ n, icon, title, items, last = false }) => (
-  <div className="journey-step-col" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+  <div className="journey-step-col" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative", height: "100%" }}>
     {/* ── numbered circle ── */}
     <div className="journey-step-circle" style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#FF5F00 0%,#C84400 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 22px rgba(255,95,0,.55), 0 4px 12px rgba(0,0,0,.5)", zIndex: 1, position: "relative", flexShrink: 0 }}>
       <span style={{ fontFamily: F.h, fontSize: 13, fontWeight: 900, color: "#fff" }}>{n}</span>
@@ -1438,7 +1438,7 @@ const JourneyStep = ({ n, icon, title, items, last = false }) => (
     {/* ── vertical connector (mobile only, hidden on desktop) ── */}
     <div className="journey-step-connector-v" style={{ display: "none", width: 1, height: 20, background: "rgba(255,95,0,.3)" }} />
     {/* ── card ── */}
-    <div className="journey-step-card" style={{ width: "100%", marginTop: 16, background: "rgba(12,6,2,.88)", border: "1px solid rgba(255,95,0,.3)", borderRadius: 16, padding: "18px 16px 20px", display: "flex", flexDirection: "column", gap: 13, backdropFilter: "blur(10px)", boxShadow: "0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)", position: "relative", overflow: "hidden" }}>
+    <div className="journey-step-card" style={{ width: "100%", marginTop: 16, flex: 1, background: "rgba(12,6,2,.88)", border: "1px solid rgba(255,95,0,.3)", borderRadius: 16, padding: "18px 16px 20px", display: "flex", flexDirection: "column", gap: 13, backdropFilter: "blur(10px)", boxShadow: "0 6px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)", position: "relative", overflow: "hidden" }}>
       {/* top glow line */}
       <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 1, background: "linear-gradient(90deg,transparent,rgba(255,95,0,.35),transparent)" }} />
       {/* icon */}
